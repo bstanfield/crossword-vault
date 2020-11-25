@@ -3,7 +3,8 @@ import styles from '../styles/Home.module.css'
 import { getData } from '../lib/data'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
-import Square from '../components/Square'
+import Square from '../components/square'
+import Clue from '../components/clue'
 import useEventListener from '@use-it/event-listener'
 
 // board ratios (temp hardcode)
@@ -71,8 +72,8 @@ const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings) => 
     arr.push({ acrossGrouping, number: gridnums[partial - 1], letter: grid[partial - 1], position: partial })
   }
   const downGroupings = createDownGroupings(crossword)
-  setDownGroupings(downGroupings)
-  setAcrossGroupings(acrossGroupings)
+  setDownGroupings(downGroupings.filter(grouping => grouping.length > 0))
+  setAcrossGroupings(acrossGroupings.filter(grouping => grouping.length > 0))
   return arr
 }
 
@@ -84,6 +85,8 @@ export default function Home({ data }) {
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
   const [filledInput, setFilledInput] = useState(false)
+  // Determines which clue to highlight
+  const [clueIndex, setClueIndex] = useState(false)
 
   const [movementDirection, setMovementDirection] = useState('across')
   const [movementKey, setMovementKey] = useState(false)
@@ -100,10 +103,12 @@ export default function Home({ data }) {
   // Functions for across movement
   // ERROR: Down groupings are shifted over
   useEffect(() => {
+    console.log('movement direction 2: ', movementDirection)
     const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
     if (selectedSquare) {
-      groupingsToUse.map(group => {
+      groupingsToUse.map((group, index) => {
         if (group.includes(selectedSquare)) {
+          setClueIndex(index)
           setHighlightedSquares(group)
         }
       })
@@ -188,7 +193,7 @@ export default function Home({ data }) {
           <div className={classNames(styles.crossword_clues__list)}>
             <h2>Across</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
-              {clues.across.map((clue, index) => (<li onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => { setMovementDirection('across'); setHoveredClue(Number(clue.split('.')[0])) }} key={index} id={index}><strong>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
+              {clues.across.map((clue, index) => (<Clue props={{ index, clue, clueIndex, movementDirection, direction: 'across', setMovementDirection, setHoveredClue }} />))}
             </ul>
           </div>
           <div>
@@ -211,7 +216,7 @@ export default function Home({ data }) {
             </div>
             <h2>Down</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
-              {clues.down.map((clue, index) => (<li onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => { setMovementDirection('down'); setHoveredClue(Number(clue.split('.')[0])) }} key={index} id={index}><strong className={styles.crossword_clues__list__item__number}>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
+              {clues.down.map((clue, index) => (<Clue props={{ index, clue, clueIndex, movementDirection, direction: 'down', setMovementDirection, setHoveredClue }} />))}
             </ul>
           </div>
         </div>

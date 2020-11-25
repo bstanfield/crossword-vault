@@ -60,9 +60,7 @@ export default function Square({ props }) {
   // If user hovers over corresponding clue...
   useEffect(() => {
     if (hoveredClue && hover) {
-      setTimeout(() => {
-        setSelectedSquare(content.position)
-      }, 200)
+      setSelectedSquare(content.position)
     }
   }, [hover])
 
