@@ -79,7 +79,7 @@ export default function Home({ data }) {
   const { crossword } = data
   const { clues } = crossword
   const [board, setBoard] = useState([])
-  const [hoveredClue, setHoveredClue] = useState(0)
+  const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
   const [filledInput, setFilledInput] = useState(false)
@@ -100,6 +100,9 @@ export default function Home({ data }) {
           setHighlightedSquares(group)
         }
       })
+    } else {
+      // Default state with no squares highlighted
+      setHighlightedSquares([])
     }
   }, [selectedSquare])
 
@@ -135,7 +138,7 @@ export default function Home({ data }) {
           <div className={classNames(styles.crossword_clues__list)}>
             <h2>Across</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
-              {clues.across.map((clue, index) => (<li onMouseEnter={() => setHoveredClue(clue.split('.')[0])} key={index} id={index}><strong>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
+              {clues.across.map((clue, index) => (<li onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => setHoveredClue(Number(clue.split('.')[0]))} key={index} id={index}><strong>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
             </ul>
           </div>
           <div>
