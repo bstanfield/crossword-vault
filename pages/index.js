@@ -4,6 +4,10 @@ import { getData } from '../lib/data'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Square from '../components/Square'
+import useEventListener from '@use-it/event-listener'
+
+// Key listener
+const spacebar = 32;
 
 // board ratios (temp hardcode)
 let width = 15
@@ -16,10 +20,10 @@ const createDownGroupings = (crossword) => {
   // how many down clues?
   // const totalAnswers = answers.down.length
   // let assignedAnswers = 0
-  let position = 0
+  let position = 1
   let grouping = []
   while (position <= 225) {
-    if (grid[position] !== '.') {
+    if (grid[position - 1] !== '.') {
       let match = false
       if (grouping.length === 0) {
         grouping.push([position])
@@ -84,6 +88,8 @@ export default function Home({ data }) {
   const [highlightedSquares, setHighlightedSquares] = useState([])
   const [filledInput, setFilledInput] = useState(false)
 
+  const [movementDirection, setMovementDirection] = useState('across')
+
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
 
@@ -93,9 +99,12 @@ export default function Home({ data }) {
     )
   }, [])
 
+  // Functions for across movement
+  // ERROR: Down groupings are shifted over
   useEffect(() => {
+    const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
     if (selectedSquare) {
-      acrossGroupings.map(group => {
+      groupingsToUse.map(group => {
         if (group.includes(selectedSquare)) {
           setHighlightedSquares(group)
         }
@@ -104,7 +113,7 @@ export default function Home({ data }) {
       // Default state with no squares highlighted
       setHighlightedSquares([])
     }
-  }, [selectedSquare])
+  }, [selectedSquare, movementDirection])
 
   useEffect(() => {
     if (filledInput) {
@@ -118,6 +127,14 @@ export default function Home({ data }) {
       }
     }
   }, [filledInput])
+
+  const handler = ({ key }) => {
+    if (key === ' ') {
+      setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
+    }
+  }
+
+  useEventListener('keydown', handler);
 
   return (
     <div className={styles.container}>
@@ -151,6 +168,8 @@ export default function Home({ data }) {
                     highlightedSquares,
                     selectedSquare,
                     filledInput,
+                    movementDirection,
+                    setMovementDirection,
                     setSelectedSquare,
                     setFilledInput
                   }} />

@@ -26,8 +26,8 @@ const squareInput = (content, filled, highlightedSquares) => scale({
   paddingTop: 1,
   fontWeight: 500,
   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
-  backgroundColor: (filled || highlightedSquares.includes(content.position)) ? 'rgba(255, 165, 0, 0.25)' : 'white',
-  transition: 'background-color 0.4s ease-in-out',
+  backgroundColor: (filled || highlightedSquares.includes(content.position)) ? 'rgba(255, 165, 0, 0.15)' : 'white',
+  transition: 'background-color 0.3s ease',
 })
 
 const squareBox = (content, filled, highlightedSquares) => scale({
@@ -38,7 +38,7 @@ const squareBox = (content, filled, highlightedSquares) => scale({
   "border": (filled || highlightedSquares.includes(content.position)) ? '2px solid orange' : '2px solid black',
   zIndex: (filled || highlightedSquares.includes(content.position)) ? 2 : 1,
   "color": "#333333",
-  transition: 'border 0.4s ease-in-out',
+  transition: 'border 0.3s ease',
 })
 
 export default function Square({ props }) {
@@ -47,36 +47,43 @@ export default function Square({ props }) {
     hoveredClue,
     highlightedSquares,
     selectedSquare,
+    movementDirection,
     filledInput,
+    setMovementDirection,
     setSelectedSquare,
     setFilledInput
   } = props
-
-  // console.log('content: ', content)
-  // console.log('perfect content: ', JSON.stringify({
-  //   grouping: [0, 1, 2, 3],
-  //   clueId: 1,
-  //   blockNumber: null,
-  //   letter: 'G',
-  //   position: 2,
-  //   guess: null,
-  // }))
+  const [clickCount, setClickCount] = useState(0)
 
   const hover = content.number === Number(hoveredClue)
 
   // If user hovers over corresponding clue...
   useEffect(() => {
     if (hoveredClue && hover) {
-      setSelectedSquare(content.position)
+      setTimeout(() => {
+        setSelectedSquare(content.position)
+      }, 200)
     }
   }, [hover])
+
+  useEffect(() => {
+    if (clickCount > 1) {
+      setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
+    }
+  }, [clickCount])
+
+  const handleKeyDown = e => {
+    if (e.key === ' ') {
+      e.preventDefault();
+    }
+  };
 
 
   return (
     <div id={content.position} css={squareBox(content, filledInput === content.position, highlightedSquares)} className={classNames(styles.crossword_board__square, content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
       {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
       {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
-      {content.letter !== '.' && <input autoComplete='off' onFocus={() => setSelectedSquare(content.position)} onBlur={() => setSelectedSquare(false)} onClick={() => setSelectedSquare(content.position)} css={squareInput(content, filledInput === content.position, highlightedSquares)} type="text" id={`input-${content.position}`} onChange={(input) => { if (input.nativeEvent.data) setFilledInput(content.position) }} name={content.letter} maxLength={1} />}
+      {content.letter !== '.' && <input onKeyDown={handleKeyDown} autoComplete='off' onFocus={() => setSelectedSquare(content.position)} onBlur={() => { setSelectedSquare(false); setClickCount(0) }} onClick={() => { setSelectedSquare(content.position); setClickCount(clickCount + 1) }} css={squareInput(content, filledInput === content.position, highlightedSquares)} type="text" id={`input-${content.position}`} onChange={(input) => { if (input.nativeEvent.data) setFilledInput(content.position) }} name={content.letter} maxLength={1} />}
     </div>
   )
 }
