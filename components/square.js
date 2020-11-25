@@ -27,7 +27,7 @@ const squareInput = (content, filled, highlightedSquares) => scale({
   fontWeight: 500,
   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
   backgroundColor: (filled || highlightedSquares.includes(content.position)) ? 'rgba(255, 165, 0, 0.15)' : 'white',
-  transition: 'background-color 0.3s ease',
+  transition: 'background-color 0.1s ease-in-out',
 })
 
 const squareBox = (content, filled, highlightedSquares) => scale({
@@ -38,7 +38,7 @@ const squareBox = (content, filled, highlightedSquares) => scale({
   "border": (filled || highlightedSquares.includes(content.position)) ? '2px solid orange' : '2px solid black',
   zIndex: (filled || highlightedSquares.includes(content.position)) ? 2 : 1,
   "color": "#333333",
-  transition: 'border 0.3s ease',
+  transition: 'border 0.1s ease-in-out',
 })
 
 export default function Square({ props }) {

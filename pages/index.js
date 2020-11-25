@@ -6,9 +6,6 @@ import { useEffect, useState } from 'react'
 import Square from '../components/Square'
 import useEventListener from '@use-it/event-listener'
 
-// Key listener
-const spacebar = 32;
-
 // board ratios (temp hardcode)
 let width = 15
 let height = 15
@@ -89,6 +86,7 @@ export default function Home({ data }) {
   const [filledInput, setFilledInput] = useState(false)
 
   const [movementDirection, setMovementDirection] = useState('across')
+  const [movementKey, setMovementKey] = useState(false)
 
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
@@ -129,10 +127,45 @@ export default function Home({ data }) {
   }, [filledInput])
 
   const handler = ({ key }) => {
+    // Spacebar changes movement direction
     if (key === ' ') {
       setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
     }
+
+    if (key === 'ArrowRight') {
+      setMovementKey(key)
+    }
+    if (key === 'ArrowLeft') {
+      setMovementKey(key)
+    }
+
   }
+
+  // Only works for right arrow key
+  // Might want to make this _clue agnostic_ (just move to the next grid point)
+  useEffect(() => {
+    if (movementKey) {
+      if (movementKey === 'ArrowRight') {
+        const currentLocation = highlightedSquares.indexOf(selectedSquare)
+        const nextLocation = highlightedSquares[currentLocation + 1]
+
+        if (highlightedSquares.indexOf(nextLocation) !== -1) {
+          document.getElementById(`input-${nextLocation}`).focus();
+        }
+      }
+
+      if (movementKey === 'ArrowLeft') {
+        const currentLocation = highlightedSquares.indexOf(selectedSquare)
+        const nextLocation = highlightedSquares[currentLocation - 1]
+
+        if (highlightedSquares.indexOf(nextLocation) !== -1) {
+          document.getElementById(`input-${nextLocation}`).focus();
+        }
+      }
+
+      setMovementKey(false)
+    }
+  }, [movementKey])
 
   useEventListener('keydown', handler);
 
@@ -155,7 +188,7 @@ export default function Home({ data }) {
           <div className={classNames(styles.crossword_clues__list)}>
             <h2>Across</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
-              {clues.across.map((clue, index) => (<li onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => setHoveredClue(Number(clue.split('.')[0]))} key={index} id={index}><strong>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
+              {clues.across.map((clue, index) => (<li onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => { setMovementDirection('across'); setHoveredClue(Number(clue.split('.')[0])) }} key={index} id={index}><strong>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
             </ul>
           </div>
           <div>
@@ -178,7 +211,7 @@ export default function Home({ data }) {
             </div>
             <h2>Down</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
-              {clues.down.map((clue, index) => (<li key={index} id={index}><strong className={styles.crossword_clues__list__item__number}>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
+              {clues.down.map((clue, index) => (<li onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => { setMovementDirection('down'); setHoveredClue(Number(clue.split('.')[0])) }} key={index} id={index}><strong className={styles.crossword_clues__list__item__number}>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>))}
             </ul>
           </div>
         </div>
