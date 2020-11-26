@@ -89,7 +89,11 @@ export default function Home({ data }) {
   const [clueIndex, setClueIndex] = useState(false)
 
   const [movementDirection, setMovementDirection] = useState('across')
+
+  // Keyboard shortcuts
+  const [backspace, setBackspace] = useState(false)
   const [movementKey, setMovementKey] = useState(false)
+  const [previousKey, setPreviousKey] = useState(false)
 
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
@@ -103,7 +107,6 @@ export default function Home({ data }) {
   // Functions for across movement
   // ERROR: Down groupings are shifted over
   useEffect(() => {
-    console.log('movement direction 2: ', movementDirection)
     const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
     if (selectedSquare) {
       groupingsToUse.map((group, index) => {
@@ -114,10 +117,12 @@ export default function Home({ data }) {
       })
     } else {
       // Default state with no squares highlighted
-      setHighlightedSquares([])
+      // This doesn't work rn
+      // setHighlightedSquares([])
     }
   }, [selectedSquare, movementDirection])
 
+  // Moves user to next input
   useEffect(() => {
     if (filledInput) {
       const currentLocation = highlightedSquares.indexOf(filledInput)
@@ -131,6 +136,20 @@ export default function Home({ data }) {
     }
   }, [filledInput])
 
+  useEffect(() => {
+    if (backspace) {
+      console.log('backspace detected!')
+      const currentLocation = highlightedSquares.indexOf(selectedSquare)
+      const nextLocation = highlightedSquares[currentLocation - 1]
+
+      if (highlightedSquares.indexOf(nextLocation) !== -1) {
+        document.getElementById(`input-${nextLocation}`).focus();
+      }
+      // Reset
+      setBackspace(false)
+    }
+  }, [backspace])
+
   const handler = ({ key }) => {
     // Spacebar changes movement direction
     if (key === ' ') {
@@ -140,10 +159,18 @@ export default function Home({ data }) {
     if (key === 'ArrowRight') {
       setMovementKey(key)
     }
+
     if (key === 'ArrowLeft') {
       setMovementKey(key)
     }
 
+    if (key === 'Tab') {
+      setMovementKey(key)
+    }
+
+    if (key === 'Shift') {
+      setMovementKey(key)
+    }
   }
 
   // Only works for right arrow key
@@ -168,11 +195,40 @@ export default function Home({ data }) {
         }
       }
 
+      // ONLY WORKS FOR ACROSS
+      if (movementKey === 'Tab') {
+        const nextClue = clueIndex + 1
+        setClueIndex(nextClue)
+        setHighlightedSquares(acrossGroupings[nextClue])
+        const nextLocation = acrossGroupings[nextClue][0]
+        document.getElementById(`input-${nextLocation}`).focus();
+      }
+
+      // Really jank solution for modifier keys
+      if (previousKey === 'Shift' && movementKey === 'Tab') {
+        const previousClue = clueIndex - 1
+        setClueIndex(previousClue)
+        setHighlightedSquares(acrossGroupings[previousClue])
+        const previousLocation = acrossGroupings[previousClue][0]
+        document.getElementById(`input-${previousLocation}`).focus();
+      }
+
       setMovementKey(false)
+      setPreviousKey(movementKey)
     }
   }, [movementKey])
 
   useEventListener('keydown', handler);
+
+  // Alternative keydown method
+  // TODO: Transition to this!
+  useEffect(() => {
+    document.addEventListener('keydown', function (event) {
+      if (event.shiftKey && event.key === 'Tab') {
+        alert('Back!');
+      }
+    });
+  }, [])
 
   return (
     <div className={styles.container}>
@@ -207,6 +263,7 @@ export default function Home({ data }) {
                     selectedSquare,
                     filledInput,
                     movementDirection,
+                    setBackspace,
                     setMovementDirection,
                     setSelectedSquare,
                     setFilledInput
