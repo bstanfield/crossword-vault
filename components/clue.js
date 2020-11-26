@@ -7,7 +7,12 @@ import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
 const clueStyle = (highlight) => scale({
-  backgroundColor: highlight && 'orange',
+  backgroundColor: highlight && 'rgba(255, 165, 0, 0.35)',
+  padding: '5px 10px',
+  border: highlight ? '2px solid rgba(255, 165, 0, 1)' : '2px solid transparent',
+  borderRadius: 4,
+  transition: 'all 0.2s ease',
+  transitionProperty: 'background-color, border'
 });
 
 export default function Clue({ props }) {
@@ -36,6 +41,6 @@ export default function Clue({ props }) {
   }, [clueIndex, movementDirection])
 
   return (
-    <li css={clueStyle(highlight)} onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => { setMovementDirection(direction); setHoveredClue(Number(clue.split('.')[0])) }} key={index} id={index}><strong>{clue.split('.')[0]}.</strong> {clue.split('.')[1]}</li>
+    <li css={clueStyle(highlight)} onMouseLeave={() => setHoveredClue(false)} onMouseEnter={() => { setMovementDirection(direction); setHoveredClue(Number(clue.split('.')[0])) }} id={`${index}-${direction}`}><strong>{clue.split('.')[0]}.</strong> {clue.substring(clue.indexOf('.') + 1)}</li>
   )
 }

@@ -87,6 +87,8 @@ export default function Home({ data }) {
   const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
   const [clueIndex, setClueIndex] = useState(false)
+  // Is a square focused?
+  const [focus, setFocus] = useState(false)
 
   const [movementDirection, setMovementDirection] = useState('across')
 
@@ -113,6 +115,13 @@ export default function Home({ data }) {
         if (group.includes(selectedSquare)) {
           setClueIndex(index)
           setHighlightedSquares(group)
+          if (!hoveredClue) {
+            console.log('scrolling into view!', `${index}-${movementDirection}`)
+            const clue = document.getElementById(`${index}-${movementDirection}`)
+            if (clue) {
+              clue.scrollIntoView({ behavior: 'smooth' })
+            }
+          }
         }
       })
     } else {
@@ -129,7 +138,7 @@ export default function Home({ data }) {
       const nextLocation = highlightedSquares[currentLocation + 1]
 
       if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus();
+        document.getElementById(`input-${nextLocation}`).focus()
       } else {
         setFilledInput(false)
       }
@@ -143,7 +152,7 @@ export default function Home({ data }) {
       const nextLocation = highlightedSquares[currentLocation - 1]
 
       if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus();
+        document.getElementById(`input-${nextLocation}`).focus()
       }
       // Reset
       setBackspace(false)
@@ -182,7 +191,7 @@ export default function Home({ data }) {
         const nextLocation = highlightedSquares[currentLocation + 1]
 
         if (highlightedSquares.indexOf(nextLocation) !== -1) {
-          document.getElementById(`input-${nextLocation}`).focus();
+          document.getElementById(`input-${nextLocation}`).focus()
         }
       }
 
@@ -191,7 +200,7 @@ export default function Home({ data }) {
         const nextLocation = highlightedSquares[currentLocation - 1]
 
         if (highlightedSquares.indexOf(nextLocation) !== -1) {
-          document.getElementById(`input-${nextLocation}`).focus();
+          document.getElementById(`input-${nextLocation}`).focus()
         }
       }
 
@@ -201,33 +210,33 @@ export default function Home({ data }) {
         setClueIndex(nextClue)
         setHighlightedSquares(acrossGroupings[nextClue])
         const nextLocation = acrossGroupings[nextClue][0]
-        document.getElementById(`input-${nextLocation}`).focus();
+        document.getElementById(`input-${nextLocation}`).focus()
       }
 
       // Really jank solution for modifier keys
-      if (previousKey === 'Shift' && movementKey === 'Tab') {
-        const previousClue = clueIndex - 1
-        setClueIndex(previousClue)
-        setHighlightedSquares(acrossGroupings[previousClue])
-        const previousLocation = acrossGroupings[previousClue][0]
-        document.getElementById(`input-${previousLocation}`).focus();
-      }
+      // if (previousKey === 'Shift' && movementKey === 'Tab') {
+      //   const previousClue = clueIndex - 1
+      //   setClueIndex(previousClue)
+      //   setHighlightedSquares(acrossGroupings[previousClue])
+      //   const previousLocation = acrossGroupings[previousClue][0]
+      //   document.getElementById(`input-${previousLocation}`).focus()
+      // }
 
       setMovementKey(false)
       setPreviousKey(movementKey)
     }
   }, [movementKey])
 
-  useEventListener('keydown', handler);
+  useEventListener('keydown', handler)
 
   // Alternative keydown method
   // TODO: Transition to this!
   useEffect(() => {
     document.addEventListener('keydown', function (event) {
       if (event.shiftKey && event.key === 'Tab') {
-        alert('Back!');
+        console.log('Shift+Tab!')
       }
-    });
+    })
   }, [])
 
   return (
@@ -246,34 +255,36 @@ export default function Home({ data }) {
         <br />
 
         <div className={styles.crossword_board__container}>
+          <div className={styles.crossword_board}>
+            {board.map(
+              (content, index) => (
+                <Square key={index} props={{
+                  content,
+                  hoveredClue,
+                  highlightedSquares,
+                  selectedSquare,
+                  filledInput,
+                  movementDirection,
+                  setFocus,
+                  setBackspace,
+                  setMovementDirection,
+                  setSelectedSquare,
+                  setFilledInput
+                }} />
+              )
+            )}
+          </div>
+
           <div className={classNames(styles.crossword_clues__list)}>
             <h2>Across</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
-              {clues.across.map((clue, index) => (<Clue props={{ index, clue, clueIndex, movementDirection, direction: 'across', setMovementDirection, setHoveredClue }} />))}
+              {clues.across.map((clue, index) => (<Clue key={index} props={{ index, clue, clueIndex, movementDirection, direction: 'across', setMovementDirection, setHoveredClue }} />))}
             </ul>
           </div>
-          <div>
-            <div className={styles.crossword_board}>
-              {board.map(
-                (content, index) => (
-                  <Square key={index} props={{
-                    content,
-                    hoveredClue,
-                    highlightedSquares,
-                    selectedSquare,
-                    filledInput,
-                    movementDirection,
-                    setBackspace,
-                    setMovementDirection,
-                    setSelectedSquare,
-                    setFilledInput
-                  }} />
-                )
-              )}
-            </div>
+          <div className={classNames(styles.crossword_clues__list)}>
             <h2>Down</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
-              {clues.down.map((clue, index) => (<Clue props={{ index, clue, clueIndex, movementDirection, direction: 'down', setMovementDirection, setHoveredClue }} />))}
+              {clues.down.map((clue, index) => (<Clue key={index} props={{ index, clue, clueIndex, movementDirection, direction: 'down', setMovementDirection, setHoveredClue }} />))}
             </ul>
           </div>
         </div>
