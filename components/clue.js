@@ -21,6 +21,7 @@ export default function Clue({ props }) {
     clue,
     clueIndex,
     direction,
+    setFocus,
     movementDirection,
     setMovementDirection,
     setHoveredClue
@@ -38,6 +39,9 @@ export default function Clue({ props }) {
     } else {
       setHighlight(false)
     }
+
+    // TODO: If focus isn't on current clue, then remove focus
+    // setFocus(false)
   }, [clueIndex, movementDirection])
 
   return (

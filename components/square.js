@@ -12,7 +12,18 @@ const blockNumber = scale({
   fontSize: 10
 });
 
-const squareInput = (content, filled, highlightedSquares) => scale({
+const setBackgroundColor = (filled, highlightedSquares, content, focus) => {
+  if (focus === content.position) {
+    return '#7575f9'
+  }
+  if (filled || highlightedSquares.includes(content.position)) {
+    return 'rgba(255, 165, 0, 0.35)'
+  }
+  return 'white'
+}
+
+const squareInput = (content, filled, highlightedSquares, focus) => scale({
+  caretColor: 'transparent',
   outlineWidth: 0,
   border: 'none',
   width: '100%',
@@ -26,8 +37,8 @@ const squareInput = (content, filled, highlightedSquares) => scale({
   paddingTop: 1,
   fontWeight: 500,
   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
-  backgroundColor: (filled || highlightedSquares.includes(content.position)) ? 'rgba(255, 165, 0, 0.35)' : 'white',
-  transition: 'background-color 0.1s ease-in-out',
+  backgroundColor: setBackgroundColor(filled, highlightedSquares, content, focus),
+  // transition: 'background-color 0.1s ease-in-out',
 })
 
 const squareBox = (filled, highlight) => scale({
@@ -35,10 +46,9 @@ const squareBox = (filled, highlight) => scale({
   "padding": "0",
   "marginLeft": "-2px",
   "marginBottom": "-2px",
-  // "border": (filled || highlight) ? '2px solid orange' : '2px solid black',
   zIndex: (filled || highlight) ? 2 : 1,
   "color": "#333333",
-  transition: 'border 0.1s ease-in-out',
+  // transition: 'border 0.1s ease-in-out',
 })
 
 export default function Square({ props }) {
@@ -49,6 +59,7 @@ export default function Square({ props }) {
     selectedSquare,
     movementDirection,
     filledInput,
+    focus,
     setFocus,
     setMovementDirection,
     setSelectedSquare,
@@ -89,9 +100,7 @@ export default function Square({ props }) {
 
     if (e.key === 'Backspace') {
       // This is a dumb method. Just see if the box is empty. If it is, move back
-      console.log('input data: ', inputData)
       if (!inputData) {
-        console.log('Setting backspace to true')
         setBackspace(true)
       }
       setInputData('')
@@ -105,7 +114,7 @@ export default function Square({ props }) {
     <div id={content.position} css={squareBox(filledInput === content.position, highlight)} className={classNames(styles.crossword_board__square, content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
       {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
       {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
-      {content.letter !== '.' && <input onKeyDown={handleKeyDown} autoComplete='off' onFocus={() => { setFocus(content.position); setSelectedSquare(content.position) }} onBlur={() => { setSelectedSquare(false); setClickCount(0) }} onClick={() => { setSelectedSquare(content.position); setClickCount(clickCount + 1) }} css={squareInput(content, filledInput === content.position, highlightedSquares)} type="text" id={`input-${content.position}`} value={inputData} onChange={(input) => { if (input.nativeEvent.data) { setInputData(input.nativeEvent.data); setFilledInput(content.position) } }} name={content.letter} />}
+      {content.letter !== '.' && <input onKeyDown={handleKeyDown} autoComplete='off' onFocus={() => { setFocus(content.position); setSelectedSquare(content.position) }} onBlur={() => { setSelectedSquare(false); setClickCount(0) }} onClick={() => { setSelectedSquare(content.position); setClickCount(clickCount + 1) }} css={squareInput(content, filledInput === content.position, highlightedSquares, focus)} type="text" id={`input-${content.position}`} value={inputData} onChange={(input) => { if (input.nativeEvent.data) { setInputData(input.nativeEvent.data); setFilledInput(content.position) } }} name={content.letter} />}
     </div>
   )
 }

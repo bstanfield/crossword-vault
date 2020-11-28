@@ -5,7 +5,6 @@ import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
-import useEventListener from '@use-it/event-listener'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -95,7 +94,6 @@ export default function Home({ data }) {
   // Keyboard shortcuts
   const [backspace, setBackspace] = useState(false)
   const [movementKey, setMovementKey] = useState(false)
-  const [previousKey, setPreviousKey] = useState(false)
 
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
@@ -116,7 +114,6 @@ export default function Home({ data }) {
           setClueIndex(index)
           setHighlightedSquares(group)
           if (!hoveredClue) {
-            console.log('scrolling into view!', `${index}-${movementDirection}`)
             const clue = document.getElementById(`${index}-${movementDirection}`)
             if (clue) {
               clue.scrollIntoView({ behavior: 'smooth' })
@@ -147,7 +144,6 @@ export default function Home({ data }) {
 
   useEffect(() => {
     if (backspace) {
-      console.log('backspace detected!')
       const currentLocation = highlightedSquares.indexOf(selectedSquare)
       const nextLocation = highlightedSquares[currentLocation - 1]
 
@@ -159,48 +155,21 @@ export default function Home({ data }) {
     }
   }, [backspace])
 
-  const handler = ({ key }) => {
-    // Spacebar changes movement direction
-    if (key === ' ') {
-      setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
-    }
-
-    if (key === 'ArrowRight') {
-      setMovementKey(key)
-    }
-
-    if (key === 'ArrowLeft') {
-      setMovementKey(key)
-    }
-
-    if (key === 'Tab') {
-      setMovementKey(key)
-    }
-
-    if (key === 'Shift') {
-      setMovementKey(key)
-    }
-  }
-
   // Only works for right arrow key
   // Might want to make this _clue agnostic_ (just move to the next grid point)
   useEffect(() => {
     if (movementKey) {
-      if (movementKey === 'ArrowRight') {
-        const currentLocation = highlightedSquares.indexOf(selectedSquare)
-        const nextLocation = highlightedSquares[currentLocation + 1]
-
-        if (highlightedSquares.indexOf(nextLocation) !== -1) {
-          document.getElementById(`input-${nextLocation}`).focus()
-        }
-      }
-
-      if (movementKey === 'ArrowLeft') {
-        const currentLocation = highlightedSquares.indexOf(selectedSquare)
-        const nextLocation = highlightedSquares[currentLocation - 1]
-
-        if (highlightedSquares.indexOf(nextLocation) !== -1) {
-          document.getElementById(`input-${nextLocation}`).focus()
+      // Sets each arrow keys movements in the grid
+      const arrowKeys = { 'ArrowRight': 1, 'ArrowLeft': -1, 'ArrowUp': -15, 'ArrowDown': 15 }
+      if (movementKey.includes('Arrow')) {
+        // Instead of next location within highlighted squares, just next location on
+        // board and determine if there should be a new set of highlighted squares (new clue)
+        if (selectedSquare) {
+          const nextLocation = selectedSquare + arrowKeys[movementKey]
+          const nextLocationInput = document.getElementById(`input-${nextLocation}`)
+          if (nextLocationInput) {
+            document.getElementById(`input-${nextLocation}`).focus()
+          }
         }
       }
 
@@ -213,28 +182,54 @@ export default function Home({ data }) {
         document.getElementById(`input-${nextLocation}`).focus()
       }
 
-      // Really jank solution for modifier keys
-      // if (previousKey === 'Shift' && movementKey === 'Tab') {
-      //   const previousClue = clueIndex - 1
-      //   setClueIndex(previousClue)
-      //   setHighlightedSquares(acrossGroupings[previousClue])
-      //   const previousLocation = acrossGroupings[previousClue][0]
-      //   document.getElementById(`input-${previousLocation}`).focus()
-      // }
+      // This is working properly but something is fucking it up
+      if (movementKey === 'Shift+Tab') {
+        const previousClue = clueIndex - 1
+        setClueIndex(previousClue)
+        setHighlightedSquares(acrossGroupings[previousClue])
+        const previousLocation = acrossGroupings[previousClue][0]
+        document.getElementById(`input-${previousLocation}`).focus()
+      }
+
+      if (movementKey === ' ') {
+        setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
+      }
 
       setMovementKey(false)
-      setPreviousKey(movementKey)
     }
   }, [movementKey])
 
-  useEventListener('keydown', handler)
-
-  // Alternative keydown method
-  // TODO: Transition to this!
   useEffect(() => {
+    // Why not just set every key to state?
     document.addEventListener('keydown', function (event) {
+      // console.log('arrow: ', event.key)
+
+      // Toggle back and forth between words
       if (event.shiftKey && event.key === 'Tab') {
-        console.log('Shift+Tab!')
+        setMovementKey('Shift+Tab')
+      } else if (event.key === 'Tab') {
+        setMovementKey(event.key)
+      }
+
+      // Spacebar toggles movement direction (across or down)
+      if (event.key === ' ') {
+        setMovementKey(event.key)
+      }
+
+      if (event.key === 'ArrowRight') {
+        setMovementKey(event.key)
+      }
+
+      if (event.key === 'ArrowLeft') {
+        setMovementKey(event.key)
+      }
+
+      if (event.key === 'ArrowUp') {
+        setMovementKey(event.key)
+      }
+
+      if (event.key === 'ArrowDown') {
+        setMovementKey(event.key)
       }
     })
   }, [])
@@ -265,6 +260,7 @@ export default function Home({ data }) {
                   selectedSquare,
                   filledInput,
                   movementDirection,
+                  focus,
                   setFocus,
                   setBackspace,
                   setMovementDirection,
@@ -278,13 +274,13 @@ export default function Home({ data }) {
           <div className={classNames(styles.crossword_clues__list)}>
             <h2>Across</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
-              {clues.across.map((clue, index) => (<Clue key={index} props={{ index, clue, clueIndex, movementDirection, direction: 'across', setMovementDirection, setHoveredClue }} />))}
+              {clues.across.map((clue, index) => (<Clue key={index} props={{ index, clue, clueIndex, movementDirection, direction: 'across', setMovementDirection, setHoveredClue, setFocus }} />))}
             </ul>
           </div>
           <div className={classNames(styles.crossword_clues__list)}>
             <h2>Down</h2>
             <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
-              {clues.down.map((clue, index) => (<Clue key={index} props={{ index, clue, clueIndex, movementDirection, direction: 'down', setMovementDirection, setHoveredClue }} />))}
+              {clues.down.map((clue, index) => (<Clue key={index} props={{ index, clue, clueIndex, movementDirection, direction: 'down', setMovementDirection, setHoveredClue, setFocus }} />))}
             </ul>
           </div>
         </div>
