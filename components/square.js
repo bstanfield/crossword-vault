@@ -60,11 +60,15 @@ export default function Square({ props }) {
     movementDirection,
     filledInput,
     focus,
+    guesses,
+    uploadGuess,
+    setUploadGuess,
     setFocus,
     setMovementDirection,
     setSelectedSquare,
     setFilledInput,
-    setBackspace
+    setBackspace,
+    setGuesses
   } = props
   const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
@@ -136,6 +140,10 @@ export default function Square({ props }) {
             setInputData(input.nativeEvent.data)
             setSelectionIterator(selectionIterator + 1)
             setFilledInput({ position: content.position, iterator: selectionIterator })
+            let newGuesses = guesses
+            newGuesses[content.position - 1] = input.nativeEvent.data
+            setGuesses(newGuesses)
+            setUploadGuess(uploadGuess ? false : true)
           }
         }}
         name={content.letter} />}

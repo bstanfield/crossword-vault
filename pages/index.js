@@ -41,13 +41,22 @@ const createDownGroupings = (crossword) => {
   return grouping
 }
 
-const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings) => {
+const instantiateGuesses = (grid) => grid.map(item => {
+  if (item === '.') {
+    return false
+  } else {
+    return null
+  }
+})
+
+const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings, setGuesses) => {
   const { grid, gridnums } = crossword
   let partial = 0
   let arr = []
   let acrossGrouping = []
   let acrossGroupings = []
   let rowPosition = 0
+  let guesses = []
 
   while (partial < total) {
     partial++
@@ -78,8 +87,9 @@ const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings) => 
 
 export default function Home({ data }) {
   const { crossword } = data
-  const { clues } = crossword
+  const { grid, clues } = crossword
   const [board, setBoard] = useState([])
+  const [guesses, setGuesses] = useState(instantiateGuesses(grid))
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
@@ -92,6 +102,8 @@ export default function Home({ data }) {
   const [newFocus, setNewFocus] = useState(false)
   // Milliseconds for lockout of clue hover
   const [lockout, setLockout] = useState(false)
+  // HACK
+  const [uploadGuess, setUploadGuess] = useState(false)
 
   const [movementDirection, setMovementDirection] = useState('across')
 
@@ -104,7 +116,7 @@ export default function Home({ data }) {
 
   useEffect(() => {
     setBoard(
-      createBoard(crossword, totalSquares, setDownGroupings, setAcrossGroupings)
+      createBoard(crossword, totalSquares, setDownGroupings, setAcrossGroupings, setGuesses)
     )
   }, [])
 
@@ -231,6 +243,10 @@ export default function Home({ data }) {
     })
   }, [])
 
+  useEffect(() => {
+    console.log('guesses: ', guesses)
+  }, [uploadGuess])
+
   return (
     <div className={styles.container}>
       <Head>
@@ -257,12 +273,16 @@ export default function Home({ data }) {
                   selectedSquare,
                   filledInput,
                   movementDirection,
+                  guesses,
                   focus,
+                  uploadGuess,
+                  setUploadGuess,
                   setFocus,
                   setBackspace,
                   setMovementDirection,
                   setSelectedSquare,
-                  setFilledInput
+                  setFilledInput,
+                  setGuesses
                 }} />
               )
             )}
