@@ -5,6 +5,8 @@ import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
+import socketIOClient from 'socket.io-client';
+const ENDPOINT = 'http://127.0.0.1:4001';
 
 // board ratios (temp hardcode)
 let width = 15
@@ -113,6 +115,23 @@ export default function Home({ data }) {
 
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
+
+  // API
+  const [response, setResponse] = useState('');
+
+  useEffect(() => {
+    const socket = socketIOClient(ENDPOINT);
+    socket.on('FromAPI', data => {
+      setResponse(data);
+    });
+
+    // CLEAN UP THE EFFECT
+    return () => socket.disconnect();
+  }, []);
+
+  useEffect(() => {
+    console.log('response: ', response)
+  }, [response])
 
   useEffect(() => {
     setBoard(
