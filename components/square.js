@@ -14,7 +14,7 @@ const blockNumber = scale({
 
 const setBackgroundColor = (filled, highlightedSquares, content, focus) => {
   if (focus === content.position) {
-    return '#7575f9'
+    return '#7cc9ff'
   }
   if (filled || highlightedSquares.includes(content.position)) {
     return 'rgba(255, 165, 0, 0.35)'
@@ -69,6 +69,7 @@ export default function Square({ props }) {
   const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
   const [inputData, setInputData] = useState('')
+  const [selectionIterator, setSelectionIterator] = useState(0)
 
   const hover = content.number === Number(hoveredClue)
 
@@ -114,7 +115,30 @@ export default function Square({ props }) {
     <div id={content.position} css={squareBox(filledInput === content.position, highlight)} className={classNames(styles.crossword_board__square, content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
       {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
       {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
-      {content.letter !== '.' && <input onKeyDown={handleKeyDown} autoComplete='off' onFocus={() => { setFocus(content.position); setSelectedSquare(content.position) }} onBlur={() => { setSelectedSquare(false); setClickCount(0) }} onClick={() => { setSelectedSquare(content.position); setClickCount(clickCount + 1) }} css={squareInput(content, filledInput === content.position, highlightedSquares, focus)} type="text" id={`input-${content.position}`} value={inputData} onChange={(input) => { if (input.nativeEvent.data) { setInputData(input.nativeEvent.data); setFilledInput(content.position) } }} name={content.letter} />}
+      {content.letter !== '.' && <input
+        onKeyDown={handleKeyDown}
+        autoComplete='off'
+        onFocus={() => {
+          setFocus(content.position)
+          setSelectedSquare(content.position)
+        }}
+        onBlur={() => { setClickCount(0) }}
+        onClick={() => {
+          setSelectedSquare(content.position)
+          setClickCount(clickCount + 1)
+        }}
+        css={squareInput(content, filledInput === content.position, highlightedSquares, focus)}
+        type="text"
+        id={`input-${content.position}`}
+        value={inputData}
+        onChange={(input) => {
+          if (input.nativeEvent.data) {
+            setInputData(input.nativeEvent.data)
+            setSelectionIterator(selectionIterator + 1)
+            setFilledInput({ position: content.position, iterator: selectionIterator })
+          }
+        }}
+        name={content.letter} />}
     </div>
   )
 }
