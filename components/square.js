@@ -12,17 +12,26 @@ const blockNumber = scale({
   fontSize: 10
 });
 
-const setBackgroundColor = (filled, highlightedSquares, content, focus) => {
+const setBackgroundColor = (filled, highlightedSquares, content, focus, guestHighlights) => {
   if (focus === content.position) {
     return '#7cc9ff'
   }
   if (filled || highlightedSquares.includes(content.position)) {
     return 'rgba(255, 165, 0, 0.35)'
   }
+  for (const [id, obj] of Object.entries(guestHighlights)) {
+    const { color, squares } = obj
+    if (squares.includes(content.position)) {
+      return color
+    }
+  }
+  // if (guestHighlights[content.position]) {
+  //   return 'red'
+  // }
   return 'white'
 }
 
-const squareInput = (content, filled, highlightedSquares, focus) => scale({
+const squareInput = (content, filled, highlightedSquares, focus, guestHighlights) => scale({
   caretColor: 'transparent',
   outlineWidth: 0,
   border: 'none',
@@ -37,7 +46,7 @@ const squareInput = (content, filled, highlightedSquares, focus) => scale({
   paddingTop: 1,
   fontWeight: 500,
   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
-  backgroundColor: setBackgroundColor(filled, highlightedSquares, content, focus),
+  backgroundColor: setBackgroundColor(filled, highlightedSquares, content, focus, guestHighlights),
   // transition: 'background-color 0.1s ease-in-out',
 })
 
@@ -62,6 +71,7 @@ export default function Square({ props }) {
     focus,
     guesses,
     uploadGuess,
+    guestHighlights,
     setUploadGuess,
     setFocus,
     setMovementDirection,
@@ -139,7 +149,7 @@ export default function Square({ props }) {
           setSelectedSquare(content.position)
           setClickCount(clickCount + 1)
         }}
-        css={squareInput(content, filledInput === content.position, highlightedSquares, focus)}
+        css={squareInput(content, filledInput === content.position, highlightedSquares, focus, guestHighlights)}
         type="text"
         id={`input-${content.position}`}
         value={inputData}

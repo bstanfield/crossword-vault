@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
-// const ENDPOINT = 'http://127.0.0.1:4001';
-const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+const ENDPOINT = 'http://127.0.0.1:4001';
+// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -121,13 +121,22 @@ export default function Home({ data }) {
   const [response, setResponse] = useState('');
   const [socketConnection, setSocketConnection] = useState(false)
   const [emptyInput, setEmptyInput] = useState(false)
+  const [guestHighlights, setGuestHighlights] = useState({})
 
   useEffect(() => {
     const connection = socketIOClient(ENDPOINT)
     setSocketConnection(connection);
-    connection.on('FromAPI', data => {
+    connection.on('inputChange', data => {
       console.log('received data from server')
       setResponse(data);
+    })
+
+    connection.on('newPlayer', data => {
+      console.log('new player joined!')
+    })
+
+    connection.on('newHighlight', data => {
+      setGuestHighlights(data)
     })
 
     // CLEAN UP THE EFFECT
@@ -137,13 +146,10 @@ export default function Home({ data }) {
   // Perhaps a duplicate useEffect?
   // Check other [filledInput] dependent useEffect
   useEffect(() => {
-    console.log('Sending to server')
     if (emptyInput) {
-      console.log('Sending empty!')
-      socketConnection.send(emptyInput)
+      socketConnection.send({ type: 'input', value: 'emptyInput' })
     } else if (filledInput) {
-      console.log('sending letter: ', filledInput)
-      socketConnection.send(filledInput)
+      socketConnection.send({ type: 'input', value: filledInput })
     }
   }, [filledInput, emptyInput])
 
@@ -166,6 +172,8 @@ export default function Home({ data }) {
         if (group.includes(selectedSquare)) {
           setClueIndex(index)
           setHighlightedSquares(group)
+          console.log('Sending newHighlight to server')
+          socketConnection.send({ type: 'newHighlight', value: group })
           if (!hoveredClue) {
             const clue = document.getElementById(`${index}-${movementDirection}`)
             if (clue) {
@@ -309,6 +317,7 @@ export default function Home({ data }) {
                   guesses,
                   focus,
                   uploadGuess,
+                  guestHighlights,
                   setEmptyInput,
                   setUploadGuess,
                   setFocus,
