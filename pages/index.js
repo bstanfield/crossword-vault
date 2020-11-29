@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
-const ENDPOINT = 'http://127.0.0.1:4001';
+// const ENDPOINT = 'http://127.0.0.1:4001';
+const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -119,25 +120,32 @@ export default function Home({ data }) {
   // API
   const [response, setResponse] = useState('');
   const [socketConnection, setSocketConnection] = useState(false)
+  const [emptyInput, setEmptyInput] = useState(false)
 
   useEffect(() => {
-    setSocketConnection(socketIOClient(ENDPOINT));
-    socketIOClient(ENDPOINT).on('FromAPI', data => {
-      console.log('receiving something from Server!')
+    const connection = socketIOClient(ENDPOINT)
+    setSocketConnection(connection);
+    connection.on('FromAPI', data => {
+      console.log('received data from server')
       setResponse(data);
     })
 
     // CLEAN UP THE EFFECT
-    return () => socketIOClient(ENDPOINT).disconnect()
+    return () => connection.disconnect()
   }, []);
 
   // Perhaps a duplicate useEffect?
   // Check other [filledInput] dependent useEffect
   useEffect(() => {
-    if (filledInput) {
+    console.log('Sending to server')
+    if (emptyInput) {
+      console.log('Sending empty!')
+      socketConnection.send(emptyInput)
+    } else if (filledInput) {
+      console.log('sending letter: ', filledInput)
       socketConnection.send(filledInput)
     }
-  }, [filledInput])
+  }, [filledInput, emptyInput])
 
   useEffect(() => {
     setGuesses(response)
@@ -272,9 +280,6 @@ export default function Home({ data }) {
     })
   }, [])
 
-  useEffect(() => {
-  }, [uploadGuess])
-
   return (
     <div className={styles.container}>
       <Head>
@@ -304,6 +309,7 @@ export default function Home({ data }) {
                   guesses,
                   focus,
                   uploadGuess,
+                  setEmptyInput,
                   setUploadGuess,
                   setFocus,
                   setBackspace,

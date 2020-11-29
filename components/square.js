@@ -68,7 +68,8 @@ export default function Square({ props }) {
     setSelectedSquare,
     setFilledInput,
     setBackspace,
-    setGuesses
+    setGuesses,
+    setEmptyInput
   } = props
   const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
@@ -101,7 +102,7 @@ export default function Square({ props }) {
   // Responds to API responses
   useEffect(() => {
     if (guesses) {
-      if (guesses[content.position - 1]) {
+      if (guesses[content.position - 1] !== inputData) {
         setInputData(guesses[content.position - 1])
       }
     }
@@ -118,6 +119,7 @@ export default function Square({ props }) {
         setBackspace(true)
       }
       setInputData('')
+      setEmptyInput({ position: content.position, letter: '', iterator: 0 })
     }
   };
 
