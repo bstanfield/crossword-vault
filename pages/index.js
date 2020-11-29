@@ -118,19 +118,29 @@ export default function Home({ data }) {
 
   // API
   const [response, setResponse] = useState('');
+  const [socketConnection, setSocketConnection] = useState(false)
 
   useEffect(() => {
-    const socket = socketIOClient(ENDPOINT);
-    socket.on('FromAPI', data => {
+    setSocketConnection(socketIOClient(ENDPOINT));
+    socketIOClient(ENDPOINT).on('FromAPI', data => {
+      console.log('receiving something from Server!')
       setResponse(data);
-    });
+    })
 
     // CLEAN UP THE EFFECT
-    return () => socket.disconnect();
+    return () => socketIOClient(ENDPOINT).disconnect()
   }, []);
 
+  // Perhaps a duplicate useEffect?
+  // Check other [filledInput] dependent useEffect
   useEffect(() => {
-    console.log('response: ', response)
+    if (filledInput) {
+      socketConnection.send(filledInput)
+    }
+  }, [filledInput])
+
+  useEffect(() => {
+    setGuesses(response)
   }, [response])
 
   useEffect(() => {
@@ -263,7 +273,6 @@ export default function Home({ data }) {
   }, [])
 
   useEffect(() => {
-    console.log('guesses: ', guesses)
   }, [uploadGuess])
 
   return (

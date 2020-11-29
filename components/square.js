@@ -98,6 +98,15 @@ export default function Square({ props }) {
     }
   }, [highlightedSquares])
 
+  // Responds to API responses
+  useEffect(() => {
+    if (guesses) {
+      if (guesses[content.position - 1]) {
+        setInputData(guesses[content.position - 1])
+      }
+    }
+  }, [guesses])
+
   const handleKeyDown = e => {
     if (e.key === ' ') {
       e.preventDefault();
@@ -111,9 +120,6 @@ export default function Square({ props }) {
       setInputData('')
     }
   };
-
-
-
 
   return (
     <div id={content.position} css={squareBox(filledInput === content.position, highlight)} className={classNames(styles.crossword_board__square, content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
@@ -139,7 +145,7 @@ export default function Square({ props }) {
           if (input.nativeEvent.data) {
             setInputData(input.nativeEvent.data)
             setSelectionIterator(selectionIterator + 1)
-            setFilledInput({ position: content.position, iterator: selectionIterator })
+            setFilledInput({ position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator })
             let newGuesses = guesses
             newGuesses[content.position - 1] = input.nativeEvent.data
             setGuesses(newGuesses)
