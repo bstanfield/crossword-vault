@@ -6,8 +6,9 @@ import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
-const ENDPOINT = 'http://127.0.0.1:4001';
-// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+import Players from '../components/players'
+// const ENDPOINT = 'http://127.0.0.1:4001';
+const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -48,7 +49,7 @@ const instantiateGuesses = (grid) => grid.map(item => {
   if (item === '.') {
     return false
   } else {
-    return null
+    return ''
   }
 })
 
@@ -92,10 +93,11 @@ export default function Home({ data }) {
   const { crossword } = data
   const { grid, clues } = crossword
   const [board, setBoard] = useState([])
-  const [guesses, setGuesses] = useState(instantiateGuesses(grid))
+  const [guesses, setGuesses] = useState([])
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
+  // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
   const [clueIndex, setClueIndex] = useState(false)
@@ -118,21 +120,35 @@ export default function Home({ data }) {
   const [acrossGroupings, setAcrossGroupings] = useState([])
 
   // API
-  const [response, setResponse] = useState('');
+  const [clientId, setClientId] = useState(false)
+  const [response, setResponse] = useState('')
   const [socketConnection, setSocketConnection] = useState(false)
   const [emptyInput, setEmptyInput] = useState(false)
-  const [guestHighlights, setGuestHighlights] = useState({})
+  const [guestHighlights, setGuestHighlights] = useState(false)
+  const [players, setPlayers] = useState(false)
+  const [inputChange, setInputChange] = useState(false)
+  const [inputChangeToApi, setInputChangeToApi] = useState(false)
 
   useEffect(() => {
+    console.log('new board: ', JSON.stringify(instantiateGuesses(grid)))
     const connection = socketIOClient(ENDPOINT)
     setSocketConnection(connection);
+
+    connection.on('id', id => {
+      setClientId(id)
+    })
+
+    // Sent once on client connection
+    connection.on('boardGuesses', data => {
+      setResponse(data)
+    })
+
     connection.on('inputChange', data => {
-      console.log('received data from server')
-      setResponse(data);
+      setInputChange(data)
     })
 
     connection.on('newPlayer', data => {
-      console.log('new player joined!')
+      setPlayers(data)
     })
 
     connection.on('newHighlight', data => {
@@ -146,12 +162,10 @@ export default function Home({ data }) {
   // Perhaps a duplicate useEffect?
   // Check other [filledInput] dependent useEffect
   useEffect(() => {
-    if (emptyInput) {
-      socketConnection.send({ type: 'input', value: 'emptyInput' })
-    } else if (filledInput) {
-      socketConnection.send({ type: 'input', value: filledInput })
+    if (inputChangeToApi) {
+      socketConnection.send({ type: 'input', value: inputChangeToApi })
     }
-  }, [filledInput, emptyInput])
+  }, [inputChangeToApi])
 
   useEffect(() => {
     setGuesses(response)
@@ -163,6 +177,15 @@ export default function Home({ data }) {
     )
   }, [])
 
+  useEffect(() => {
+    const { position, letter } = inputChange
+    if (guesses[position] !== letter) {
+      const newGuesses = guesses
+      newGuesses[position] = letter
+      setGuesses([...newGuesses])
+    }
+  }, [inputChange])
+
   // Functions for across movement
   // ERROR: Down groupings are shifted over
   useEffect(() => {
@@ -172,7 +195,6 @@ export default function Home({ data }) {
         if (group.includes(selectedSquare)) {
           setClueIndex(index)
           setHighlightedSquares(group)
-          console.log('Sending newHighlight to server')
           socketConnection.send({ type: 'newHighlight', value: group })
           if (!hoveredClue) {
             const clue = document.getElementById(`${index}-${movementDirection}`)
@@ -297,6 +319,8 @@ export default function Home({ data }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <Players props={{ players }} />
+
       <main className={styles.main}>
         <h1 className={styles.title}>
           The Word Vault
@@ -325,7 +349,8 @@ export default function Home({ data }) {
                   setMovementDirection,
                   setSelectedSquare,
                   setFilledInput,
-                  setGuesses
+                  setGuesses,
+                  setInputChangeToApi
                 }} />
               )
             )}
