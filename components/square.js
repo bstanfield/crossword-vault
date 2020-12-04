@@ -19,9 +19,9 @@ const setBackgroundColor = (filled, highlightedSquares, content, focus, guestHig
   if (filled || highlightedSquares.includes(content.position)) {
     return 'rgba(255, 165, 0, 0.35)'
   }
-  // if (guestHighlight) {
-  //   return guestHighlight.color
-  // }
+  if (guestHighlight) {
+    return guestHighlight.color.low
+  }
   return 'white'
 }
 
@@ -33,7 +33,7 @@ const setBorderColor = (filled, highlightedSquares, content, focus, guestHighlig
     return '2px solid black'
   }
   if (guestHighlight) {
-    return `2px solid ${guestHighlight.color}`
+    return `2px solid ${guestHighlight.color.high}`
   }
 }
 
@@ -83,6 +83,7 @@ export default function Square({ props }) {
     filledInput,
     focus,
     guesses,
+    clientId,
     uploadGuess,
     guestHighlights,
     setUploadGuess,
@@ -150,7 +151,10 @@ export default function Square({ props }) {
 
   const isGuestHighlight = () => {
     if (guestHighlights) {
-      for (const [id, obj] of Object.entries(guestHighlights)) {
+      // Replace this deletion with a new method outside of Square
+      const filteredHighlights = guestHighlights
+      delete filteredHighlights[clientId]
+      for (const [id, obj] of Object.entries(filteredHighlights)) {
         const { color, squares } = obj
         if (squares.includes(content.position)) {
           setGuestHighlight({ id, color })

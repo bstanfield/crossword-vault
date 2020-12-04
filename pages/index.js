@@ -130,7 +130,7 @@ export default function Home({ data }) {
   const [inputChangeToApi, setInputChangeToApi] = useState(false)
 
   useEffect(() => {
-    console.log('new board: ', JSON.stringify(instantiateGuesses(grid)))
+    // console.log('new board: ', JSON.stringify(instantiateGuesses(grid)))
     const connection = socketIOClient(ENDPOINT)
     setSocketConnection(connection);
 
@@ -144,6 +144,7 @@ export default function Home({ data }) {
     })
 
     connection.on('inputChange', data => {
+      console.log('new input: ', data)
       setInputChange(data)
     })
 
@@ -310,6 +311,28 @@ export default function Home({ data }) {
     })
   }, [])
 
+  // useEffect(() => {
+  //   console.log('guesses: ', guesses)
+  //   if (guesses.length > 0) {
+  //     const correctGuesses = guesses.reduce((acc, current, index) => {
+  //       let starterAcc = { correct: 0, incorrect: 0 }
+  //       if (!acc) {
+  //         acc = starterAcc
+  //       }
+
+  //       if (current === false || current === '') return acc
+  //       if (current.toUpperCase() === board[index].letter) {
+  //         const newAcc = { correct: acc.correct + 1, incorrect: acc.incorrect }
+  //         console.log('new acc: ', newAcc)
+  //         return newAcc
+  //       }
+  //       const newAcc = { correct: acc.correct, incorrect: acc.incorrect + 1 }
+  //       return newAcc
+  //     })
+  //     console.log('total correct guesses: ', correctGuesses)
+  //   }
+  // }, [guesses])
+
   return (
     <div className={styles.container}>
       <Head>
@@ -341,6 +364,7 @@ export default function Home({ data }) {
                   guesses,
                   focus,
                   uploadGuess,
+                  clientId,
                   guestHighlights,
                   setEmptyInput,
                   setUploadGuess,
