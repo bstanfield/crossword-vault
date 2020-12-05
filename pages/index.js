@@ -11,6 +11,7 @@ import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
 import Players from '../components/players'
+import Timer from '../components/timer'
 const ENDPOINT = 'http://127.0.0.1:4001';
 // const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
@@ -147,6 +148,8 @@ export default function Home({ data }) {
   const [acrossGroupings, setAcrossGroupings] = useState([])
 
   // API
+  const [timestamp, setTimestamp] = useState(false)
+  const [timer, setTimer] = useState(false)
   const [clientId, setClientId] = useState(false)
   const [response, setResponse] = useState('')
   const [socketConnection, setSocketConnection] = useState(false)
@@ -163,6 +166,11 @@ export default function Home({ data }) {
 
     connection.on('id', id => {
       setClientId(id)
+    })
+
+    // Sends board time once on connect
+    connection.on('timestamp', time => {
+      setTimestamp(time)
     })
 
     // Sent once on client connection
@@ -359,6 +367,19 @@ export default function Home({ data }) {
     }
   }, [guesses])
 
+  useEffect(() => {
+    if (timestamp) {
+      let seconds = timestamp / 1000
+      let timeElapsed = Date.now() / 1000 - seconds
+      const intervalId = setInterval(() => {
+        timeElapsed++
+        setTimer(timeElapsed)
+      }, 1000)
+
+      return () => clearInterval(intervalId);
+    }
+  }, [timestamp])
+
   return (
     <div css={appContainer(darkmode)} className={styles.container}>
       <Head>
@@ -456,6 +477,7 @@ export default function Home({ data }) {
             </ul>
           </div>
         </div>
+        <Timer props={{ timer }} />
       </main>
     </div>
   )
