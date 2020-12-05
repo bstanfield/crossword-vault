@@ -146,6 +146,9 @@ export default function Square({ props }) {
       }
       setInputData('')
       setInputChangeToApi({ position: content.position, letter: '', iterator: 0 })
+      let newGuesses = guesses
+      newGuesses[content.position - 1] = ''
+      setGuesses(newGuesses)
     }
   };
 
