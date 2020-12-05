@@ -4,10 +4,11 @@ import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
-const clueStyle = (highlight) => scale({
-  backgroundColor: highlight && 'rgba(255, 165, 0, 0.35)',
+const clueStyle = (darkmode, highlight) => scale({
+  color: darkmode ? 'white' : '#333333',
+  backgroundColor: highlight ? darkmode ? '#5c5cff' : 'rgba(255, 165, 0, 0.35)' : '',
   padding: '5px 10px',
-  border: highlight ? '2px solid rgba(255, 165, 0, 1)' : '2px solid transparent',
+  border: highlight ? darkmode ? '2px solid #5c5cff' : '2px solid rgba(255, 165, 0, 1)' : '2px solid transparent',
   borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s ease',
@@ -16,6 +17,7 @@ const clueStyle = (highlight) => scale({
 
 export default function Clue({ props }) {
   const {
+    darkmode,
     index,
     clue,
     clueIndex,
@@ -63,7 +65,7 @@ export default function Clue({ props }) {
 
   return (
     <li
-      css={clueStyle(highlight)}
+      css={clueStyle(darkmode, highlight)}
       onClick={() => {
         setNewFocus(index)
         setLockout(Date.now())

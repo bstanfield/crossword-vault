@@ -12,20 +12,20 @@ const blockNumber = scale({
   fontSize: 10
 });
 
-const setBackgroundColor = (filled, highlightedSquares, content, focus, guestHighlight) => {
+const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight) => {
   if (focus === content.position) {
-    return '#7cc9ff'
+    return darkmode ? '#5c5cff' : '#7cc9ff'
   }
   if (filled || highlightedSquares.includes(content.position)) {
-    return 'rgba(255, 165, 0, 0.35)'
+    return darkmode ? '#885c88' : 'rgba(255, 165, 0, 0.35)'
   }
   if (guestHighlight) {
-    return guestHighlight.color.low
+    return darkmode ? guestHighlight.color.dark_low : guestHighlight.color.low
   }
-  return 'white'
+  return darkmode ? '#555563' : 'white'
 }
 
-const setBorderColor = (filled, highlightedSquares, content, focus, guestHighlight) => {
+const setBorderColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight) => {
   if (focus === content.position) {
     return '2px solid black'
   }
@@ -33,8 +33,9 @@ const setBorderColor = (filled, highlightedSquares, content, focus, guestHighlig
     return '2px solid black'
   }
   if (guestHighlight) {
-    return `2px solid ${guestHighlight.color.high}`
+    return `2px solid ${darkmode ? guestHighlight.color.dark_high : guestHighlight.color.high}`
   }
+  return darkmode ? '2px solid #333333' : '2px solid black'
 }
 
 const form = scale({
@@ -43,7 +44,7 @@ const form = scale({
   height: '100%'
 })
 
-const squareInput = (content, filled, highlightedSquares, focus, guestHighlight) => scale({
+const squareInput = (darkmode, content, filled, highlightedSquares, focus, guestHighlight) => scale({
   caretColor: 'transparent',
   outlineWidth: 0,
   border: 'none',
@@ -51,6 +52,7 @@ const squareInput = (content, filled, highlightedSquares, focus, guestHighlight)
   height: '100%',
   padding: 0,
   margin: 0,
+  color: darkmode ? 'white' : '#333333',
   textTransform: 'uppercase',
   textAlign: 'center',
   fontSize: '26px',
@@ -58,23 +60,37 @@ const squareInput = (content, filled, highlightedSquares, focus, guestHighlight)
   paddingTop: 1,
   fontWeight: 500,
   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
-  backgroundColor: setBackgroundColor(filled, highlightedSquares, content, focus, guestHighlight),
+  backgroundColor: setBackgroundColor(darkmode, filled, highlightedSquares, content, focus, guestHighlight),
   // transition: 'background-color 0.1s ease-in-out',
 })
 
-const squareBox = (content, filled, highlightedSquares, highlight, focus, guestHighlight) => scale({
-  "margin": "0",
-  "padding": "0",
-  "marginLeft": "-2px",
-  "marginBottom": "-2px",
-  border: setBorderColor(filled, highlightedSquares, content, focus, guestHighlight),
+const squareBox = (darkmode, content, filled, highlightedSquares, highlight, focus, guestHighlight) => scale({
+  position: 'relative',
+  margin: 0,
+  padding: 0,
+  marginLeft: -2,
+  marginBottom: -2,
+  border: setBorderColor(darkmode, filled, highlightedSquares, content, focus, guestHighlight),
   zIndex: (filled || highlight || guestHighlight) ? 2 : 1,
   "color": "#333333",
   // transition: 'border 0.1s ease-in-out',
+  span: {
+    color: darkmode ? 'white' : 'black',
+    position: 'absolute',
+    top: '2px',
+    left: '2px',
+    '-webkit-touch-callout': 'none',
+    '-webkit-user-select': 'none',
+    '-khtml-user-select': 'none',
+    '-moz-user-select': 'none',
+    '-ms-user-select': 'none',
+    'user-select': 'none',
+  }
 })
 
 export default function Square({ props }) {
   const {
+    darkmode,
     content,
     hoveredClue,
     highlightedSquares,
@@ -152,6 +168,28 @@ export default function Square({ props }) {
     }
   };
 
+  // Only have matching dark colors for red
+  const colorLookup = {
+    'red': {
+      high: 'rgba(255, 40, 101, 1)',
+      low: 'rgba(255, 40, 101, 0.2)',
+      dark_high: 'rgba(70, 17, 32, 1)',
+      dark_low: 'rgba(72, 8, 26, 0.8)'
+    },
+    'purple': {
+      high: 'rgba(161, 59, 224, 1)',
+      low: 'rgba(161, 59, 224, 0.2)',
+      dark_high: 'rgba(70, 17, 32, 1)',
+      dark_low: 'rgba(72, 8, 26, 0.8)'
+    },
+    'blue': {
+      high: 'rgba(40, 203, 255, 1)',
+      low: 'rgba(40, 203, 255, 0.2)',
+      dark_high: 'rgba(70, 17, 32, 1)',
+      dark_low: 'rgba(72, 8, 26, 0.8)'
+    }
+  }
+
   const isGuestHighlight = () => {
     if (guestHighlights) {
       // Replace this deletion with a new method outside of Square
@@ -160,7 +198,8 @@ export default function Square({ props }) {
       for (const [id, obj] of Object.entries(filteredHighlights)) {
         const { color, squares } = obj
         if (squares.includes(content.position)) {
-          setGuestHighlight({ id, color })
+          console.log('color: ', color)
+          setGuestHighlight({ id, color: colorLookup[color] })
           return
         }
       }
@@ -173,7 +212,7 @@ export default function Square({ props }) {
   }, [guestHighlights])
 
   return (
-    <div id={content.position} css={squareBox(content, filledInput === content.position, highlightedSquares, highlight, focus, guestHighlight)} className={classNames(styles.crossword_board__square, content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
+    <div id={content.position} css={squareBox(darkmode, content, filledInput === content.position, highlightedSquares, highlight, focus, guestHighlight)} className={classNames(content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
       <form css={form} autoComplete='off'>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
         {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
@@ -189,7 +228,7 @@ export default function Square({ props }) {
             setSelectedSquare(content.position)
             setClickCount(clickCount + 1)
           }}
-          css={squareInput(content, filledInput === content.position, highlightedSquares, focus, guestHighlight)}
+          css={squareInput(darkmode, content, filledInput === content.position, highlightedSquares, focus, guestHighlight)}
           type="text"
           id={`input-${content.position}`}
           value={inputData}

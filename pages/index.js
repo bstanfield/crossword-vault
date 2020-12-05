@@ -1,3 +1,7 @@
+/** @jsx jsx */
+
+import { jsx } from '@emotion/react'
+import { scale } from '../lib/helpers'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { getData } from '../lib/data'
@@ -7,14 +11,35 @@ import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
 import Players from '../components/players'
-// const ENDPOINT = 'http://127.0.0.1:4001';
-const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+const ENDPOINT = 'http://127.0.0.1:4001';
+// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
 let height = 15
 
 let totalSquares = width * height
+
+const appContainer = (darkmode) => scale({
+  height: '100vh',
+  backgroundColor: darkmode ? 'black' : 'white',
+  color: darkmode ? 'white' : '#333333',
+})
+
+const boardContainer = (darkmode) => scale({
+  cursor: 'text',
+  display: 'grid',
+  marginTop: '30px',
+  width: '550px',
+  backgroundColor: 'white',
+  height: '550px',
+  gridTemplateColumns: 'repeat(15, 1fr)',
+  gridTemplateRows: 'repeat(15, 1fr)',
+  border: '2px solid #333',
+  borderLeft: '4px solid #333',
+  borderBottom: '4px solid #333',
+  borderRadius: '4px',
+})
 
 const createDownGroupings = (crossword) => {
   const { grid, answers } = crossword
@@ -92,6 +117,8 @@ const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings, set
 export default function Home({ data }) {
   const { crossword } = data
   const { grid, clues } = crossword
+  // Darkmode
+  const [darkmode, setDarkmode] = useState(false)
   const [board, setBoard] = useState([])
   const [guesses, setGuesses] = useState([])
   const [hoveredClue, setHoveredClue] = useState(false)
@@ -333,7 +360,7 @@ export default function Home({ data }) {
   }, [guesses])
 
   return (
-    <div className={styles.container}>
+    <div css={appContainer(darkmode)} className={styles.container}>
       <Head>
         <title>The Vault</title>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -341,7 +368,7 @@ export default function Home({ data }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Players props={{ players }} />
+      <Players props={{ darkmode, setDarkmode, players }} />
 
       <main className={styles.main}>
         <h1 className={styles.title}>
@@ -350,10 +377,11 @@ export default function Home({ data }) {
         <br />
 
         <div className={styles.crossword_board__container}>
-          <div className={styles.crossword_board}>
+          <div css={boardContainer(darkmode)}>
             {board.map(
               (content, index) => (
                 <Square key={index} props={{
+                  darkmode,
                   content,
                   hoveredClue,
                   highlightedSquares,
@@ -386,6 +414,7 @@ export default function Home({ data }) {
                 <Clue
                   key={index}
                   props={{
+                    darkmode,
                     lockout,
                     index,
                     clue,
@@ -409,6 +438,7 @@ export default function Home({ data }) {
                 <Clue
                   key={index}
                   props={{
+                    darkmode,
                     lockout,
                     index,
                     clue,

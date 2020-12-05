@@ -12,7 +12,9 @@ const playersBox = scale({
 
 export default function Players({ props }) {
   const {
-    players
+    darkmode,
+    players,
+    setDarkmode,
   } = props
 
   const countPlayers = (players) => {
@@ -25,6 +27,7 @@ export default function Players({ props }) {
 
   return (
     <div css={playersBox}>
+      <strong><span style={{ cursor: 'pointer' }} onClick={() => setDarkmode(darkmode ? false : true)}>{darkmode ? 'Daytime' : 'Nightime'}&nbsp;&nbsp;&nbsp;&nbsp;</span></strong>
       Other players: {players && countPlayers(players)}
     </div>
   )
