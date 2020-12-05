@@ -5,6 +5,10 @@ import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
+import socketIOClient from 'socket.io-client';
+import Players from '../components/players'
+// const ENDPOINT = 'http://127.0.0.1:4001';
+const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -45,7 +49,7 @@ const instantiateGuesses = (grid) => grid.map(item => {
   if (item === '.') {
     return false
   } else {
-    return null
+    return ''
   }
 })
 
@@ -89,10 +93,11 @@ export default function Home({ data }) {
   const { crossword } = data
   const { grid, clues } = crossword
   const [board, setBoard] = useState([])
-  const [guesses, setGuesses] = useState(instantiateGuesses(grid))
+  const [guesses, setGuesses] = useState([])
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
+  // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
   const [clueIndex, setClueIndex] = useState(false)
@@ -114,14 +119,75 @@ export default function Home({ data }) {
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
 
+  // API
+  const [clientId, setClientId] = useState(false)
+  const [response, setResponse] = useState('')
+  const [socketConnection, setSocketConnection] = useState(false)
+  const [emptyInput, setEmptyInput] = useState(false)
+  const [guestHighlights, setGuestHighlights] = useState(false)
+  const [players, setPlayers] = useState(false)
+  const [inputChange, setInputChange] = useState(false)
+  const [inputChangeToApi, setInputChangeToApi] = useState(false)
+
+  useEffect(() => {
+    console.log('new board: ', JSON.stringify(instantiateGuesses(grid)))
+    const connection = socketIOClient(ENDPOINT)
+    setSocketConnection(connection);
+
+    connection.on('id', id => {
+      setClientId(id)
+    })
+
+    // Sent once on client connection
+    connection.on('boardGuesses', data => {
+      setResponse(data)
+    })
+
+    connection.on('inputChange', data => {
+      console.log('new input: ', data)
+      setInputChange(data)
+    })
+
+    connection.on('newPlayer', data => {
+      setPlayers(data)
+    })
+
+    connection.on('newHighlight', data => {
+      setGuestHighlights(data)
+    })
+
+    return () => connection.disconnect()
+  }, []);
+
+  // Perhaps a duplicate useEffect?
+  // Check other [filledInput] dependent useEffect
+  useEffect(() => {
+    if (inputChangeToApi) {
+      socketConnection.send({ type: 'input', value: inputChangeToApi })
+    }
+  }, [inputChangeToApi])
+
+  useEffect(() => {
+    setGuesses(response)
+  }, [response])
+
   useEffect(() => {
     setBoard(
       createBoard(crossword, totalSquares, setDownGroupings, setAcrossGroupings, setGuesses)
     )
   }, [])
 
+  useEffect(() => {
+    const { position, letter } = inputChange
+    if (guesses[position] !== letter) {
+      const newGuesses = guesses
+      newGuesses[position] = letter
+      console.log('newGuesses: ', newGuesses)
+      setGuesses([...newGuesses])
+    }
+  }, [inputChange])
+
   // Functions for across movement
-  // ERROR: Down groupings are shifted over
   useEffect(() => {
     const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
     if (selectedSquare) {
@@ -129,6 +195,7 @@ export default function Home({ data }) {
         if (group.includes(selectedSquare)) {
           setClueIndex(index)
           setHighlightedSquares(group)
+          socketConnection.send({ type: 'newHighlight', value: group })
           if (!hoveredClue) {
             const clue = document.getElementById(`${index}-${movementDirection}`)
             if (clue) {
@@ -245,7 +312,25 @@ export default function Home({ data }) {
 
   useEffect(() => {
     console.log('guesses: ', guesses)
-  }, [uploadGuess])
+    if (guesses.length > 0) {
+      const correctGuesses = guesses.reduce((acc, current, index) => {
+        let starterAcc = { correct: 0, incorrect: 0 }
+        if (!acc) {
+          acc = starterAcc
+        }
+
+        if (current === false || current === '') return acc
+        if (current.toUpperCase() === board[index].letter) {
+          const newAcc = { correct: acc.correct + 1, incorrect: acc.incorrect }
+          console.log('new acc: ', newAcc)
+          return newAcc
+        }
+        const newAcc = { correct: acc.correct, incorrect: acc.incorrect + 1 }
+        return newAcc
+      })
+      console.log('total correct guesses: ', correctGuesses)
+    }
+  }, [guesses])
 
   return (
     <div className={styles.container}>
@@ -255,6 +340,8 @@ export default function Home({ data }) {
         <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300&display=swap" rel="stylesheet"></link>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+      <Players props={{ players }} />
 
       <main className={styles.main}>
         <h1 className={styles.title}>
@@ -276,13 +363,17 @@ export default function Home({ data }) {
                   guesses,
                   focus,
                   uploadGuess,
+                  clientId,
+                  guestHighlights,
+                  setEmptyInput,
                   setUploadGuess,
                   setFocus,
                   setBackspace,
                   setMovementDirection,
                   setSelectedSquare,
                   setFilledInput,
-                  setGuesses
+                  setGuesses,
+                  setInputChangeToApi
                 }} />
               )
             )}

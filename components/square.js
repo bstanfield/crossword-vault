@@ -12,17 +12,38 @@ const blockNumber = scale({
   fontSize: 10
 });
 
-const setBackgroundColor = (filled, highlightedSquares, content, focus) => {
+const setBackgroundColor = (filled, highlightedSquares, content, focus, guestHighlight) => {
   if (focus === content.position) {
     return '#7cc9ff'
   }
   if (filled || highlightedSquares.includes(content.position)) {
     return 'rgba(255, 165, 0, 0.35)'
   }
+  if (guestHighlight) {
+    return guestHighlight.color.low
+  }
   return 'white'
 }
 
-const squareInput = (content, filled, highlightedSquares, focus) => scale({
+const setBorderColor = (filled, highlightedSquares, content, focus, guestHighlight) => {
+  if (focus === content.position) {
+    return '2px solid black'
+  }
+  if (filled || highlightedSquares.includes(content.position)) {
+    return '2px solid black'
+  }
+  if (guestHighlight) {
+    return `2px solid ${guestHighlight.color.high}`
+  }
+}
+
+const form = scale({
+  padding: 0,
+  margin: 0,
+  height: '100%'
+})
+
+const squareInput = (content, filled, highlightedSquares, focus, guestHighlight) => scale({
   caretColor: 'transparent',
   outlineWidth: 0,
   border: 'none',
@@ -37,16 +58,17 @@ const squareInput = (content, filled, highlightedSquares, focus) => scale({
   paddingTop: 1,
   fontWeight: 500,
   fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
-  backgroundColor: setBackgroundColor(filled, highlightedSquares, content, focus),
+  backgroundColor: setBackgroundColor(filled, highlightedSquares, content, focus, guestHighlight),
   // transition: 'background-color 0.1s ease-in-out',
 })
 
-const squareBox = (filled, highlight) => scale({
+const squareBox = (content, filled, highlightedSquares, highlight, focus, guestHighlight) => scale({
   "margin": "0",
   "padding": "0",
   "marginLeft": "-2px",
   "marginBottom": "-2px",
-  zIndex: (filled || highlight) ? 2 : 1,
+  border: setBorderColor(filled, highlightedSquares, content, focus, guestHighlight),
+  zIndex: (filled || highlight || guestHighlight) ? 2 : 1,
   "color": "#333333",
   // transition: 'border 0.1s ease-in-out',
 })
@@ -61,19 +83,24 @@ export default function Square({ props }) {
     filledInput,
     focus,
     guesses,
+    clientId,
     uploadGuess,
+    guestHighlights,
     setUploadGuess,
     setFocus,
     setMovementDirection,
     setSelectedSquare,
     setFilledInput,
     setBackspace,
-    setGuesses
+    setGuesses,
+    setEmptyInput,
+    setInputChangeToApi
   } = props
   const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
   const [inputData, setInputData] = useState('')
   const [selectionIterator, setSelectionIterator] = useState(0)
+  const [guestHighlight, setGuestHighlight] = useState(false)
 
   const hover = content.number === Number(hoveredClue)
 
@@ -98,6 +125,15 @@ export default function Square({ props }) {
     }
   }, [highlightedSquares])
 
+  // Responds to API responses
+  useEffect(() => {
+    if (guesses) {
+      if (guesses[content.position - 1] !== inputData) {
+        setInputData(guesses[content.position - 1])
+      }
+    }
+  }, [guesses])
+
   const handleKeyDown = e => {
     if (e.key === ' ') {
       e.preventDefault();
@@ -109,44 +145,72 @@ export default function Square({ props }) {
         setBackspace(true)
       }
       setInputData('')
+      setInputChangeToApi({ position: content.position, letter: '', iterator: 0 })
+      let newGuesses = guesses
+      newGuesses[content.position - 1] = ''
+      setGuesses(newGuesses)
     }
   };
 
+  const isGuestHighlight = () => {
+    if (guestHighlights) {
+      // Replace this deletion with a new method outside of Square
+      const filteredHighlights = guestHighlights
+      delete filteredHighlights[clientId]
+      for (const [id, obj] of Object.entries(filteredHighlights)) {
+        const { color, squares } = obj
+        if (squares.includes(content.position)) {
+          setGuestHighlight({ id, color })
+          return
+        }
+      }
+      setGuestHighlight(false)
+    }
+  }
 
-
+  useEffect(() => {
+    isGuestHighlight()
+  }, [guestHighlights])
 
   return (
-    <div id={content.position} css={squareBox(filledInput === content.position, highlight)} className={classNames(styles.crossword_board__square, content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
-      {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
-      {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
-      {content.letter !== '.' && <input
-        onKeyDown={handleKeyDown}
-        autoComplete='off'
-        onFocus={() => {
-          setFocus(content.position)
-          setSelectedSquare(content.position)
-        }}
-        onBlur={() => { setClickCount(0) }}
-        onClick={() => {
-          setSelectedSquare(content.position)
-          setClickCount(clickCount + 1)
-        }}
-        css={squareInput(content, filledInput === content.position, highlightedSquares, focus)}
-        type="text"
-        id={`input-${content.position}`}
-        value={inputData}
-        onChange={(input) => {
-          if (input.nativeEvent.data) {
-            setInputData(input.nativeEvent.data)
-            setSelectionIterator(selectionIterator + 1)
-            setFilledInput({ position: content.position, iterator: selectionIterator })
-            let newGuesses = guesses
-            newGuesses[content.position - 1] = input.nativeEvent.data
-            setGuesses(newGuesses)
-            setUploadGuess(uploadGuess ? false : true)
-          }
-        }}
-        name={content.letter} />}
+    <div id={content.position} css={squareBox(content, filledInput === content.position, highlightedSquares, highlight, focus, guestHighlight)} className={classNames(styles.crossword_board__square, content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
+      <form css={form} autoComplete='off'>
+        {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
+        {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
+        {content.letter !== '.' && <input
+          onKeyDown={handleKeyDown}
+          autoComplete='off'
+          onFocus={() => {
+            setFocus(content.position)
+            setSelectedSquare(content.position)
+          }}
+          onBlur={() => { setClickCount(0) }}
+          onClick={() => {
+            setSelectedSquare(content.position)
+            setClickCount(clickCount + 1)
+          }}
+          css={squareInput(content, filledInput === content.position, highlightedSquares, focus, guestHighlight)}
+          type="text"
+          id={`input-${content.position}`}
+          value={inputData}
+          onChange={(input) => {
+            if (input.nativeEvent.data && input.nativeEvent.data !== '') {
+              setInputData(input.nativeEvent.data)
+              setSelectionIterator(selectionIterator + 1)
+
+              // Rename
+              const inputToFill = { position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator }
+              setFilledInput({ ...inputToFill })
+              setInputChangeToApi({ ...inputToFill })
+
+              let newGuesses = guesses
+              newGuesses[content.position - 1] = input.nativeEvent.data
+              setGuesses(newGuesses)
+              setUploadGuess(uploadGuess ? false : true)
+            }
+          }}
+          name={content.letter} />}
+      </form>
     </div>
   )
 }
