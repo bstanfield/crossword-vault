@@ -6,7 +6,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { getData } from '../lib/data'
 import classNames from 'classnames'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Fragment } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
@@ -23,8 +23,20 @@ let totalSquares = width * height
 
 const appContainer = (darkmode) => scale({
   height: '100vh',
+  minHeight: '80vh',
+  padding: '0px 20px',
+  display: 'flex',
+  flexDirection: 'column',
+  paddingTop: '120px',
+  alignItems: 'center',
+  paddingBottom: '40px',
+  margin: 'auto',
+  position: 'relative',
+})
+
+const appBackground = (darkmode) => scale({
   backgroundColor: darkmode ? 'black' : 'white',
-  color: darkmode ? 'white' : '#333333',
+  color: darkmode ? '#e4e4e4' : '#333333',
 })
 
 const boardContainer = (darkmode) => scale({
@@ -381,104 +393,109 @@ export default function Home({ data }) {
   }, [timestamp])
 
   return (
-    <div css={appContainer(darkmode)} className={styles.container}>
+    <div css={appBackground(darkmode)}>
       <Head>
         <title>The Vault</title>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300&display=swap" rel="stylesheet"></link>
+        <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <div css={{ borderBottom: '1px solid #333333', zIndex: 999, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
+        <div css={{ padding: '0 60px' }}>
+          <Players props={{ darkmode, setDarkmode, players }} />
 
-      <Players props={{ darkmode, setDarkmode, players }} />
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          The Word Vault
-        </h1>
-        <br />
-
-        <div className={styles.crossword_board__container}>
-          <div css={boardContainer(darkmode)}>
-            {board.map(
-              (content, index) => (
-                <Square key={index} props={{
-                  darkmode,
-                  content,
-                  hoveredClue,
-                  highlightedSquares,
-                  selectedSquare,
-                  filledInput,
-                  movementDirection,
-                  guesses,
-                  focus,
-                  uploadGuess,
-                  clientId,
-                  guestHighlights,
-                  setEmptyInput,
-                  setUploadGuess,
-                  setFocus,
-                  setBackspace,
-                  setMovementDirection,
-                  setSelectedSquare,
-                  setFilledInput,
-                  setGuesses,
-                  setInputChangeToApi
-                }} />
-              )
-            )}
-          </div>
-
-          <div className={classNames(styles.crossword_clues__list)}>
-            <h2>Across</h2>
-            <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
-              {clues.across.map((clue, index) => (
-                <Clue
-                  key={index}
-                  props={{
-                    darkmode,
-                    lockout,
-                    index,
-                    clue,
-                    clueIndex,
-                    movementDirection,
-                    direction: 'across',
-                    setLockout,
-                    setNewFocus,
-                    setMovementDirection,
-                    setHoveredClue,
-                    setFocus
-                  }}
-                />
-              ))}
-            </ul>
-          </div>
-          <div className={classNames(styles.crossword_clues__list)}>
-            <h2>Down</h2>
-            <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
-              {clues.down.map((clue, index) => (
-                <Clue
-                  key={index}
-                  props={{
-                    darkmode,
-                    lockout,
-                    index,
-                    clue,
-                    clueIndex,
-                    movementDirection,
-                    direction: 'down',
-                    setLockout,
-                    setNewFocus,
-                    setMovementDirection,
-                    setHoveredClue,
-                    setFocus
-                  }}
-                />
-              ))}
-            </ul>
+          <div>
+            <p css={{ maxWidth: 300, margin: 'auto', fontFamily: 'Old Standard TT, Serif', fontWeight: 400, fontStyle: 'italic', letterSpacing: -4, fontSize: 50, textAlign: 'center' }}>Word Vault</p>
           </div>
         </div>
-        <Timer props={{ timer }} />
-      </main>
+      </div>
+      <div css={appContainer(darkmode)}>
+
+
+        <main className={styles.main}>
+          <div className={styles.crossword_board__container}>
+            <div css={boardContainer(darkmode)}>
+              {board.map(
+                (content, index) => (
+                  <Square key={index} props={{
+                    darkmode,
+                    content,
+                    hoveredClue,
+                    highlightedSquares,
+                    selectedSquare,
+                    filledInput,
+                    movementDirection,
+                    guesses,
+                    focus,
+                    uploadGuess,
+                    clientId,
+                    guestHighlights,
+                    setEmptyInput,
+                    setUploadGuess,
+                    setFocus,
+                    setBackspace,
+                    setMovementDirection,
+                    setSelectedSquare,
+                    setFilledInput,
+                    setGuesses,
+                    setInputChangeToApi
+                  }} />
+                )
+              )}
+            </div>
+
+            <div className={classNames(styles.crossword_clues__list)}>
+              <h2>Across</h2>
+              <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
+                {clues.across.map((clue, index) => (
+                  <Clue
+                    key={index}
+                    props={{
+                      darkmode,
+                      lockout,
+                      index,
+                      clue,
+                      clueIndex,
+                      movementDirection,
+                      direction: 'across',
+                      setLockout,
+                      setNewFocus,
+                      setMovementDirection,
+                      setHoveredClue,
+                      setFocus
+                    }}
+                  />
+                ))}
+              </ul>
+            </div>
+            <div className={classNames(styles.crossword_clues__list)}>
+              <h2>Down</h2>
+              <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
+                {clues.down.map((clue, index) => (
+                  <Clue
+                    key={index}
+                    props={{
+                      darkmode,
+                      lockout,
+                      index,
+                      clue,
+                      clueIndex,
+                      movementDirection,
+                      direction: 'down',
+                      setLockout,
+                      setNewFocus,
+                      setMovementDirection,
+                      setHoveredClue,
+                      setFocus
+                    }}
+                  />
+                ))}
+              </ul>
+            </div>
+          </div>
+          <Timer props={{ timer }} />
+        </main>
+      </div>
     </div>
   )
 }

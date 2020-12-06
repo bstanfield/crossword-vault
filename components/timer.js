@@ -13,11 +13,7 @@ export default function Timer({ props }) {
     let hours = 0
     let minutes = Math.floor(seconds / 60)
     let remainingSeconds = 0
-    if (minutes > 60) {
-      hours = Math.floor(minutes / 60)
-      minutes = Math.floor(minutes % 60 / 100 * 60)
-      remainingSeconds = seconds % 60 / 100 * 60
-    }
+
     if (seconds < 60) {
       minutes = 0
       remainingSeconds = seconds
@@ -26,11 +22,22 @@ export default function Timer({ props }) {
       remainingSeconds = seconds % 60 % 60
     }
 
+    if (minutes > 60) {
+      hours = Math.floor(minutes / 60)
+      minutes = Math.floor(minutes % 60 / 100 * 60)
+      remainingSeconds = seconds % 60 % 60
+    }
+
+
+    if (remainingSeconds === 60) {
+      remainingSeconds = 0
+    }
+
     let leadingSecond = ''
     let leadingMinute = ''
     let leadingHour = ''
 
-    if (remainingSeconds < 10) {
+    if (Math.round(remainingSeconds) < 10) {
       leadingSecond = 0
     }
     if (minutes < 10) {

@@ -4,9 +4,8 @@ import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
 
 const playersBox = scale({
-  position: 'absolute',
-  top: 32,
-  right: 42,
+  float: 'right',
+  marginTop: 16,
   fontSize: 20,
 })
 
