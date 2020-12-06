@@ -9,6 +9,25 @@ const playersBox = scale({
   fontSize: 20,
 })
 
+const icon = (size) => scale({
+  fontSize: size || 'inherit',
+  marginBottom: -2,
+  'ion-icon': {
+    marginBottom: -2,
+    marginRight: 4,
+  }
+})
+
+const button = (darkmode) => scale({
+  margin: '0 16px',
+  padding: '4px 12px',
+  borderRadius: 4,
+  cursor: 'pointer',
+  '&:hover': {
+    backgroundColor: darkmode ? '#333' : '#dcdcdc',
+  }
+})
+
 export default function Players({ props }) {
   const {
     darkmode,
@@ -21,13 +40,13 @@ export default function Players({ props }) {
     for (const [id, color] of Object.entries(players)) {
       count++
     }
-    return count - 1
+    return count
   }
 
   return (
     <div css={playersBox}>
-      <strong><span style={{ cursor: 'pointer' }} onClick={() => setDarkmode(darkmode ? false : true)}>{darkmode ? 'Daytime' : 'Nightime'}&nbsp;&nbsp;&nbsp;&nbsp;</span></strong>
-      Other players: {players && countPlayers(players)}
+      <span css={button(darkmode)}><strong><span onClick={() => setDarkmode(darkmode ? false : true)}>{darkmode ? <span css={icon}><ion-icon name="sunny"></ion-icon> Daymode</span> : <span css={icon}><ion-icon name="moon"></ion-icon> Nightmode</span>}</span></strong></span>
+      <span css={icon(23)}><ion-icon size="medium" name="people"></ion-icon></span>{players && countPlayers(players)} Guest{countPlayers(players) > 1 ? 's' : ''}
     </div>
   )
 }

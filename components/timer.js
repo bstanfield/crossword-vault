@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react'
 
 export default function Timer({ props }) {
   const {
-    timer
+    timer,
+    grading
   } = props
 
   const formatTime = (seconds) => {

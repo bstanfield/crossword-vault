@@ -5,7 +5,7 @@ import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
 const clueStyle = (darkmode, highlight) => scale({
-  color: darkmode ? 'white' : '#333333',
+  color: darkmode ? '#f5f5f5' : '#333333',
   backgroundColor: highlight ? darkmode ? '#5c5cff' : 'rgba(255, 165, 0, 0.35)' : '',
   padding: '5px 10px',
   border: highlight ? darkmode ? '2px solid #5c5cff' : '2px solid rgba(255, 165, 0, 1)' : '2px solid transparent',

@@ -22,7 +22,7 @@ const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus
   if (guestHighlight) {
     return darkmode ? guestHighlight.color.dark_low : guestHighlight.color.low
   }
-  return darkmode ? '#555563' : 'white'
+  return darkmode ? '#555563' : '#f5f5f5'
 }
 
 const setBorderColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight) => {
@@ -52,7 +52,7 @@ const squareInput = (darkmode, content, filled, highlightedSquares, focus, guest
   height: '100%',
   padding: 0,
   margin: 0,
-  color: darkmode ? 'white' : '#333333',
+  color: darkmode ? '#f5f5f5' : '#333333',
   textTransform: 'uppercase',
   textAlign: 'center',
   fontSize: '26px',
@@ -77,7 +77,7 @@ const squareBox = (darkmode, content, filled, highlightedSquares, highlight, foc
   "color": "#333333",
   // transition: 'border 0.1s ease-in-out',
   span: {
-    color: darkmode ? 'white' : 'black',
+    color: darkmode ? '#f5f5f5' : 'black',
     position: 'absolute',
     top: '2px',
     left: '2px',
@@ -112,6 +112,7 @@ export default function Square({ props }) {
     setBackspace,
     setGuesses,
     setEmptyInput,
+    setInputChange,
     setInputChangeToApi
   } = props
   const [clickCount, setClickCount] = useState(0)
@@ -163,10 +164,11 @@ export default function Square({ props }) {
         setBackspace(true)
       }
       setInputData('')
-      setInputChangeToApi({ position: content.position, letter: '', iterator: 0 })
+      const inputToFill = { position: content.position, letter: '', iterator: 0 }
+      setInputChangeToApi({ ...inputToFill })
       let newGuesses = guesses
       newGuesses[content.position - 1] = ''
-      setGuesses(newGuesses)
+      setGuesses([...newGuesses])
     }
   };
 
@@ -245,7 +247,7 @@ export default function Square({ props }) {
 
               let newGuesses = guesses
               newGuesses[content.position - 1] = input.nativeEvent.data
-              setGuesses(newGuesses)
+              setGuesses([...newGuesses])
               setUploadGuess(uploadGuess ? false : true)
             }
           }}

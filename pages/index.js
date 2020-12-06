@@ -21,13 +21,17 @@ let height = 15
 
 let totalSquares = width * height
 
+const clueHeader = scale({
+  marginTop: 30,
+})
+
 const appContainer = (darkmode) => scale({
   height: '100vh',
   minHeight: '80vh',
   padding: '0px 20px',
   display: 'flex',
   flexDirection: 'column',
-  paddingTop: '120px',
+  paddingTop: '90px',
   alignItems: 'center',
   paddingBottom: '40px',
   margin: 'auto',
@@ -35,7 +39,7 @@ const appContainer = (darkmode) => scale({
 })
 
 const appBackground = (darkmode) => scale({
-  backgroundColor: darkmode ? 'black' : 'white',
+  backgroundColor: darkmode ? 'black' : '#f5f5f5',
   color: darkmode ? '#e4e4e4' : '#333333',
 })
 
@@ -44,7 +48,7 @@ const boardContainer = (darkmode) => scale({
   display: 'grid',
   marginTop: '30px',
   width: '550px',
-  backgroundColor: 'white',
+  backgroundColor: '#f5f5f5',
   height: '550px',
   gridTemplateColumns: 'repeat(15, 1fr)',
   gridTemplateRows: 'repeat(15, 1fr)',
@@ -83,14 +87,6 @@ const createDownGroupings = (crossword) => {
   return grouping
 }
 
-const instantiateGuesses = (grid) => grid.map(item => {
-  if (item === '.') {
-    return false
-  } else {
-    return ''
-  }
-})
-
 const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings, setGuesses) => {
   const { grid, gridnums } = crossword
   let partial = 0
@@ -127,12 +123,15 @@ const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings, set
   return arr
 }
 
-export default function Home({ data }) {
-  const { crossword } = data
-  const { grid, clues } = crossword
+export default function Home() {
+  const [data, setData] = useState(false)
+  const { grid, clues } = data
+
   // Darkmode
   const [darkmode, setDarkmode] = useState(false)
+
   const [board, setBoard] = useState([])
+  const [grading, setGrading] = useState(false)
   const [guesses, setGuesses] = useState([])
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
@@ -172,7 +171,6 @@ export default function Home({ data }) {
   const [inputChangeToApi, setInputChangeToApi] = useState(false)
 
   useEffect(() => {
-    console.log('new board: ', JSON.stringify(instantiateGuesses(grid)))
     const connection = socketIOClient(ENDPOINT)
     setSocketConnection(connection);
 
@@ -185,13 +183,17 @@ export default function Home({ data }) {
       setTimestamp(time)
     })
 
+    connection.on('board', board => {
+      console.log('received board: ', board)
+      setData(board)
+    })
+
     // Sent once on client connection
-    connection.on('boardGuesses', data => {
+    connection.on('guesses', data => {
       setResponse(data)
     })
 
     connection.on('inputChange', data => {
-      console.log('new input: ', data)
       setInputChange(data)
     })
 
@@ -219,10 +221,12 @@ export default function Home({ data }) {
   }, [response])
 
   useEffect(() => {
-    setBoard(
-      createBoard(crossword, totalSquares, setDownGroupings, setAcrossGroupings, setGuesses)
-    )
-  }, [])
+    if (data) {
+      setBoard(
+        createBoard(data, totalSquares, setDownGroupings, setAcrossGroupings, setGuesses)
+      )
+    }
+  }, [data])
 
   useEffect(() => {
     const { position, letter } = inputChange
@@ -358,26 +362,41 @@ export default function Home({ data }) {
   }, [])
 
   useEffect(() => {
+    let incorrect = 0
+    let correct = 0
+    let blank = 0
+    let black = 0
     console.log('guesses: ', guesses)
     if (guesses.length > 0) {
-      const correctGuesses = guesses.reduce((acc, current, index) => {
-        let starterAcc = { correct: 0, incorrect: 0 }
-        if (!acc) {
-          acc = starterAcc
+      guesses.map((guess, index) => {
+        if (guess === false) {
+          black++
+          return
         }
-
-        if (current === false || current === '') return acc
-        if (current.toUpperCase() === board[index].letter) {
-          const newAcc = { correct: acc.correct + 1, incorrect: acc.incorrect }
-          console.log('new acc: ', newAcc)
-          return newAcc
+        if (guess === '') {
+          blank++
+          return
         }
-        const newAcc = { correct: acc.correct, incorrect: acc.incorrect + 1 }
-        return newAcc
+        if (guess.toUpperCase() === board[index].letter) {
+          correct++
+          return
+        }
+        incorrect++
       })
-      console.log('total correct guesses: ', correctGuesses)
     }
+    setGrading({ correct, incorrect, blank, black })
   }, [guesses])
+
+  useEffect(() => {
+    if (guesses.length > 0 && grading) {
+      if (grading.correct === 225 - grading.other) {
+        alert('You did it! Crossword solved.')
+      }
+      if (grading.correct + grading.incorrect === guesses.length - grading.black) {
+        alert(`Not quite... (${grading.incorrect} wrong)`)
+      }
+    }
+  }, [grading])
 
   useEffect(() => {
     if (timestamp) {
@@ -396,11 +415,12 @@ export default function Home({ data }) {
     <div css={appBackground(darkmode)}>
       <Head>
         <title>The Vault</title>
+        <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div css={{ borderBottom: '1px solid #333333', zIndex: 999, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
+      <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 999, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
         <div css={{ padding: '0 60px' }}>
           <Players props={{ darkmode, setDarkmode, players }} />
 
@@ -412,7 +432,8 @@ export default function Home({ data }) {
       <div css={appContainer(darkmode)}>
 
 
-        <main className={styles.main}>
+        <main css={{ marginTop: 20 }}>
+          <p css={{ marginBottom: -8, padding: 0 }}>{data.title} • {data.editor} (Editor) • {data.author} (Author)</p>
           <div className={styles.crossword_board__container}>
             <div css={boardContainer(darkmode)}>
               {board.map(
@@ -438,6 +459,7 @@ export default function Home({ data }) {
                     setSelectedSquare,
                     setFilledInput,
                     setGuesses,
+                    setInputChange,
                     setInputChangeToApi
                   }} />
                 )
@@ -445,9 +467,9 @@ export default function Home({ data }) {
             </div>
 
             <div className={classNames(styles.crossword_clues__list)}>
-              <h2>Across</h2>
+              <h2 css={clueHeader}>Across</h2>
               <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
-                {clues.across.map((clue, index) => (
+                {clues && clues.across.map((clue, index) => (
                   <Clue
                     key={index}
                     props={{
@@ -469,9 +491,9 @@ export default function Home({ data }) {
               </ul>
             </div>
             <div className={classNames(styles.crossword_clues__list)}>
-              <h2>Down</h2>
+              <h2 css={clueHeader}>Down</h2>
               <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
-                {clues.down.map((clue, index) => (
+                {clues && clues.down.map((clue, index) => (
                   <Clue
                     key={index}
                     props={{
@@ -493,19 +515,12 @@ export default function Home({ data }) {
               </ul>
             </div>
           </div>
-          <Timer props={{ timer }} />
+          <Timer props={{ timer, grading }} />
         </main>
       </div>
     </div>
   )
 }
 
-export async function getStaticProps() {
-  const data = getData()
-
-  return {
-    props: {
-      data,
-    }
-  }
-}
+// export async function getStaticProps() {
+// }
