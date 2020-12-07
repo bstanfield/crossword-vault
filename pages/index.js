@@ -13,8 +13,9 @@ import socketIOClient from 'socket.io-client';
 import Players from '../components/players'
 import Timer from '../components/timer'
 import Metadata from '../components/metadata'
-const ENDPOINT = 'http://127.0.0.1:4001';
-// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+import Alert from '../components/alert'
+// const ENDPOINT = 'http://127.0.0.1:4001';
+const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -379,7 +380,7 @@ export default function Home() {
     let correct = 0
     let blank = 0
     let black = 0
-    console.log('guesses: ', guesses)
+
     if (guesses.length > 0) {
       guesses.map((guess, index) => {
         if (guess === false) {
@@ -402,11 +403,8 @@ export default function Home() {
 
   useEffect(() => {
     if (guesses.length > 0 && grading) {
-      if (grading.correct === 225 - grading.other) {
+      if (grading.correct === 225 - grading.black) {
         alert('You did it! Crossword solved.')
-      }
-      if (grading.correct + grading.incorrect === guesses.length - grading.black) {
-        alert(`Not quite... (${grading.incorrect} wrong)`)
       }
     }
   }, [grading])
@@ -546,6 +544,7 @@ export default function Home() {
               </div>
             </div>
             <Timer props={{ timer, grading }} />
+            <Alert props={{ guesses, grading }} />
           </main>
         </div>
       </div>

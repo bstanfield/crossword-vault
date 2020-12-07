@@ -13,7 +13,8 @@ const timerStyles = () => scale({
   color: '#f5f5f5',
   fontFamily: 'monospace',
   borderRadius: 2,
-  fontFamily: 'JetBrains Mono, monospace'
+  fontFamily: 'JetBrains Mono, monospace',
+  marginRight: 12,
 })
 
 export default function Timer({ props }) {
