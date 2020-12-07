@@ -13,8 +13,8 @@ import socketIOClient from 'socket.io-client';
 import Players from '../components/players'
 import Timer from '../components/timer'
 import Metadata from '../components/metadata'
-// const ENDPOINT = 'http://127.0.0.1:4001';
-const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+const ENDPOINT = 'http://127.0.0.1:4001';
+// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -66,6 +66,8 @@ const boardContainer = (darkmode) => scale({
   gridTemplateColumns: 'repeat(15, 1fr)',
   gridTemplateRows: 'repeat(15, 1fr)',
   border: '4px solid #333',
+  borderLeft: '5px solid #333',
+  borderBottom: '5px solid #333',
   borderRadius: '4px',
 })
 
@@ -430,6 +432,7 @@ export default function Home() {
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
+          <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div css={loadingSpinner}>

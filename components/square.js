@@ -216,7 +216,7 @@ export default function Square({ props }) {
 
   return (
     <div id={content.position} css={squareBox(darkmode, content, filledInput === content.position, highlightedSquares, highlight, focus, guestHighlight)} className={classNames(content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
-      <form css={form} autoComplete='off'>
+      <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
         {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
         {content.letter !== '.' && <input
@@ -253,6 +253,6 @@ export default function Square({ props }) {
           }}
           name={content.letter} />}
       </form>
-    </div>
+    </div >
   )
 }

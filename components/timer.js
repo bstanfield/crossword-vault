@@ -4,6 +4,18 @@ import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
+const timerStyles = () => scale({
+  display: 'inline-block',
+  margin: 0,
+  padding: 8,
+  backgroundColor: '#333',
+  fontSize: 13,
+  color: '#f5f5f5',
+  fontFamily: 'monospace',
+  borderRadius: 2,
+  fontFamily: 'JetBrains Mono, monospace'
+})
+
 export default function Timer({ props }) {
   const {
     timer,
@@ -52,6 +64,6 @@ export default function Timer({ props }) {
   }
 
   return (
-    <p>{timer ? formatTime(timer) : 'Retrieving time...'}</p>
+    <p css={timerStyles}>{timer ? formatTime(timer) : 'Retrieving time...'}</p>
   )
 }
