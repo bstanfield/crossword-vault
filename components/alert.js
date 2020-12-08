@@ -4,11 +4,11 @@ import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
-const alertStyles = () => scale({
+const alertStyles = (status) => scale({
   display: 'inline-block',
   margin: 0,
   padding: 8,
-  backgroundColor: 'red',
+  backgroundColor: status === 'correct' ? 'green' : 'red',
   fontSize: 13,
   color: '#f5f5f5',
   fontFamily: 'monospace',
@@ -21,23 +21,33 @@ export default function Alert({ props }) {
     grading,
     guesses,
   } = props
-  const [showAlert, setShowAlert] = useState(false)
+  const [status, setStatus] = useState('incorrect')
+  const [text, setText] = useState(false)
 
   useEffect(() => {
     if (guesses) {
+      // Success!
       if (grading.correct === 225 - grading.black) {
+        setStatus('correct')
+        setText('Crossword solved!')
         return
       }
+      // Incorrect answers
       if (grading.correct + grading.incorrect === guesses.length - grading.black) {
         setShowAlert(true)
+        setText(`${grading.incorrect} incorrect.`)
       }
+    } else {
+      // Reset
+      setText('')
     }
+
   }, [grading])
 
 
-  if (showAlert) {
+  if (text) {
     return (
-      <p css={alertStyles}><strong>{grading.incorrect}</strong> incorrect</p>
+      <p css={alertStyles(status)}>{text}</p>
     )
   } else {
     return null
