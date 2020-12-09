@@ -34,7 +34,7 @@ export default function Alert({ props }) {
       }
       // Incorrect answers
       if (grading.correct + grading.incorrect === guesses.length - grading.black) {
-        setShowAlert(true)
+        setStatus('incorrect')
         setText(`${grading.incorrect} incorrect.`)
         return
       }
