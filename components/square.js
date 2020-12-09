@@ -66,6 +66,17 @@ const squareInput = (darkmode, content, filled, highlightedSquares, focus, guest
   // transition: 'background-color 0.1s ease-in-out',
 })
 
+const circleClue = scale({
+  width: '100%',
+  height: '100%',
+  border: '1px solid #333333',
+  opacity: 1,
+  borderRadius: '50%',
+  position: 'absolute',
+  top: 0,
+  pointerEvents: 'none',
+})
+
 const squareBox = (darkmode, content, filled, highlightedSquares, highlight, focus, guestHighlight) => scale({
   position: 'relative',
   margin: 0,
@@ -92,6 +103,7 @@ const squareBox = (darkmode, content, filled, highlightedSquares, highlight, foc
 
 export default function Square({ props }) {
   const {
+    circle,
     darkmode,
     content,
     hoveredClue,
@@ -253,6 +265,7 @@ export default function Square({ props }) {
           }}
           name={content.letter} />}
       </form>
+      {circle === 1 && <div css={circleClue}></div>}
     </div >
   )
 }

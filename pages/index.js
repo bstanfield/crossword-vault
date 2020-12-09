@@ -14,8 +14,8 @@ import Players from '../components/players'
 import Timer from '../components/timer'
 import Metadata from '../components/metadata'
 import Alert from '../components/alert'
-// const ENDPOINT = 'http://127.0.0.1:4001';
-const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+const ENDPOINT = 'http://127.0.0.1:4001';
+// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -467,6 +467,7 @@ export default function Home() {
                 {board.map(
                   (content, index) => (
                     <Square key={index} props={{
+                      circle: data.circles && data.circles[index],
                       darkmode,
                       content,
                       hoveredClue,
