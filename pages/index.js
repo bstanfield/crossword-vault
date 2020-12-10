@@ -14,6 +14,8 @@ import Players from '../components/players'
 import Timer from '../components/timer'
 import Metadata from '../components/metadata'
 import Alert from '../components/alert'
+import { motion } from "framer-motion"
+import Button from '../components/button'
 const ENDPOINT = 'http://127.0.0.1:4001';
 // const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
@@ -25,6 +27,22 @@ let totalSquares = width * height
 
 const clueHeader = scale({
   marginTop: 30,
+})
+
+const sidePanel = scale({
+  width: 300,
+  height: '100vh',
+  position: 'absolute',
+  borderLeft: '2px solid #333333',
+  backgroundColor: '#f5f5f5',
+  zIndex: 3,
+  top: 0,
+  bottom: 0,
+  margin: 'auto',
+  right: 0,
+  '-webkit-box-shadow': '-8px 0px 5px -6px rgba(0,0,0,0.20)',
+  '-moz-box-shadow': '-8px 0px 5px -6px rgba(0,0,0,0.20)',
+  'box-shadow': '-8px 0px 5px -6px rgba(0,0,0,0.20)',
 })
 
 const appContainer = (darkmode) => scale({
@@ -43,6 +61,8 @@ const appContainer = (darkmode) => scale({
 const appBackground = (darkmode) => scale({
   backgroundColor: darkmode ? 'black' : '#f5f5f5',
   color: darkmode ? '#e4e4e4' : '#333333',
+  overflowX: 'hidden',
+  position: 'relative',
 })
 
 const loadingSpinner = () => scale({
@@ -150,6 +170,8 @@ export default function Home() {
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
+  const [showSidePanel, setShowSidePanel] = useState(false)
+
   // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
@@ -448,7 +470,8 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 999, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
+        <motion.div css={sidePanel} transition={{ ease: "easeInOut", duration: 0.3 }} animate={{ x: showSidePanel ? 0 : 300 }} initial={false} />
+        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 60px' }}>
             <Players props={{ darkmode, setDarkmode, players }} />
 
@@ -546,9 +569,12 @@ export default function Home() {
             </div>
             <Timer props={{ timer, grading }} />
             <Alert props={{ guesses, grading }} />
+            <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
+              <Button props={{ text: 'Shortcuts', icon: { name: 'flash', size: 13 } }} />
+            </span>
           </main>
         </div>
-      </div>
+      </div >
     )
   }
 

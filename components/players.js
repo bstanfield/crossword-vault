@@ -2,20 +2,12 @@
 
 import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
+import Icon from './icon'
 
 const playersBox = scale({
   float: 'right',
   marginTop: 16,
   fontSize: 20,
-})
-
-const icon = (size) => scale({
-  fontSize: size || 'inherit',
-  marginBottom: -2,
-  'ion-icon': {
-    marginBottom: -2,
-    marginRight: 4,
-  }
 })
 
 const button = (darkmode) => scale({
@@ -45,8 +37,13 @@ export default function Players({ props }) {
 
   return (
     <div css={playersBox}>
-      <span css={button(darkmode)}><strong><span onClick={() => setDarkmode(darkmode ? false : true)}>{darkmode ? <span css={icon}><ion-icon name="sunny"></ion-icon> Daymode</span> : <span css={icon}><ion-icon name="moon"></ion-icon> Nightmode</span>}</span></strong></span>
-      <span css={icon(23)}><ion-icon size="medium" name="people"></ion-icon></span>{players && countPlayers(players)} Guest{countPlayers(players) > 1 ? 's' : ''}
+      <span css={button(darkmode)}>
+        <strong>
+          <span onClick={() => setDarkmode(darkmode ? false : true)}>{darkmode ? <span><Icon props={{ size: 18, name: 'sunny', color: '#eee' }} /> Lightmode</span> : <span><Icon props={{ size: 18, name: 'moon' }} /> Darkmode</span>}
+          </span>
+        </strong>
+      </span>
+      <Icon props={{ size: 21, name: 'people' }} /><strong>{players && countPlayers(players)} Guest{countPlayers(players) > 1 ? 's' : ''}</strong>
     </div>
   )
 }
