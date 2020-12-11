@@ -4,7 +4,7 @@ import { jsx } from '@emotion/react'
 import styles from '../styles/Home.module.css'
 import classNames from 'classnames'
 import { scale } from '../lib/helpers'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 
 const blockNumber = scale({
@@ -17,7 +17,7 @@ const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus
     return darkmode ? '#5c5cff' : '#7cc9ff'
   }
   if (filled || highlightedSquares.includes(content.position)) {
-    return darkmode ? '#885c88' : 'rgba(255, 165, 0, 0.35)'
+    return darkmode ? '#885c88' : '#f5c46c'
   }
   if (guestHighlight) {
     return darkmode ? guestHighlight.color.dark_low : guestHighlight.color.low
@@ -92,12 +92,12 @@ const squareBox = (darkmode, content, filled, highlightedSquares, highlight, foc
     position: 'absolute',
     top: '2px',
     left: '2px',
-    '-webkit-touch-callout': 'none',
-    '-webkit-user-select': 'none',
-    '-khtml-user-select': 'none',
-    '-moz-user-select': 'none',
-    '-ms-user-select': 'none',
-    'user-select': 'none',
+    webkitTouchCallout: 'none',
+    webkitUserSelect: 'none',
+    khtmlUserSelect: 'none',
+    mozUserSelect: 'none',
+    msUserSelect: 'none',
+    userSelect: 'none',
   }
 })
 
@@ -225,6 +225,12 @@ export default function Square({ props }) {
   useEffect(() => {
     isGuestHighlight()
   }, [guestHighlights])
+
+  useEffect(() => {
+    document.ontouchmove = () => {
+      e.preventDefault()
+    }
+  })
 
   return (
     <div id={content.position} css={squareBox(darkmode, content, filledInput === content.position, highlightedSquares, highlight, focus, guestHighlight)} className={classNames(content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>

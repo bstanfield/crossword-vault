@@ -4,7 +4,6 @@ import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import { getData } from '../lib/data'
 import classNames from 'classnames'
 import { useEffect, useState, Fragment } from 'react'
 import Square from '../components/square'
@@ -14,6 +13,8 @@ import Players from '../components/players'
 import Timer from '../components/timer'
 import Metadata from '../components/metadata'
 import Alert from '../components/alert'
+import Button from '../components/button'
+import Shortcuts from '../components/shortcuts'
 const ENDPOINT = 'http://127.0.0.1:4001';
 // const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
@@ -43,6 +44,8 @@ const appContainer = (darkmode) => scale({
 const appBackground = (darkmode) => scale({
   backgroundColor: darkmode ? 'black' : '#f5f5f5',
   color: darkmode ? '#e4e4e4' : '#333333',
+  overflowX: 'hidden',
+  position: 'relative',
 })
 
 const loadingSpinner = () => scale({
@@ -62,7 +65,7 @@ const boardContainer = (darkmode) => scale({
   display: 'grid',
   marginTop: '30px',
   width: '550px',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: '#333',
   height: '550px',
   gridTemplateColumns: 'repeat(15, 1fr)',
   gridTemplateRows: 'repeat(15, 1fr)',
@@ -150,6 +153,8 @@ export default function Home() {
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
+  const [showSidePanel, setShowSidePanel] = useState(false)
+
   // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
@@ -448,8 +453,9 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 999, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
-          <div css={{ padding: '0 60px' }}>
+        <Shortcuts props={{ show: showSidePanel, darkmode }} />
+        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
+          <div css={{ padding: '0 32px' }}>
             <Players props={{ darkmode, setDarkmode, players }} />
 
             <div>
@@ -546,9 +552,15 @@ export default function Home() {
             </div>
             <Timer props={{ timer, grading }} />
             <Alert props={{ guesses, grading }} />
+            <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
+              <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
+            </span>
+            <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
+              <Button props={{ darkmode, text: 'New puzzle', icon: { name: 'refresh', size: 18 } }} />
+            </span>
           </main>
         </div>
-      </div>
+      </div >
     )
   }
 

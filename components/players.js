@@ -2,30 +2,13 @@
 
 import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
+import Button from './button'
+import Icon from './icon'
 
 const playersBox = scale({
   float: 'right',
-  marginTop: 16,
+  marginTop: 12,
   fontSize: 20,
-})
-
-const icon = (size) => scale({
-  fontSize: size || 'inherit',
-  marginBottom: -2,
-  'ion-icon': {
-    marginBottom: -2,
-    marginRight: 4,
-  }
-})
-
-const button = (darkmode) => scale({
-  margin: '0 16px',
-  padding: '4px 12px',
-  borderRadius: 4,
-  cursor: 'pointer',
-  '&:hover': {
-    backgroundColor: darkmode ? '#333' : '#dcdcdc',
-  }
 })
 
 export default function Players({ props }) {
@@ -45,8 +28,23 @@ export default function Players({ props }) {
 
   return (
     <div css={playersBox}>
-      <span css={button(darkmode)}><strong><span onClick={() => setDarkmode(darkmode ? false : true)}>{darkmode ? <span css={icon}><ion-icon name="sunny"></ion-icon> Daymode</span> : <span css={icon}><ion-icon name="moon"></ion-icon> Nightmode</span>}</span></strong></span>
-      <span css={icon(23)}><ion-icon size="medium" name="people"></ion-icon></span>{players && countPlayers(players)} Guest{countPlayers(players) > 1 ? 's' : ''}
+      <Button props={{
+        onClickFn: () => setDarkmode(!darkmode),
+        darkmode,
+        text: darkmode ? 'Lightmode' : 'Darkmode',
+        icon: {
+          name: darkmode ? 'sunny' : 'moon',
+          size: 16
+        }
+      }} />
+      <Button props={{
+        darkmode,
+        inactive: true,
+        text: players
+          ? `${countPlayers(players)} Player${countPlayers(players) > 1 ? 's' : ''}`
+          : '? Players',
+        icon: { name: 'people', size: 14 }
+      }} />
     </div>
   )
 }
