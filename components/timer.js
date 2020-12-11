@@ -65,6 +65,6 @@ export default function Timer({ props }) {
   }
 
   return (
-    <p css={timerStyles}>{timer ? formatTime(timer) : 'Retrieving time...'}</p>
+    <p css={timerStyles}>{timer ? formatTime(timer) : '--:--:--'}</p>
   )
 }

@@ -4,7 +4,6 @@ import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
-import { getData } from '../lib/data'
 import classNames from 'classnames'
 import { useEffect, useState, Fragment } from 'react'
 import Square from '../components/square'
@@ -14,8 +13,8 @@ import Players from '../components/players'
 import Timer from '../components/timer'
 import Metadata from '../components/metadata'
 import Alert from '../components/alert'
-import { motion } from "framer-motion"
 import Button from '../components/button'
+import Shortcuts from '../components/shortcuts'
 const ENDPOINT = 'http://127.0.0.1:4001';
 // const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
@@ -27,22 +26,6 @@ let totalSquares = width * height
 
 const clueHeader = scale({
   marginTop: 30,
-})
-
-const sidePanel = scale({
-  width: 300,
-  height: '100vh',
-  position: 'absolute',
-  borderLeft: '2px solid #333333',
-  backgroundColor: '#f5f5f5',
-  zIndex: 3,
-  top: 0,
-  bottom: 0,
-  margin: 'auto',
-  right: 0,
-  '-webkit-box-shadow': '-8px 0px 5px -6px rgba(0,0,0,0.20)',
-  '-moz-box-shadow': '-8px 0px 5px -6px rgba(0,0,0,0.20)',
-  'box-shadow': '-8px 0px 5px -6px rgba(0,0,0,0.20)',
 })
 
 const appContainer = (darkmode) => scale({
@@ -82,7 +65,7 @@ const boardContainer = (darkmode) => scale({
   display: 'grid',
   marginTop: '30px',
   width: '550px',
-  backgroundColor: '#f5f5f5',
+  backgroundColor: '#333',
   height: '550px',
   gridTemplateColumns: 'repeat(15, 1fr)',
   gridTemplateRows: 'repeat(15, 1fr)',
@@ -470,9 +453,9 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <motion.div css={sidePanel} transition={{ ease: "easeInOut", duration: 0.3 }} animate={{ x: showSidePanel ? 0 : 300 }} initial={false} />
+        <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
-          <div css={{ padding: '0 60px' }}>
+          <div css={{ padding: '0 32px' }}>
             <Players props={{ darkmode, setDarkmode, players }} />
 
             <div>
@@ -570,7 +553,10 @@ export default function Home() {
             <Timer props={{ timer, grading }} />
             <Alert props={{ guesses, grading }} />
             <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
-              <Button props={{ text: 'Shortcuts', icon: { name: 'flash', size: 13 } }} />
+              <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
+            </span>
+            <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
+              <Button props={{ darkmode, text: 'New puzzle', icon: { name: 'refresh', size: 18 } }} />
             </span>
           </main>
         </div>

@@ -20,12 +20,20 @@ export default function Icon({ props }) {
   } = props
 
   const iconStyles = scale({
+    position: 'relative',
+    width: 23,
+    height: 10,
+    display: 'inline-block',
     color: color,
     fontSize: size || 'inherit',
-    marginBottom: -2,
     'ion-icon': {
-      marginBottom: -2,
-      marginRight: 4,
+      position: 'absolute',
+      display: 'block',
+      top: 0,
+      bottom: 0,
+      left: -6,
+      right: 0,
+      margin: 'auto',
     }
   })
 
