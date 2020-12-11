@@ -555,9 +555,9 @@ export default function Home() {
             <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
               <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
             </span>
-            <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
+            {/* <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
               <Button props={{ darkmode, text: 'New puzzle', icon: { name: 'refresh', size: 18 } }} />
-            </span>
+            </span> */}
           </main>
         </div>
       </div >

@@ -18,7 +18,7 @@ const buttonStyles = (inactive, darkmode) => scale({
   cursor: inactive ? 'inherit' : 'pointer',
   border: '1px solid transparent',
   '&:hover': {
-    border: inactive ? '1px solid transparent' : '1px solid #333',
+    border: inactive ? '1px solid transparent' : darkmode ? '1px solid #eee' : '1px solid #333',
   }
 })
 
