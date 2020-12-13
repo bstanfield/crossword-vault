@@ -189,6 +189,8 @@ export default function Home() {
   const [inputChange, setInputChange] = useState(false)
   const [inputChangeToApi, setInputChangeToApi] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+
   useEffect(() => {
     const connection = socketIOClient(ENDPOINT)
     setSocketConnection(connection);
@@ -205,6 +207,12 @@ export default function Home() {
     connection.on('board', board => {
       console.log('received board: ', board)
       setData(board)
+    })
+
+    // Alert should do more than just setLoading...
+    connection.on('alert', alert => {
+      setLoading(true)
+      setTimeout(() => setLoading(false), 2000)
     })
 
     // Sent once on client connection
@@ -427,7 +435,7 @@ export default function Home() {
     }
   }, [timestamp])
 
-  if (!data) {
+  if (!data || loading) {
     return (
       <div css={[appBackground(darkmode), { height: '100vh' }]}>
         <Head>
@@ -439,7 +447,8 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div css={loadingSpinner}>
-          <div className={styles.lds_ripple}><div></div><div></div></div>
+          <div className={styles.lds_ring}><div></div><div></div></div>
+          <p>Pinging Will Shortz...</p>
         </div>
       </div>
     )
@@ -555,9 +564,11 @@ export default function Home() {
             <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
               <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
             </span>
-            {/* <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
+            <span onClick={() => {
+              socketConnection.send({ type: 'newPuzzle', value: null })
+            }}>
               <Button props={{ darkmode, text: 'New puzzle', icon: { name: 'refresh', size: 18 } }} />
-            </span> */}
+            </span>
           </main>
         </div>
       </div >

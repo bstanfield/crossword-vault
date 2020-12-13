@@ -74,7 +74,7 @@ export default function Clue({ props }) {
       onMouseEnter={() => hoverClue()}
       id={`${index}-${direction}`}
     >
-      <strong>{clue.split('.')[0]}.</strong> {clue.substring(clue.indexOf('.') + 1)}
+      <strong>{clue.split('.')[0]}.</strong> <span dangerouslySetInnerHTML={{ __html: clue.substring(clue.indexOf('.') + 1) }} />
     </li>
   )
 }

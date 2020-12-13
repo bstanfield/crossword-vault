@@ -187,22 +187,22 @@ export default function Square({ props }) {
   // Only have matching dark colors for red
   const colorLookup = {
     'red': {
-      high: 'rgba(255, 40, 101, 1)',
-      low: 'rgba(255, 40, 101, 0.2)',
-      dark_high: 'rgba(70, 17, 32, 1)',
-      dark_low: 'rgba(72, 8, 26, 0.8)'
+      high: 'rgb(255, 40, 101)',
+      low: '#E7D6DB',
+      dark_high: 'rgb(70, 17, 32)',
+      dark_low: '#635156'
     },
     'purple': {
-      high: 'rgba(161, 59, 224, 1)',
-      low: 'rgba(161, 59, 224, 0.2)',
-      dark_high: 'rgba(70, 17, 32, 1)',
-      dark_low: 'rgba(72, 8, 26, 0.8)'
+      high: 'rgb(161, 59, 224)',
+      low: '#DDD1E4',
+      dark_high: '#332d4a',
+      dark_low: '#5c5577'
     },
     'blue': {
-      high: 'rgba(40, 203, 255, 1)',
-      low: 'rgba(40, 203, 255, 0.2)',
-      dark_high: 'rgba(70, 17, 32, 1)',
-      dark_low: 'rgba(72, 8, 26, 0.8)'
+      high: 'rgb(40, 203, 255)',
+      low: '#CFE2E8',
+      dark_high: 'rgb(70, 17, 32)',
+      dark_low: '#635156'
     }
   }
 
