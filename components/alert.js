@@ -11,7 +11,6 @@ const alertStyles = (status) => scale({
   backgroundColor: status === 'correct' ? 'green' : 'red',
   fontSize: 13,
   color: '#f5f5f5',
-  fontFamily: 'monospace',
   borderRadius: 2,
   fontFamily: 'JetBrains Mono, monospace'
 })

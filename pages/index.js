@@ -15,8 +15,10 @@ import Metadata from '../components/metadata'
 import Alert from '../components/alert'
 import Button from '../components/button'
 import Shortcuts from '../components/shortcuts'
-const ENDPOINT = 'http://127.0.0.1:4001';
-// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+import smoothscroll from 'smoothscroll-polyfill';
+
+// const ENDPOINT = 'http://127.0.0.1:4001';
+const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 let width = 15
@@ -193,7 +195,9 @@ export default function Home() {
 
   useEffect(() => {
     const connection = socketIOClient(ENDPOINT)
-    setSocketConnection(connection);
+    setSocketConnection(connection)
+
+    smoothscroll.polyfill()
 
     connection.on('id', id => {
       setClientId(id)
@@ -441,14 +445,11 @@ export default function Home() {
         <Head>
           <title>The Vault</title>
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
-          <link rel="preconnect" href="https://fonts.gstatic.com" />
-          <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
-          <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <div css={loadingSpinner}>
           <div className={styles.lds_ring}><div></div><div></div></div>
-          <p>Pinging Will Shortz...</p>
+          <p>Loading puzzle...</p>
         </div>
       </div>
     )
@@ -459,16 +460,18 @@ export default function Home() {
           <title>The Vault</title>
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
           <link rel="preconnect" href="https://fonts.gstatic.com" />
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"></link>
+          <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"></link>
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
-        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '70px', top: 12, left: 0, right: 0, margin: 'auto' }}>
+        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '60px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>
             <Players props={{ darkmode, setDarkmode, players }} />
 
             <div>
-              <p css={{ maxWidth: 300, margin: 'auto', fontFamily: 'Old Standard TT, Serif', fontWeight: 400, fontStyle: 'italic', letterSpacing: -4, fontSize: 50, textAlign: 'center' }}>Word Vault</p>
+              <p css={{ maxWidth: 300, margin: 'auto', fontFamily: 'Old Standard TT, Serif', fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 40, textAlign: 'center', marginTop: 3 }}>Word Vault</p>
             </div>
           </div>
         </div>

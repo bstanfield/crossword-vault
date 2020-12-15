@@ -11,7 +11,6 @@ const timerStyles = () => scale({
   backgroundColor: '#333',
   fontSize: 13,
   color: '#f5f5f5',
-  fontFamily: 'monospace',
   borderRadius: 2,
   fontFamily: 'JetBrains Mono, monospace',
   marginRight: 12,

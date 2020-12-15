@@ -7,7 +7,7 @@ import Icon from './icon'
 
 const playersBox = scale({
   float: 'right',
-  marginTop: 12,
+  marginTop: 2,
   fontSize: 20,
 })
 

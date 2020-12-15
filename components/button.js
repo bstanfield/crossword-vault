@@ -12,7 +12,6 @@ const buttonStyles = (inactive, darkmode) => scale({
   backgroundColor: inactive ? 'transparent' : darkmode ? '#333' : '#eee',
   fontSize: 13,
   color: darkmode ? '#f5f5f5' : '#333333',
-  fontFamily: 'monospace',
   borderRadius: 2,
   fontFamily: 'JetBrains Mono, monospace',
   cursor: inactive ? 'inherit' : 'pointer',

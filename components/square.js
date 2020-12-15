@@ -61,7 +61,7 @@ const squareInput = (darkmode, content, filled, highlightedSquares, focus, guest
   fontWeight: 500,
   borderRadius: 0,
   webkitBorderRadius: 0,
-  fontFamily: '-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
+  fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
   backgroundColor: setBackgroundColor(darkmode, filled, highlightedSquares, content, focus, guestHighlight),
   // transition: 'background-color 0.1s ease-in-out',
 })
