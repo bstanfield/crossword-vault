@@ -43,11 +43,28 @@ const appContainer = (darkmode) => scale({
   position: 'relative',
 })
 
+const signature = () => scale({
+  position: 'absolute',
+  bottom: 18,
+  left: 0,
+  right: 0,
+  margin: 'auto',
+  textAlign: 'center',
+  letterSpacing: 0,
+  fontSize: 13,
+  fontFamily: 'JetBrains Mono, monospace',
+  a: {
+    textDecoration: 'underline',
+    textDecorationColor: '#ddd',
+  }
+})
+
 const appBackground = (darkmode) => scale({
   backgroundColor: darkmode ? 'black' : '#f5f5f5',
   color: darkmode ? '#e4e4e4' : '#333333',
   overflowX: 'hidden',
   position: 'relative',
+  paddingBottom: 80,
 })
 
 const loadingSpinner = () => scale({
@@ -465,20 +482,21 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
+        <p css={signature}>Created by <a target="_blank" href="https://benstanfield.io">Ben Stanfield</a></p>
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
-        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '60px', top: 12, left: 0, right: 0, margin: 'auto' }}>
+        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>
             <Players props={{ darkmode, setDarkmode, players }} />
 
             <div>
-              <p css={{ maxWidth: 300, margin: 'auto', fontFamily: 'Old Standard TT, Serif', fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 40, textAlign: 'center', marginTop: 3 }}>Word Vault</p>
+              <p css={{ maxWidth: 300, margin: 'auto', fontFamily: 'Old Standard TT, Serif', fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 36, textAlign: 'center', marginTop: 3 }}>Word Vault</p>
             </div>
           </div>
         </div>
         <div css={appContainer(darkmode)}>
 
 
-          <main css={{ marginTop: 20 }}>
+          <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
             <div className={styles.crossword_board__container}>
               <div css={boardContainer(darkmode)}>
