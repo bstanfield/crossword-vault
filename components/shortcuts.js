@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 
 const sidePanel = (show, darkmode) => scale({
   width: 300,
-  height: '100vh',
+  height: '100%',
   padding: 18,
   position: 'absolute',
   borderLeft: `2px solid ${darkmode ? 'transparent' : '#333'}`,

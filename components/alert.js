@@ -5,9 +5,11 @@ import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
 const alertStyles = (status) => scale({
+  cursor: 'pointer',
   display: 'inline-block',
   margin: 0,
   padding: 8,
+  marginRight: 6,
   backgroundColor: status === 'correct' ? 'green' : 'red',
   fontSize: 13,
   color: '#f5f5f5',
@@ -19,6 +21,8 @@ export default function Alert({ props }) {
   const {
     grading,
     guesses,
+    showIncorrect,
+    setShowIncorrect,
   } = props
   const [status, setStatus] = useState('incorrect')
   const [text, setText] = useState(false)
@@ -33,7 +37,7 @@ export default function Alert({ props }) {
       // Incorrect answers
       if (grading.correct + grading.incorrect === guesses.length - grading.black) {
         setStatus('incorrect')
-        return setText(`${grading.incorrect} incorrect.`)
+        return setText(`${grading.incorrect} wrong`)
       }
 
       // Do not show
@@ -44,11 +48,9 @@ export default function Alert({ props }) {
 
   if (text) {
     return (
-      <p css={alertStyles(status)}>{text}</p>
+      <p onClick={() => setShowIncorrect(!showIncorrect)} css={alertStyles(status)}>{text} {status === 'incorrect' && (showIncorrect ? '(hide)' : '(show)')}</p>
     )
   } else {
     return null
   }
-
-
 }

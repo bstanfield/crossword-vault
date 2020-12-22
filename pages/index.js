@@ -28,35 +28,19 @@ let totalSquares = width * height
 
 const clueHeader = scale({
   marginTop: 30,
+  paddingBottom: 6,
+  borderBottom: '1.5px solid #d0d0d0',
 })
 
 const appContainer = (darkmode) => scale({
   height: '100vh',
-  minHeight: '80vh',
   padding: '0px 20px',
   display: 'flex',
   flexDirection: 'column',
   paddingTop: '90px',
   alignItems: 'center',
-  paddingBottom: '40px',
   margin: 'auto',
   position: 'relative',
-})
-
-const signature = () => scale({
-  position: 'absolute',
-  bottom: 18,
-  left: 0,
-  right: 0,
-  margin: 'auto',
-  textAlign: 'center',
-  letterSpacing: 0,
-  fontSize: 13,
-  fontFamily: 'JetBrains Mono, monospace',
-  a: {
-    textDecoration: 'underline',
-    textDecorationColor: '#ddd',
-  }
 })
 
 const appBackground = (darkmode) => scale({
@@ -64,7 +48,6 @@ const appBackground = (darkmode) => scale({
   color: darkmode ? '#e4e4e4' : '#333333',
   overflowX: 'hidden',
   position: 'relative',
-  paddingBottom: 80,
 })
 
 const loadingSpinner = () => scale({
@@ -173,6 +156,7 @@ export default function Home() {
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
   const [showSidePanel, setShowSidePanel] = useState(false)
+  const [showIncorrect, setShowIncorrect] = useState(false)
 
   // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
@@ -275,6 +259,10 @@ export default function Home() {
       )
     }
   }, [data])
+
+  useEffect(() => {
+    console.log('show incorrect: ', showIncorrect)
+  }, [showIncorrect])
 
   useEffect(() => {
     const { position, letter } = inputChange
@@ -438,7 +426,7 @@ export default function Home() {
   useEffect(() => {
     if (guesses.length > 0 && grading) {
       if (grading.correct === 225 - grading.black) {
-        alert('You did it! Crossword solved.')
+        // Alert goes here
       }
     }
   }, [grading])
@@ -482,7 +470,6 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
-        <p css={signature}>Created by <a target="_blank" href="https://benstanfield.io">Ben Stanfield</a></p>
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>
@@ -516,6 +503,7 @@ export default function Home() {
                       uploadGuess,
                       clientId,
                       guestHighlights,
+                      showIncorrect,
                       setEmptyInput,
                       setUploadGuess,
                       setFocus,
@@ -581,7 +569,7 @@ export default function Home() {
               </div>
             </div>
             <Timer props={{ timer, grading }} />
-            <Alert props={{ guesses, grading }} />
+            <Alert props={{ guesses, grading, showIncorrect, setShowIncorrect }} />
             <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
               <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
             </span>

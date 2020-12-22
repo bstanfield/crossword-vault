@@ -5,8 +5,9 @@ import { jsx } from '@emotion/react'
 import { scale } from '../lib/helpers'
 
 const fancyHeader = scale({
-  fontSize: 20,
+  fontSize: 18,
   margin: 0,
+  padding: 0,
 })
 
 const getOrdinal = (i) => {
@@ -45,7 +46,7 @@ export default function Metadata({ props }) {
   return (
     <div>
       <h1 css={fancyHeader}>{data && `${data.dow}, ${formatDate(data.date)}`}</h1>
-      <p css={{ padding: 0, marginTop: 8, marginBottom: -8 }}>{data ? `${data.editor} (Editor) • ${data.author} (Author)` : 'Retrieving puzzle details...'}</p>
+      <p css={{ padding: 0, marginTop: 6, marginBottom: -8 }}>{data ? `${data.editor} (Editor) • ${data.author} (Author)` : 'Retrieving puzzle details...'}</p>
     </div>
   )
 }
