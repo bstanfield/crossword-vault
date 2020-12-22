@@ -28,15 +28,16 @@ export default function Alert({ props }) {
       // Success!
       if (grading.correct === 225 - grading.black) {
         setStatus('correct')
-        setText('Crossword solved!')
-        return
+        return setText('Crossword solved!')
       }
       // Incorrect answers
       if (grading.correct + grading.incorrect === guesses.length - grading.black) {
         setStatus('incorrect')
-        setText(`${grading.incorrect} incorrect.`)
-        return
+        return setText(`${grading.incorrect} incorrect.`)
       }
+
+      // Do not show
+      setText(false)
     }
   }, [grading])
 

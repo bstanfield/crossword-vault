@@ -28,7 +28,7 @@ const formatDate = (date) => {
   // takes in 5/26/2000 --> May 26, 2000
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
   const splits = date.split('/')
-  const month = months[splits[0]]
+  const month = months[splits[0] - 1]
   const day = splits[1]
   const year = splits[2]
 
