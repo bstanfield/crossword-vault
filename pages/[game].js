@@ -177,6 +177,10 @@ export default function Home() {
   const [showSidePanel, setShowSidePanel] = useState(false)
   const [showIncorrect, setShowIncorrect] = useState(false)
 
+  // Nametags
+  const [nametagLocations, setNametagLocations] = useState([])
+  const [nametagData, setNametagData] = useState([])
+
   // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
@@ -215,10 +219,18 @@ export default function Home() {
 
   useEffect(() => {
     const path = window.location.pathname
+    const params = window.location.search
     let room = false
+    let name = false
     if (path) {
       room = path.split('/')[1]
     }
+    console.log('params: ', params)
+
+    if (params) {
+      name = params.split('=')[1]
+    }
+
     const connection = socketIOClient(ENDPOINT)
     setSocketConnection(connection)
 
@@ -230,6 +242,7 @@ export default function Home() {
 
     connection.on('connect', () => {
       connection.emit('join', room)
+      connection.emit('name', name)
     })
 
     connection.on('id', id => {
@@ -267,12 +280,20 @@ export default function Home() {
 
     connection.on('newHighlight', data => {
       let filteredHighlights = {}
+
+      // Grab first square of every guest highlight to place nametag 
+      let nametags = []
+      let nametagLookup = []
       for (const [key, value] of Object.entries(data)) {
         if (value.room === room) {
           filteredHighlights[key] = value
+          nametags.push(value.squares[0])
+          nametagLookup.push({ location: value.squares[0], name: value.name, color: value.color })
         }
       }
       setGuestHighlights(filteredHighlights)
+      setNametagLocations(nametags)
+      setNametagData(nametagLookup)
     })
 
     return () => connection.disconnect()
@@ -548,6 +569,8 @@ export default function Home() {
                       clientId,
                       guestHighlights,
                       showIncorrect,
+                      nametagLocations,
+                      nametagData,
                       setEmptyInput,
                       setUploadGuess,
                       setFocus,
@@ -619,19 +642,19 @@ export default function Home() {
                 <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
               </span>
               <select
-                onChange={(value) => socketConnection.send({ type: 'newPuzzle', value })}
+                onChange={(event) => socketConnection.send({ type: 'newPuzzle', value: event.target.value })}
                 css={selectStyles(false, darkmode)}
                 name="newPuzzle"
                 id="newPuzzle"
               >
                 <option value="" disabled selected>New puzzle ▼</option>
-                <option value="volvo">Monday</option>
-                <option value="saab">Tuesday</option>
-                <option value="mercedes">Wednesday</option>
-                <option value="audi">Thursday</option>
-                <option value="audi">Friday</option>
-                <option value="audi">Saturday</option>
-                <option value="audi">Sunday</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                <option value="Sunday">Sunday</option>
               </select>
             </div>
           </main>
@@ -639,8 +662,4 @@ export default function Home() {
       </div >
     )
   }
-
 }
-
-// export async function getStaticProps() {
-// }

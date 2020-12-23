@@ -6,10 +6,45 @@ import classNames from 'classnames'
 import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
+// Only have matching dark colors for red
+const colorLookup = {
+  'red': {
+    high: 'rgb(255, 40, 101)',
+    low: '#E7D6DB',
+    dark_high: 'rgb(70, 17, 32)',
+    dark_low: '#635156'
+  },
+  'purple': {
+    high: 'rgb(161, 59, 224)',
+    low: '#DDD1E4',
+    dark_high: '#332d4a',
+    dark_low: '#5c5577'
+  },
+  'blue': {
+    high: 'rgb(40, 203, 255)',
+    low: '#CFE2E8',
+    dark_high: 'rgb(70, 17, 32)',
+    dark_low: '#635156'
+  }
+}
+
 const blockNumber = scale({
   fontWeight: 400,
   fontSize: 10
 });
+
+const nametag = (darkmode, color) => scale({
+  fontSize: 8,
+  fontWeight: 600,
+  position: 'absolute',
+  backgroundColor: darkmode ? colorLookup[color].dark_high : colorLookup[color].high,
+  color: 'white !important',
+  padding: '1px 4px',
+  top: '-12px !important',
+  left: '-2px !important',
+  borderTopLeftRadius: 2,
+  borderTopRightRadius: 2,
+})
 
 const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData) => {
   if (focus === content.position) {
@@ -74,6 +109,8 @@ export default function Square({ props }) {
     showIncorrect,
     focus,
     guesses,
+    nametagLocations,
+    nametagData,
     clientId,
     uploadGuess,
     guestHighlights,
@@ -144,28 +181,6 @@ export default function Square({ props }) {
       setGuesses([...newGuesses])
     }
   };
-
-  // Only have matching dark colors for red
-  const colorLookup = {
-    'red': {
-      high: 'rgb(255, 40, 101)',
-      low: '#E7D6DB',
-      dark_high: 'rgb(70, 17, 32)',
-      dark_low: '#635156'
-    },
-    'purple': {
-      high: 'rgb(161, 59, 224)',
-      low: '#DDD1E4',
-      dark_high: '#332d4a',
-      dark_low: '#5c5577'
-    },
-    'blue': {
-      high: 'rgb(40, 203, 255)',
-      low: '#CFE2E8',
-      dark_high: 'rgb(70, 17, 32)',
-      dark_low: '#635156'
-    }
-  }
 
   const isGuestHighlight = () => {
     if (guestHighlights) {
@@ -240,10 +255,25 @@ export default function Square({ props }) {
     }
   })
 
+  const getNametag = (position) => {
+    console.log('nametag data: ', nametagData)
+    console.log('position: ', position)
+    console.log('returning: ', nametagData.filter(tag => tag.location === position)[0])
+    const nametagObject = nametagData.filter(tag => tag.location === position)[0]
+    if (nametagObject) {
+      return nametagObject
+    }
+    return { color: 'red' }
+  }
+
+
   return (
     <div id={content.position} css={squareBox} className={classNames(content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
       <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
+
+        {/* TODO: Reformat into its own component */}
+        {guestHighlight && nametagLocations.includes(content.position) && <span css={nametag(darkmode, getNametag(content.position).color)}>{getNametag(content.position).name}</span>}
         {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
         {content.letter !== '.' && <input
           onKeyDown={handleKeyDown}
