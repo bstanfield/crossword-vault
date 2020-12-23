@@ -18,14 +18,6 @@ export default function Players({ props }) {
     setDarkmode,
   } = props
 
-  const countPlayers = (players) => {
-    let count = 0
-    for (const [id, color] of Object.entries(players)) {
-      count++
-    }
-    return count
-  }
-
   return (
     <div css={playersBox}>
       <Button props={{
@@ -41,7 +33,7 @@ export default function Players({ props }) {
         darkmode,
         inactive: true,
         text: players
-          ? `${countPlayers(players)} Player${countPlayers(players) > 1 ? 's' : ''}`
+          ? `${players} Player${players > 1 ? 's' : ''}`
           : '? Players',
         icon: { name: 'people', size: 14 }
       }} />
