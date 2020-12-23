@@ -17,14 +17,33 @@ import Button from '../components/button'
 import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 
-const ENDPOINT = 'http://127.0.0.1:4001';
-// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/'
+const ENDPOINT = 'http://127.0.0.1:4001' // Local
+// const ENDPOINT = 'https://wordvault-pr-3.herokuapp.com/' // Review
+// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/' // Live
 
 // board ratios (temp hardcode)
 let width = 15
 let height = 15
 
 let totalSquares = width * height
+
+const selectStyles = (inactive, darkmode) => scale({
+  display: 'inline-block',
+  margin: 0,
+  padding: 8,
+  backgroundColor: inactive ? 'transparent' : darkmode ? '#333' : '#eee',
+  fontSize: 13,
+  color: darkmode ? '#f5f5f5' : '#333333',
+  borderRadius: 2,
+  fontFamily: 'JetBrains Mono, monospace',
+  cursor: inactive ? 'inherit' : 'pointer',
+  border: '1px solid transparent',
+  '&:hover': {
+    border: inactive ? '1px solid transparent' : darkmode ? '1px solid #eee' : '1px solid #333',
+  },
+  '-webkit-appearance': 'none',
+  '-moz-appearance': 'none',
+})
 
 const clueHeader = scale({
   marginTop: 30,
@@ -205,6 +224,10 @@ export default function Home() {
 
     smoothscroll.polyfill()
 
+    connection.on('reject', () => {
+      window.location.href = `/`
+    })
+
     connection.on('connect', () => {
       connection.emit('join', room)
     })
@@ -373,8 +396,6 @@ export default function Home() {
 
         // Creates boundary so you can't tab outside of board
         if (nextClue < groupingsToUse.length) {
-          console.log('next clue: ', nextClue)
-          console.log('grouping length: ', groupingsToUse.length)
           setClueIndex(nextClue)
           setHighlightedSquares(groupingsToUse[nextClue])
           const nextLocation = groupingsToUse[nextClue][0]
@@ -471,9 +492,9 @@ export default function Home() {
     return (
       <div css={[appBackground(darkmode), { height: '100vh' }]}>
         <Head>
-          <title>The Vault</title>
-          <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
+          <title>Word Vault</title>
           <link rel="icon" href="/favicon.ico" />
+          <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         </Head>
         <div css={loadingSpinner}>
           <div className={styles.lds_ring}><div></div><div></div></div>
@@ -485,7 +506,7 @@ export default function Home() {
     return (
       <div css={appBackground(darkmode)}>
         <Head>
-          <title>The Vault</title>
+          <title>Word Vault</title>
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"></link>
@@ -591,16 +612,28 @@ export default function Home() {
                 </ul>
               </div>
             </div>
-            <Timer props={{ timer, grading }} />
-            <Alert props={{ guesses, grading, showIncorrect, setShowIncorrect }} />
-            <span onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
-              <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
-            </span>
-            <span onClick={() => {
-              socketConnection.send({ type: 'newPuzzle', value: null })
-            }}>
-              <Button props={{ darkmode, text: 'New puzzle', icon: { name: 'refresh', size: 18 } }} />
-            </span>
+            {/* <Timer props={{ timer, grading }} /> */}
+            <div css={{ marginTop: 6 }}>
+              <Alert props={{ guesses, grading, showIncorrect, setShowIncorrect }} />
+              <span css={{ marginRight: 8 }} onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
+                <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
+              </span>
+              <select
+                onChange={(value) => socketConnection.send({ type: 'newPuzzle', value })}
+                css={selectStyles(false, darkmode)}
+                name="newPuzzle"
+                id="newPuzzle"
+              >
+                <option value="" disabled selected>New puzzle ▼</option>
+                <option value="volvo">Monday</option>
+                <option value="saab">Tuesday</option>
+                <option value="mercedes">Wednesday</option>
+                <option value="audi">Thursday</option>
+                <option value="audi">Friday</option>
+                <option value="audi">Saturday</option>
+                <option value="audi">Sunday</option>
+              </select>
+            </div>
           </main>
         </div>
       </div >
