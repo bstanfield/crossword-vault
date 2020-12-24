@@ -254,9 +254,15 @@ export default function Home() {
     })
 
     // Alert should do more than just setLoading...
-    connection.on('alert', alert => {
-      setLoading(true)
-      setTimeout(() => setLoading(false), 2000)
+    connection.on('loading', boolean => {
+      setLoading(boolean)
+
+      // Reset stuff
+      setFocus(false)
+      setHighlightedSquares([])
+      setHoveredClue(false)
+      setSelectedSquare(false)
+      setGuestHighlights(false)
     })
 
     // Sent once on client connection

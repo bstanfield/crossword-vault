@@ -26,7 +26,7 @@ export default function Nametag({ props }) {
       return nametagObject
     }
     // placeholder
-    return { color: 'red' }
+    return { color: 'transparent' }
   }
 
   const nametag = (darkmode, color) => scale({

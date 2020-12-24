@@ -9,6 +9,12 @@ import Nametag from './nametag'
 
 // Only have matching dark colors for red
 const colorLookup = {
+  'transparent': {
+    high: 'transparent',
+    low: 'transparent',
+    dark_high: 'transparent',
+    dark_low: 'transparent',
+  },
   'grey': {
     high: '#333',
     low: '#eee',
