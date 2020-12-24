@@ -34,7 +34,7 @@ export default function Index() {
   };
 
   const checkKey = async (key) => {
-    const res = await fetch(`https://wordvault-pr-3.herokuapp.com/secret?key=${key}`)
+    const res = await fetch(`https://multiplayer-crossword-server.herokuapp.com/secret?key=${key}`)
     const data = await res.json()
     if (data.error) {
       alert('Invalid key')
