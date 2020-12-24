@@ -9,6 +9,12 @@ import Nametag from './nametag'
 
 // Only have matching dark colors for red
 const colorLookup = {
+  'grey': {
+    high: '#333',
+    low: '#eee',
+    dark_high: '#333',
+    dark_low: '#eee',
+  },
   'red': {
     high: 'rgb(255, 40, 101)',
     low: '#E7D6DB',
@@ -79,7 +85,7 @@ const setZIndex = (showIncorrect, inputData, content, filledInput, highlight, gu
 
   // local client
   if (highlight) {
-  return 3
+    return 3
   }
 
   // other clients
@@ -120,6 +126,7 @@ export default function Square({ props }) {
     filledInput,
     showIncorrect,
     focus,
+    name,
     guesses,
     nametagLocations,
     nametagData,
@@ -274,8 +281,10 @@ export default function Square({ props }) {
 
         <Nametag
           props={{
+            focus: focus === content.position,
             clientId,
             colorLookup,
+            name,
             guestHighlight,
             nametagData,
             nametagLocations,

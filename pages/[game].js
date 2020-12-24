@@ -223,7 +223,6 @@ export default function Home() {
   useEffect(() => {
     const path = window.location.pathname
     let room = false
-    let name = false
     if (path) {
       room = path.split('/')[1]
     }
@@ -283,6 +282,7 @@ export default function Home() {
       for (const [key, value] of Object.entries(data)) {
         if (value.room === room) {
           filteredHighlights[key] = value
+
           nametags.push(value.squares[0])
           nametagLookup.push({ id: value.id, location: value.squares[0], name: value.name, color: value.color })
         }
@@ -311,7 +311,6 @@ export default function Home() {
 
   useEffect(() => {
     if (name) {
-      console.log('sending name to socket: ', name)
       socketConnection.emit('name', name)
       setShowPopup(false)
     }
@@ -576,6 +575,7 @@ export default function Home() {
                       movementDirection,
                       guesses,
                       focus,
+                      name,
                       uploadGuess,
                       clientId,
                       guestHighlights,
