@@ -237,10 +237,20 @@ export default function Home() {
 
     connection.on('connect', () => {
       connection.emit('join', room)
+
+      // Attempting to fix tab unfocus issue
+      if (name) {
+        connection.emit('name', name)
+      }
     })
 
     connection.on('id', id => {
       setClientId(id)
+
+      // Attempting to fix tab unfocus issue
+      if (name) {
+        connection.emit('name', name)
+      }
     })
 
     // Sends board time once on connect

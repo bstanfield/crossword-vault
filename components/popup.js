@@ -102,7 +102,7 @@ export default function Popup({ props }) {
               <h1>Enter a username</h1>
               <p>Must be <strong>5 or fewer</strong> letters.</p>
               <br />
-              <input onKeyDown={handleKeyDown} css={textInput} value={input} onChange={(i) => handleChange(i)} placeholder="Username" type="text"></input>
+              <input autoFocus onKeyDown={handleKeyDown} css={textInput} value={input} onChange={(i) => handleChange(i)} placeholder="Username" type="text"></input>
               <Button props={{ onClickFn: () => checkName(input), darkmode: false, text: 'Save', icon: { name: 'checkmark-circle', size: 16 } }} />
             </div>
           </div>

@@ -43,11 +43,13 @@ const colorLookup = {
 
 const blockNumber = scale({
   fontWeight: 400,
-  fontSize: 10
+  fontSize: 8,
+  top: '1px !important',
 });
 
 const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData) => {
   if (focus === content.position) {
+    // Maybe replace with: #ffa600
     return darkmode ? '#5c5cff' : '#7cc9ff'
   }
   if (filled || highlightedSquares.includes(content.position)) {
@@ -244,9 +246,9 @@ export default function Square({ props }) {
     color: darkmode ? '#f5f5f5' : '#333333',
     textTransform: 'uppercase',
     textAlign: 'center',
-    fontSize: '26px',
+    fontSize: '25px',
     lineHeight: 0,
-    paddingTop: 1,
+    paddingTop: 4,
     fontWeight: 500,
     borderRadius: 0,
     webkitBorderRadius: 0,

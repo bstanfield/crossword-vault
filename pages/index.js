@@ -65,7 +65,7 @@ export default function Index() {
       </Head>
       <div css={{ textAlign: 'center', position: 'absolute', top: 0, bottom: 0, right: 0, left: 0, height: 200, margin: 'auto' }}>
         <h1>Enter your key</h1>
-        <input onKeyDown={handleKeyDown} css={textInput} value={key} onChange={(i) => handleChange(i)} placeholder="Your key" type="text"></input>
+        <input autoFocus onKeyDown={handleKeyDown} css={textInput} value={key} onChange={(i) => handleChange(i)} placeholder="Your key" type="text"></input>
         <Button props={{ onClickFn: () => checkKey(key), darkmode: false, text: 'Enter', icon: { name: 'enter-outline', size: 16 } }} />
       </div >
     </Fragment>
