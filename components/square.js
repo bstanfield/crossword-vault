@@ -5,6 +5,35 @@ import styles from '../styles/Home.module.css'
 import classNames from 'classnames'
 import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
+import Nametag from './nametag'
+
+// Only have matching dark colors for red
+const colorLookup = {
+  'grey': {
+    high: '#333',
+    low: '#eee',
+    dark_high: '#333',
+    dark_low: '#eee',
+  },
+  'red': {
+    high: 'rgb(255, 40, 101)',
+    low: '#E7D6DB',
+    dark_high: 'rgb(70, 17, 32)',
+    dark_low: '#635156'
+  },
+  'purple': {
+    high: 'rgb(161, 59, 224)',
+    low: '#DDD1E4',
+    dark_high: '#332d4a',
+    dark_low: '#5c5577'
+  },
+  'blue': {
+    high: 'rgb(40, 203, 255)',
+    low: '#CFE2E8',
+    dark_high: 'rgb(70, 17, 32)',
+    dark_low: '#635156'
+  }
+}
 
 const blockNumber = scale({
   fontWeight: 400,
@@ -44,6 +73,30 @@ const setBorderColor = (darkmode, filled, highlightedSquares, content, focus, gu
   return darkmode ? '2px solid #333333' : '2px solid black'
 }
 
+const setZIndex = (showIncorrect, inputData, content, filledInput, highlight, guestHighlight) => {
+  // show incorrect results
+  if (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) {
+    return 5
+  }
+
+  if (filledInput === content.position) {
+    return 3
+  }
+
+  // local client
+  if (highlight) {
+    return 3
+  }
+
+  // other clients
+  if (guestHighlight) {
+    return 2
+  }
+
+  // default
+  return 1
+}
+
 const form = scale({
   padding: 0,
   margin: 0,
@@ -73,7 +126,10 @@ export default function Square({ props }) {
     filledInput,
     showIncorrect,
     focus,
+    name,
     guesses,
+    nametagLocations,
+    nametagData,
     clientId,
     uploadGuess,
     guestHighlights,
@@ -145,28 +201,6 @@ export default function Square({ props }) {
     }
   };
 
-  // Only have matching dark colors for red
-  const colorLookup = {
-    'red': {
-      high: 'rgb(255, 40, 101)',
-      low: '#E7D6DB',
-      dark_high: 'rgb(70, 17, 32)',
-      dark_low: '#635156'
-    },
-    'purple': {
-      high: 'rgb(161, 59, 224)',
-      low: '#DDD1E4',
-      dark_high: '#332d4a',
-      dark_low: '#5c5577'
-    },
-    'blue': {
-      high: 'rgb(40, 203, 255)',
-      low: '#CFE2E8',
-      dark_high: 'rgb(70, 17, 32)',
-      dark_low: '#635156'
-    }
-  }
-
   const isGuestHighlight = () => {
     if (guestHighlights) {
       // Replace this deletion with a new method outside of Square
@@ -223,7 +257,7 @@ export default function Square({ props }) {
     marginBottom: -2,
     borderRadius: '2px',
     border: setBorderColor(darkmode, filledInput === content.position, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData),
-    zIndex: (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) ? 3 : (filledInput === content.position || highlight || guestHighlight) ? 2 : 1,
+    zIndex: setZIndex(showIncorrect, inputData, content, filledInput, highlight, guestHighlight),
     "color": "#333333",
     // transition: 'border 0.1s ease-in-out',
     span: {
@@ -244,6 +278,20 @@ export default function Square({ props }) {
     <div id={content.position} css={squareBox} className={classNames(content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
       <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
+
+        <Nametag
+          props={{
+            focus: focus === content.position,
+            clientId,
+            colorLookup,
+            name,
+            guestHighlight,
+            nametagData,
+            nametagLocations,
+            content,
+            darkmode,
+          }}
+        />
         {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
         {content.letter !== '.' && <input
           onKeyDown={handleKeyDown}

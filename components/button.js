@@ -7,7 +7,7 @@ import Icon from './icon'
 
 const buttonStyles = (inactive, darkmode) => scale({
   display: 'inline-block',
-  margin: '0 6px',
+  margin: 0,
   padding: 8,
   backgroundColor: inactive ? 'transparent' : darkmode ? '#333' : '#eee',
   fontSize: 13,
