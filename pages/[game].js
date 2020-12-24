@@ -16,6 +16,7 @@ import Alert from '../components/alert'
 import Button from '../components/button'
 import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
+import Popup from '../components/popup'
 
 const ENDPOINT = 'http://127.0.0.1:4001' // Local
 // const ENDPOINT = 'https://wordvault-pr-3.herokuapp.com/' // Review
@@ -178,6 +179,8 @@ export default function Home() {
   const [showIncorrect, setShowIncorrect] = useState(false)
 
   // Nametags
+  const [showPopup, setShowPopup] = useState(false)
+  const [name, setName] = useState(false)
   const [nametagLocations, setNametagLocations] = useState([])
   const [nametagData, setNametagData] = useState([])
 
@@ -219,16 +222,10 @@ export default function Home() {
 
   useEffect(() => {
     const path = window.location.pathname
-    const params = window.location.search
     let room = false
     let name = false
     if (path) {
       room = path.split('/')[1]
-    }
-    console.log('params: ', params)
-
-    if (params) {
-      name = params.split('=')[1]
     }
 
     const connection = socketIOClient(ENDPOINT)
@@ -242,7 +239,6 @@ export default function Home() {
 
     connection.on('connect', () => {
       connection.emit('join', room)
-      connection.emit('name', name)
     })
 
     connection.on('id', id => {
@@ -288,7 +284,7 @@ export default function Home() {
         if (value.room === room) {
           filteredHighlights[key] = value
           nametags.push(value.squares[0])
-          nametagLookup.push({ location: value.squares[0], name: value.name, color: value.color })
+          nametagLookup.push({ id: value.id, location: value.squares[0], name: value.name, color: value.color })
         }
       }
       setGuestHighlights(filteredHighlights)
@@ -306,6 +302,20 @@ export default function Home() {
       socketConnection.send({ type: 'input', value: inputChangeToApi })
     }
   }, [inputChangeToApi])
+
+  useEffect(() => {
+    if (!name) {
+      setShowPopup(true)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (name) {
+      console.log('sending name to socket: ', name)
+      socketConnection.emit('name', name)
+      setShowPopup(false)
+    }
+  }, [name])
 
   useEffect(() => {
     setGuesses(response)
@@ -535,6 +545,7 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
+        <Popup props={{ showPopup, setName }} />
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>
@@ -656,6 +667,7 @@ export default function Home() {
                 <option value="Saturday">Saturday</option>
                 <option value="Sunday">Sunday</option>
               </select>
+              <p css={{ display: 'inline-block', fontSize: 14, paddingLeft: 12 }}>Playing as <strong>{name || 'anonymous'}</strong></p>
             </div>
           </main>
         </div>

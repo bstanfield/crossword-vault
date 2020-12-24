@@ -5,6 +5,7 @@ import styles from '../styles/Home.module.css'
 import classNames from 'classnames'
 import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
+import Nametag from './nametag'
 
 // Only have matching dark colors for red
 const colorLookup = {
@@ -32,19 +33,6 @@ const blockNumber = scale({
   fontWeight: 400,
   fontSize: 10
 });
-
-const nametag = (darkmode, color) => scale({
-  fontSize: 8,
-  fontWeight: 600,
-  position: 'absolute',
-  backgroundColor: darkmode ? colorLookup[color].dark_high : colorLookup[color].high,
-  color: 'white !important',
-  padding: '1px 4px',
-  top: '-12px !important',
-  left: '-2px !important',
-  borderTopLeftRadius: 2,
-  borderTopRightRadius: 2,
-})
 
 const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData) => {
   if (focus === content.position) {
@@ -77,6 +65,30 @@ const setBorderColor = (darkmode, filled, highlightedSquares, content, focus, gu
     return `2px solid ${darkmode ? guestHighlight.color.dark_high : guestHighlight.color.high}`
   }
   return darkmode ? '2px solid #333333' : '2px solid black'
+}
+
+const setZIndex = (showIncorrect, inputData, content, filledInput, highlight, guestHighlight) => {
+  // show incorrect results
+  if (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) {
+    return 5
+  }
+
+  if (filledInput === content.position) {
+    return 3
+  }
+
+  // local client
+  if (highlight) {
+  return 3
+  }
+
+  // other clients
+  if (guestHighlight) {
+    return 2
+  }
+
+  // default
+  return 1
 }
 
 const form = scale({
@@ -238,7 +250,7 @@ export default function Square({ props }) {
     marginBottom: -2,
     borderRadius: '2px',
     border: setBorderColor(darkmode, filledInput === content.position, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData),
-    zIndex: (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) ? 3 : (filledInput === content.position || highlight || guestHighlight) ? 2 : 1,
+    zIndex: setZIndex(showIncorrect, inputData, content, filledInput, highlight, guestHighlight),
     "color": "#333333",
     // transition: 'border 0.1s ease-in-out',
     span: {
@@ -255,25 +267,22 @@ export default function Square({ props }) {
     }
   })
 
-  const getNametag = (position) => {
-    console.log('nametag data: ', nametagData)
-    console.log('position: ', position)
-    console.log('returning: ', nametagData.filter(tag => tag.location === position)[0])
-    const nametagObject = nametagData.filter(tag => tag.location === position)[0]
-    if (nametagObject) {
-      return nametagObject
-    }
-    return { color: 'red' }
-  }
-
-
   return (
     <div id={content.position} css={squareBox} className={classNames(content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
       <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
 
-        {/* TODO: Reformat into its own component */}
-        {guestHighlight && nametagLocations.includes(content.position) && <span css={nametag(darkmode, getNametag(content.position).color)}>{getNametag(content.position).name}</span>}
+        <Nametag
+          props={{
+            clientId,
+            colorLookup,
+            guestHighlight,
+            nametagData,
+            nametagLocations,
+            content,
+            darkmode,
+          }}
+        />
         {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
         {content.letter !== '.' && <input
           onKeyDown={handleKeyDown}
