@@ -19,7 +19,8 @@ export default function Nametag({ props }) {
 
 
   const getNametag = (position) => {
-    const nametagObject = nametagData.filter(tag => tag.location === position)[0]
+    const nametagDataWithoutLocalClient = nametagData.filter(tag => tag.id !== clientId)
+    const nametagObject = nametagDataWithoutLocalClient.filter(tag => tag.location === position)[0]
 
     if (nametagObject) {
       return nametagObject
