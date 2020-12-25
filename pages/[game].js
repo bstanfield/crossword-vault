@@ -680,7 +680,7 @@ export default function Home() {
                 <option value="Thursday">Thursday</option>
                 <option value="Friday">Friday</option>
                 <option value="Saturday">Saturday</option>
-                <option value="Sunday">Sunday</option>
+                <option value="Sunday" disabled>Sunday</option>
               </select>
               <p css={{ display: 'inline-block', fontSize: 14, paddingLeft: 12 }}>Playing as <strong>{name || 'anonymous'}</strong></p>
             </div>
