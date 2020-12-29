@@ -19,7 +19,8 @@ import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
 
 // const ENDPOINT = 'http://127.0.0.1:4001' // Local
-const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/' // Live
+const ENDPOINT = 'https://wordvault-pr-4.herokuapp.com/' // PR Review
+// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/' // Live
 
 // board ratios (temp hardcode)
 let width = 15
