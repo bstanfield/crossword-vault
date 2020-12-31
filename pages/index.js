@@ -3,17 +3,21 @@
 import { useEffect, useState, Fragment } from 'react'
 import { jsx } from '@emotion/react'
 import Head from 'next/head'
-import { scale } from '../lib/helpers'
+import { scale, fonts, colors } from '../lib/helpers'
 import Button from '../components/button'
+
+const ENDPOINT = process.env.NODE_ENV
+  ? 'http://127.0.0.1:4001'
+  : 'https://multiplayer-crossword-server.herokuapp.com'
 
 const textInput = scale({
   padding: '8px 9px 8px 9px',
-  border: '1px solid #333',
+  border: `1px solid ${colors.slate}`,
   borderRadius: 2,
   marginRight: 12,
-  fontFamily: 'JetBrains Mono',
+  fontFamily: fonts.monospace,
   '&::placeholder': {
-    fontFamily: 'JetBrains Mono',
+    fontFamily: fonts.monospace,
   }
 })
 
@@ -34,7 +38,7 @@ export default function Index() {
   };
 
   const checkKey = async (key) => {
-    const res = await fetch(`https://multiplayer-crossword-server.herokuapp.com/secret?key=${key}`)
+    const res = await fetch(`${ENDPOINT}/secret?key=${key}`)
     const data = await res.json()
     if (data.error) {
       alert('Invalid key')

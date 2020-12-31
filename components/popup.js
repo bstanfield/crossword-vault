@@ -1,9 +1,9 @@
 
 /** @jsx jsx */
 
-import { useEffect, useState, Fragment } from 'react'
+import { useState } from 'react'
 import { jsx } from '@emotion/react'
-import { scale } from '../lib/helpers'
+import { fonts, scale, colors } from '../lib/helpers'
 import Button from './button'
 
 export default function Popup({ props }) {
@@ -64,12 +64,12 @@ export default function Popup({ props }) {
 
   const textInput = scale({
     padding: '8px 9px 8px 9px',
-    border: '1px solid #333',
+    border: `1px solid ${colors.slate}`,
     borderRadius: 2,
     marginRight: 12,
-    fontFamily: 'JetBrains Mono',
+    fontFamily: fonts.monospace,
     '&::placeholder': {
-      fontFamily: 'JetBrains Mono',
+      fontFamily: fonts.monospace,
     }
   })
 
@@ -88,7 +88,7 @@ export default function Popup({ props }) {
       paddingBottom: 8,
     },
     'p:first-of-type': {
-      color: error ? 'red' : '#333',
+      color: error ? colors.error : colors.slate,
       margin: 0,
     }
   })
@@ -102,7 +102,7 @@ export default function Popup({ props }) {
               <h1>Enter a username</h1>
               <p>Must be <strong>5 or fewer</strong> letters.</p>
               <br />
-              <input autoFocus onKeyDown={handleKeyDown} css={textInput} value={input} onChange={(i) => handleChange(i)} placeholder="Username" type="text"></input>
+              <input autoFocus onKeyDown={handleKeyDown} css={textInput} value={input} onChange={(i) => handleChange(i)} placeholder='Username' type='text'></input>
               <Button props={{ onClickFn: () => checkName(input), darkmode: false, text: 'Save', icon: { name: 'checkmark-circle', size: 16 } }} />
             </div>
           </div>

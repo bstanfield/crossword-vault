@@ -25,7 +25,8 @@ export default function Nametag({ props }) {
     if (nametagObject) {
       return nametagObject
     }
-    // placeholder
+
+    // default
     return { color: 'transparent' }
   }
 
@@ -49,7 +50,7 @@ export default function Nametag({ props }) {
         <span css={nametag(darkmode, 'grey')}>{name}</span>
       )
     }
-    console.log('guestHighlight: ', guestHighlight)
+
     // Then, check if this square is the beginning of the clue
     const index = nametagLocations.indexOf(content.position)
     if (index > -1) {
@@ -57,6 +58,7 @@ export default function Nametag({ props }) {
         <span css={nametag(darkmode, getNametag(content.position).color)}>{getNametag(content.position).name}</span>
       )
     }
+
     return null
   } else {
     return null

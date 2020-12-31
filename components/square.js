@@ -3,7 +3,7 @@
 import { jsx } from '@emotion/react'
 import styles from '../styles/Home.module.css'
 import classNames from 'classnames'
-import { scale } from '../lib/helpers'
+import { scale, colors, fonts } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 import Nametag from './nametag'
 
@@ -16,10 +16,10 @@ const colorLookup = {
     dark_low: 'transparent',
   },
   'grey': {
-    high: '#333',
-    low: '#eee',
-    dark_high: '#333',
-    dark_low: '#eee',
+    high: colors.slate,
+    low: colors.lightgrey,
+    dark_high: colors.slate,
+    dark_low: colors.lightgrey,
   },
   'red': {
     high: 'rgb(255, 40, 101)',
@@ -67,7 +67,7 @@ const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus
 const setBorderColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData) => {
   // z index is bad
   if (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) {
-    return `2px solid #e61818`
+    return `2px solid ${colors.error}`
   }
   if (focus === content.position) {
     return '2px solid black'
@@ -78,7 +78,7 @@ const setBorderColor = (darkmode, filled, highlightedSquares, content, focus, gu
   if (guestHighlight) {
     return `2px solid ${darkmode ? guestHighlight.color.dark_high : guestHighlight.color.high}`
   }
-  return darkmode ? '2px solid #333333' : '2px solid black'
+  return darkmode ? `2px solid ${colors.slate}` : '2px solid black'
 }
 
 const setZIndex = (showIncorrect, inputData, content, filledInput, highlight, guestHighlight) => {
@@ -114,7 +114,7 @@ const form = scale({
 const circleClue = scale({
   width: '100%',
   height: '100%',
-  border: '1px solid #333333',
+  border: `1px solid ${colors.slate}`,
   opacity: 1,
   borderRadius: '50%',
   position: 'absolute',
@@ -152,6 +152,7 @@ export default function Square({ props }) {
     setInputChange,
     setInputChangeToApi
   } = props
+
   const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
   const [inputData, setInputData] = useState('')
@@ -243,7 +244,7 @@ export default function Square({ props }) {
     height: '100%',
     padding: 0,
     margin: 0,
-    color: darkmode ? '#f5f5f5' : '#333333',
+    color: darkmode ? colors.offwhite : colors.slate,
     textTransform: 'uppercase',
     textAlign: 'center',
     fontSize: '25px',
@@ -252,7 +253,7 @@ export default function Square({ props }) {
     fontWeight: 500,
     borderRadius: 0,
     webkitBorderRadius: 0,
-    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif',
+    fontFamily: fonts.sans,
     backgroundColor: setBackgroundColor(darkmode, filledInput === content.position, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData),
     // transition: 'background-color 0.1s ease-in-out',
   })
@@ -263,16 +264,16 @@ export default function Square({ props }) {
     padding: 0,
     marginLeft: -2,
     marginBottom: -2,
-    borderRadius: '2px',
+    borderRadius: 2,
     border: setBorderColor(darkmode, filledInput === content.position, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData),
     zIndex: setZIndex(showIncorrect, inputData, content, filledInput, highlight, guestHighlight),
-    "color": "#333333",
+    color: colors.slate,
     // transition: 'border 0.1s ease-in-out',
     span: {
-      color: darkmode ? '#f5f5f5' : 'black',
+      color: darkmode ? colors.offwhite : 'black',
       position: 'absolute',
-      top: '2px',
-      left: '2px',
+      top: 2,
+      left: 2,
       webkitTouchCallout: 'none',
       webkitUserSelect: 'none',
       khtmlUserSelect: 'none',
@@ -287,6 +288,7 @@ export default function Square({ props }) {
       <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
 
+        {/* Shows client username above square */}
         <Nametag
           props={{
             focus: focus === content.position,
@@ -300,7 +302,8 @@ export default function Square({ props }) {
             darkmode,
           }}
         />
-        {/* <span css={blockNumber(hover)}>{content.position - 1}</span> */}
+
+        {/* Skips rendering input for black squares */}
         {content.letter !== '.' && <input
           onKeyDown={handleKeyDown}
           autoComplete='off'
@@ -314,7 +317,7 @@ export default function Square({ props }) {
             setClickCount(clickCount + 1)
           }}
           css={squareInput}
-          type="text"
+          type='text'
           id={`input-${content.position}`}
           value={inputData}
           onChange={(input) => {
