@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from '@emotion/react'
-import { scale, colors, fonts } from '../lib/helpers'
+import { scale, colors, fonts, ENDPOINT } from '../lib/helpers'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import classNames from 'classnames'
@@ -18,10 +18,6 @@ import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
-
-const ENDPOINT = process.env.NODE_ENV
-  ? 'http://127.0.0.1:4001'
-  : 'https://multiplayer-crossword-server.herokuapp.com/'
 
 // board ratios (temp hardcode)
 const width = 15
