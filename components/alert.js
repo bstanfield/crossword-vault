@@ -10,7 +10,7 @@ const alertStyles = (status) => scale({
   margin: 0,
   padding: 8,
   marginRight: 6,
-  backgroundColor: status === 'correct' ? colors.success : colors.alert,
+  backgroundColor: status === 'correct' ? colors.success : colors.error,
   fontSize: 13,
   color: colors.offwhite,
   borderRadius: 2,
