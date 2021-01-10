@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from '@emotion/react'
-import { scale } from '../lib/helpers'
+import { colors, fonts, scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 
 const alertStyles = (status) => scale({
@@ -10,11 +10,11 @@ const alertStyles = (status) => scale({
   margin: 0,
   padding: 8,
   marginRight: 6,
-  backgroundColor: status === 'correct' ? 'green' : 'red',
+  backgroundColor: status === 'correct' ? colors.success : colors.error,
   fontSize: 13,
-  color: '#f5f5f5',
+  color: colors.offwhite,
   borderRadius: 2,
-  fontFamily: 'JetBrains Mono, monospace'
+  fontFamily: fonts.monospace,
 })
 
 export default function Alert({ props }) {

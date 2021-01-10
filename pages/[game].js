@@ -1,11 +1,11 @@
 /** @jsx jsx */
 
 import { jsx } from '@emotion/react'
-import { scale } from '../lib/helpers'
+import { scale, colors, fonts, ENDPOINT } from '../lib/helpers'
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import classNames from 'classnames'
-import { useEffect, useState, Fragment } from 'react'
+import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
@@ -17,39 +17,17 @@ import Button from '../components/button'
 import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
-
-// const ENDPOINT = 'http://127.0.0.1:4001' // Local
-const ENDPOINT = 'https://wordvault-pr-4.herokuapp.com/' // PR Review
-// const ENDPOINT = 'https://multiplayer-crossword-server.herokuapp.com/' // Live
+import PuzzleSelector from '../components/puzzleSelector'
 
 // board ratios (temp hardcode)
-let width = 15
-let height = 15
-
-let totalSquares = width * height
-
-const selectStyles = (inactive, darkmode) => scale({
-  display: 'inline-block',
-  margin: 0,
-  padding: 8,
-  backgroundColor: inactive ? 'transparent' : darkmode ? '#333' : '#eee',
-  fontSize: 13,
-  color: darkmode ? '#f5f5f5' : '#333333',
-  borderRadius: 2,
-  fontFamily: 'JetBrains Mono, monospace',
-  cursor: inactive ? 'inherit' : 'pointer',
-  border: '1px solid transparent',
-  '&:hover': {
-    border: inactive ? '1px solid transparent' : darkmode ? '1px solid #eee' : '1px solid #333',
-  },
-  '-webkit-appearance': 'none',
-  '-moz-appearance': 'none',
-})
+const width = 15
+const height = 15
+const totalSquares = width * height
 
 const clueHeader = scale({
   marginTop: 30,
   paddingBottom: 6,
-  borderBottom: '1.5px solid #d0d0d0',
+  borderBottom: `1.5px solid ${colors.mediumgrey}`,
 })
 
 const appContainer = (darkmode) => scale({
@@ -64,8 +42,8 @@ const appContainer = (darkmode) => scale({
 })
 
 const appBackground = (darkmode) => scale({
-  backgroundColor: darkmode ? 'black' : '#f5f5f5',
-  color: darkmode ? '#e4e4e4' : '#333333',
+  backgroundColor: darkmode ? 'black' : colors.offwhite,
+  color: darkmode ? colors.offwhite : colors.slate,
   overflowX: 'hidden',
   position: 'relative',
 })
@@ -86,32 +64,32 @@ const boardContainer = (darkmode) => scale({
   cursor: 'text',
   display: 'grid',
   marginTop: '30px',
-  width: '550px',
-  backgroundColor: '#333',
-  height: '550px',
-  gridTemplateColumns: 'repeat(15, 1fr)',
-  gridTemplateRows: 'repeat(15, 1fr)',
-  border: '4px solid #333',
-  borderLeft: '5px solid #333',
-  borderBottom: '5px solid #333',
+  width: 'auto',
+  backgroundColor: colors.slate,
+  height: 'auto',
+  gridTemplateColumns: `repeat(${height}, 1fr)`,
+  gridTemplateRows: `repeat(${width}, 1fr)`,
+  border: `4px solid ${colors.slate}`,
+  borderLeft: `5px solid ${colors.slate}`,
+  borderBottom: `5px solid ${colors.slate}`,
   borderRadius: '4px',
 })
 
 const createDownGroupings = (crossword) => {
-  const { grid, answers } = crossword
+  const { grid } = crossword
   // how many down clues?
   // const totalAnswers = answers.down.length
   // let assignedAnswers = 0
   let position = 1
   let grouping = []
-  while (position <= 225) {
+  while (position <= totalSquares) {
     if (grid[position - 1] !== '.') {
       let match = false
       if (grouping.length === 0) {
         grouping.push([position])
       } else {
         grouping.map((group, index) => {
-          if (group.includes(position - 15)) {
+          if (group.includes(position - width)) {
             match = true
             grouping[index].push(position)
           }
@@ -139,14 +117,14 @@ const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings, set
     partial++
     rowPosition++
 
-    // Reset grouping after each dot OR after 15 squares
+    // Reset grouping after each dot OR after <width> squares
     if (grid[partial - 1] === '.') {
       acrossGroupings.push(acrossGrouping)
       acrossGrouping = []
     } else {
       acrossGrouping.push(partial)
     }
-    if (rowPosition === 15) {
+    if (rowPosition === width) {
       acrossGroupings.push(acrossGrouping)
       acrossGrouping = []
       rowPosition = 0
@@ -423,7 +401,7 @@ export default function Home() {
   useEffect(() => {
     if (movementKey) {
       // Sets each arrow keys movements in the grid
-      const arrowKeys = { 'ArrowRight': 1, 'ArrowLeft': -1, 'ArrowUp': -15, 'ArrowDown': 15 }
+      const arrowKeys = { 'ArrowRight': 1, 'ArrowLeft': -1, 'ArrowUp': -width, 'ArrowDown': width }
       if (movementKey.includes('Arrow')) {
         // Instead of next location within highlighted squares, just next location on
         // board and determine if there should be a new set of highlighted squares (new clue)
@@ -515,7 +493,7 @@ export default function Home() {
 
   useEffect(() => {
     if (guesses.length > 0 && grading) {
-      if (grading.correct === 225 - grading.black) {
+      if (grading.correct === totalSquares - grading.black) {
         // Alert goes here
       }
     }
@@ -567,7 +545,7 @@ export default function Home() {
             <Players props={{ darkmode, setDarkmode, players }} />
 
             <div>
-              <p css={{ maxWidth: 300, margin: 'auto', fontFamily: 'Old Standard TT, Serif', fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 36, textAlign: 'center', marginTop: 3 }}>Word Vault</p>
+              <p css={{ maxWidth: 300, margin: 'auto', fontFamily: fonts.headline, fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 36, textAlign: 'center', marginTop: 3 }}>Word Vault</p>
             </div>
           </div>
         </div>
@@ -662,27 +640,22 @@ export default function Home() {
                 </ul>
               </div>
             </div>
+
             {/* <Timer props={{ timer, grading }} /> */}
+
             <div css={{ marginTop: 6 }}>
               <Alert props={{ guesses, grading, showIncorrect, setShowIncorrect }} />
               <span css={{ marginRight: 8 }} onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
                 <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
               </span>
-              <select
-                onChange={(event) => socketConnection.send({ type: 'newPuzzle', value: event.target.value })}
-                css={selectStyles(false, darkmode)}
-                name="newPuzzle"
-                id="newPuzzle"
-              >
-                <option value="" disabled selected>New puzzle ▼</option>
-                <option value="Monday">Monday</option>
-                <option value="Tuesday">Tuesday</option>
-                <option value="Wednesday">Wednesday</option>
-                <option value="Thursday">Thursday</option>
-                <option value="Friday">Friday</option>
-                <option value="Saturday">Saturday</option>
-                <option value="Sunday" disabled>Sunday</option>
-              </select>
+
+              <PuzzleSelector
+                props={{
+                  darkmode,
+                  socketConnection
+                }}
+              />
+
               <p css={{ display: 'inline-block', fontSize: 14, paddingLeft: 12 }}>Playing as <strong>{name || 'anonymous'}</strong></p>
             </div>
           </main>
