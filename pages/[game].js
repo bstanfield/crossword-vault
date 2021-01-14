@@ -41,6 +41,13 @@ const appContainer = scale({
   position: 'relative',
 })
 
+const boardGrid = scale({
+  display: 'grid',
+  gridGap: '30px',
+  gridTemplateColumns: '4fr 2fr 2fr',
+  maxWidth: '1200px',
+})
+
 const appBackground = (darkmode) => scale({
   backgroundColor: darkmode ? 'black' : colors.offwhite,
   color: darkmode ? colors.offwhite : colors.slate,
@@ -569,7 +576,7 @@ export default function Home() {
 
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
-            <div className={styles.crossword_board__container}>
+            <div css={boardGrid}>
               <div css={boardContainer}>
                 {board.map(
                   (content, index) => (
