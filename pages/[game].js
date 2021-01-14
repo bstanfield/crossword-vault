@@ -274,6 +274,7 @@ export default function Home() {
       setHoveredClue(false)
       setSelectedSquare(false)
       setGuestHighlights(false)
+      setShowIncorrect(false)
     })
 
     // Sent once on client connection
@@ -343,10 +344,6 @@ export default function Home() {
       )
     }
   }, [data])
-
-  useEffect(() => {
-    console.log('show incorrect: ', showIncorrect)
-  }, [showIncorrect])
 
   useEffect(() => {
     const { position, letter } = inputChange
