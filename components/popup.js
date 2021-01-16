@@ -8,6 +8,7 @@ import Button from './button'
 
 export default function Popup({ props }) {
   const {
+    insufficientWidth = true,
     showPopup,
     setName,
   } = props
@@ -37,11 +38,12 @@ export default function Popup({ props }) {
     }
   }
 
-  const darkBackground = scale({
+  const darkBackground = (opacity) => scale({
+    display: showPopup ? 'block' : ['block', 'block', 'none', 'none'],
     width: '100%',
     height: '100%',
     position: 'absolute',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: `rgba(0, 0, 0, ${opacity || 0.5})`,
     zIndex: 8,
   })
 
@@ -93,9 +95,24 @@ export default function Popup({ props }) {
     }
   })
 
+  if (insufficientWidth && !showPopup) {
+    return (
+      <div css={darkBackground(1)}>
+        <div css={container}>
+          <div css={{ position: 'relative', width: '100%', height: '100%' }}>
+            <div css={content}>
+              <h1>🙈 Oops! Your screen is too small to play.</h1>
+              <p>WordVault doesn't support mobile or slim browser widths just yet. Please widen your browser!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (showPopup) {
     return (
-      <div css={darkBackground}>
+      <div css={darkBackground(0.5)}>
         <div css={container}>
           <div css={{ position: 'relative', width: '100%', height: '100%' }}>
             <div css={content}>

@@ -12,7 +12,8 @@ const clueStyle = (darkmode, highlight) => scale({
   borderRadius: 4,
   cursor: 'pointer',
   transition: 'all 0.2s ease',
-  transitionProperty: 'background-color, border'
+  transitionProperty: 'background-color, border',
+  fontSize: [14, 14, 14, 'inherit'],
 });
 
 export default function Clue({ props }) {

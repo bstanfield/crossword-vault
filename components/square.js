@@ -1,8 +1,6 @@
 /** @jsx jsx */
 
 import { jsx } from '@emotion/react'
-import styles from '../styles/Home.module.css'
-import classNames from 'classnames'
 import { scale, colors, fonts } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 import Nametag from './nametag'
@@ -284,7 +282,7 @@ export default function Square({ props }) {
   })
 
   return (
-    <div id={content.position} css={squareBox} className={classNames(content.letter === '.' ? styles.crossword_board__square__block : styles.crossword_board__square__letter)}>
+    <div id={content.position} css={squareBox}>
       <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
 
@@ -325,7 +323,7 @@ export default function Square({ props }) {
               setInputData(input.nativeEvent.data)
               setSelectionIterator(selectionIterator + 1)
 
-              // Rename
+              // TODO: Rename
               const inputToFill = { position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator }
               setFilledInput({ ...inputToFill })
               setInputChangeToApi({ ...inputToFill })

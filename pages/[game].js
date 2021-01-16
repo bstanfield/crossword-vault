@@ -1,10 +1,8 @@
 /** @jsx jsx */
 
 import { jsx } from '@emotion/react'
-import { scale, colors, fonts, ENDPOINT } from '../lib/helpers'
+import { fonts, ENDPOINT } from '../lib/helpers'
 import Head from 'next/head'
-import styles from '../styles/Home.module.css'
-import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import Square from '../components/square'
 import Clue from '../components/clue'
@@ -18,90 +16,16 @@ import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
+import styles from '../lib/boardStyles'
 
 // board ratios (temp hardcode)
 const width = 15
 const height = 15
 const totalSquares = width * height
 
-const clueHeader = scale({
-  marginTop: 30,
-  paddingBottom: 6,
-  borderBottom: `1.5px solid ${colors.mediumgrey}`,
-})
-
-const appContainer = scale({
-  height: '100vh',
-  padding: '0px 20px',
-  display: 'flex',
-  flexDirection: 'column',
-  paddingTop: '90px',
-  alignItems: 'center',
-  margin: 'auto',
-  position: 'relative',
-})
-
-const boardGrid = scale({
-  display: 'grid',
-  gridGap: '30px',
-  gridTemplateColumns: '4fr 2fr 2fr',
-  maxWidth: '1200px',
-})
-
-const appBackground = (darkmode) => scale({
-  backgroundColor: darkmode ? 'black' : colors.offwhite,
-  color: darkmode ? colors.offwhite : colors.slate,
-  overflowX: 'hidden',
-  position: 'relative',
-})
-
-const loadingSpinner = () => scale({
-  position: 'absolute',
-  top: 0,
-  right: 0,
-  left: 0,
-  bottom: 0,
-  margin: 'auto',
-  textAlign: 'center',
-  height: 200,
-  width: 200,
-})
-
-const boardContainer = scale({
-  cursor: 'text',
-  display: 'grid',
-  marginTop: '30px',
-  width: 'auto',
-  backgroundColor: colors.slate,
-  height: 'auto',
-  gridTemplateColumns: `repeat(${height}, 1fr)`,
-  gridTemplateRows: `repeat(${width}, 1fr)`,
-  border: `4px solid ${colors.slate}`,
-  borderLeft: `5px solid ${colors.slate}`,
-  borderBottom: `5px solid ${colors.slate}`,
-  borderRadius: '4px',
-})
-
-const crosswordClues = scale({
-  listStyleType: 'none',
-  padding: 0,
-  ul: {
-    margin: 0,
-    padding: 0,
-    maxHeight: 500,
-    overflowY: 'scroll',
-  },
-  li: {
-    cursor: 'pointer',
-    paddingBottom: 6,
-  }
-})
-
 const createDownGroupings = (crossword) => {
   const { grid } = crossword
-  // how many down clues?
-  // const totalAnswers = answers.down.length
-  // let assignedAnswers = 0
+
   let position = 1
   let grouping = []
   while (position <= totalSquares) {
@@ -177,9 +101,9 @@ export default function Home() {
   const [highlightedSquares, setHighlightedSquares] = useState([])
   const [showSidePanel, setShowSidePanel] = useState(false)
   const [showIncorrect, setShowIncorrect] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
 
   // Nametags
-  const [showPopup, setShowPopup] = useState(false)
   const [name, setName] = useState(false)
   const [nametagLocations, setNametagLocations] = useState([])
   const [nametagData, setNametagData] = useState([])
@@ -260,7 +184,6 @@ export default function Home() {
     })
 
     connection.on('board', board => {
-      console.log('received board: ', board)
       setData(board)
     })
 
@@ -283,6 +206,7 @@ export default function Home() {
     })
 
     connection.on('inputChange', data => {
+      console.log('received input change: ', data)
       setInputChange(data)
     })
 
@@ -350,7 +274,6 @@ export default function Home() {
     if (guesses[position] !== letter) {
       const newGuesses = guesses
       newGuesses[position] = letter
-      console.log('newGuesses: ', newGuesses)
       setGuesses([...newGuesses])
     }
   }, [inputChange])
@@ -533,21 +456,21 @@ export default function Home() {
 
   if (!data || loading) {
     return (
-      <div css={[appBackground(darkmode), { height: '100vh' }]}>
+      <div css={[styles.appBackground(darkmode), { height: '100vh' }]}>
         <Head>
           <title>Word Vault</title>
           <link rel="icon" href="/favicon.ico" />
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         </Head>
-        <div css={loadingSpinner}>
-          <div className={styles.lds_ring}><div></div><div></div></div>
+        <div css={styles.loadingSpinner}>
+          <div css={styles.loadingRing}><div></div><div></div></div>
           <p>Loading puzzle...</p>
         </div>
       </div>
     )
   } else {
     return (
-      <div css={appBackground(darkmode)}>
+      <div css={styles.appBackground(darkmode)}>
         <Head>
           <title>Word Vault</title>
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
@@ -568,13 +491,13 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div css={appContainer}>
+        <div css={styles.appContainer}>
 
 
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
-            <div css={boardGrid}>
-              <div css={boardContainer}>
+            <div css={styles.boardAndCluesContainer}>
+              <div css={styles.boardContainer}>
                 {board.map(
                   (content, index) => (
                     <Square key={index} props={{
@@ -610,8 +533,8 @@ export default function Home() {
                 )}
               </div>
 
-              <div css={crosswordClues}>
-                <h2 css={clueHeader}>Across</h2>
+              <div css={styles.crosswordClues}>
+                <h2 css={styles.clueHeader}>Across</h2>
                 <ul>
                   {clues && clues.across.map((clue, index) => (
                     <Clue
@@ -634,8 +557,8 @@ export default function Home() {
                   ))}
                 </ul>
               </div>
-              <div css={crosswordClues}>
-                <h2 css={clueHeader}>Down</h2>
+              <div css={styles.crosswordClues}>
+                <h2 css={styles.clueHeader}>Down</h2>
                 <ul>
                   {clues && clues.down.map((clue, index) => (
                     <Clue
