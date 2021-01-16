@@ -30,7 +30,7 @@ const clueHeader = scale({
   borderBottom: `1.5px solid ${colors.mediumgrey}`,
 })
 
-const appContainer = (darkmode) => scale({
+const appContainer = scale({
   height: '100vh',
   padding: '0px 20px',
   display: 'flex',
@@ -39,6 +39,13 @@ const appContainer = (darkmode) => scale({
   alignItems: 'center',
   margin: 'auto',
   position: 'relative',
+})
+
+const boardGrid = scale({
+  display: 'grid',
+  gridGap: '30px',
+  gridTemplateColumns: '4fr 2fr 2fr',
+  maxWidth: '1200px',
 })
 
 const appBackground = (darkmode) => scale({
@@ -60,7 +67,7 @@ const loadingSpinner = () => scale({
   width: 200,
 })
 
-const boardContainer = (darkmode) => scale({
+const boardContainer = scale({
   cursor: 'text',
   display: 'grid',
   marginTop: '30px',
@@ -73,6 +80,21 @@ const boardContainer = (darkmode) => scale({
   borderLeft: `5px solid ${colors.slate}`,
   borderBottom: `5px solid ${colors.slate}`,
   borderRadius: '4px',
+})
+
+const crosswordClues = scale({
+  listStyleType: 'none',
+  padding: 0,
+  ul: {
+    margin: 0,
+    padding: 0,
+    maxHeight: 500,
+    overflowY: 'scroll',
+  },
+  li: {
+    cursor: 'pointer',
+    paddingBottom: 6,
+  }
 })
 
 const createDownGroupings = (crossword) => {
@@ -252,6 +274,7 @@ export default function Home() {
       setHoveredClue(false)
       setSelectedSquare(false)
       setGuestHighlights(false)
+      setShowIncorrect(false)
     })
 
     // Sent once on client connection
@@ -321,10 +344,6 @@ export default function Home() {
       )
     }
   }, [data])
-
-  useEffect(() => {
-    console.log('show incorrect: ', showIncorrect)
-  }, [showIncorrect])
 
   useEffect(() => {
     const { position, letter } = inputChange
@@ -549,13 +568,13 @@ export default function Home() {
             </div>
           </div>
         </div>
-        <div css={appContainer(darkmode)}>
+        <div css={appContainer}>
 
 
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
-            <div className={styles.crossword_board__container}>
-              <div css={boardContainer(darkmode)}>
+            <div css={boardGrid}>
+              <div css={boardContainer}>
                 {board.map(
                   (content, index) => (
                     <Square key={index} props={{
@@ -591,9 +610,9 @@ export default function Home() {
                 )}
               </div>
 
-              <div className={classNames(styles.crossword_clues__list)}>
+              <div css={crosswordClues}>
                 <h2 css={clueHeader}>Across</h2>
-                <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__across)}>
+                <ul>
                   {clues && clues.across.map((clue, index) => (
                     <Clue
                       key={index}
@@ -615,9 +634,9 @@ export default function Home() {
                   ))}
                 </ul>
               </div>
-              <div className={classNames(styles.crossword_clues__list)}>
+              <div css={crosswordClues}>
                 <h2 css={clueHeader}>Down</h2>
-                <ul className={classNames(styles.crossword_clues__list, styles.crossword_clues__list__down)}>
+                <ul>
                   {clues && clues.down.map((clue, index) => (
                     <Clue
                       key={index}
