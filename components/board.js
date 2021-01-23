@@ -13,17 +13,19 @@ export default function Board({ props }) {
     hoveredClue,
     showIncorrect,
     name,
-    nametagLocations, 
+    nametagLocations,
     nametagData,
     darkmode,
     data,
     newFocus,
+    clueIndex,
     downGroupings,
     acrossGroupings,
     guestHighlights,
     handleSendToSocket,
     guesses,
     setGuesses,
+    setClueIndex,
   } = props
   const { grid, clues } = data
   const [selectedSquare, setSelectedSquare] = useState(false)
@@ -31,8 +33,6 @@ export default function Board({ props }) {
 
   // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
-  // Determines which clue to highlight
-  const [clueIndex, setClueIndex] = useState(false)
   // Is a square focused?
   const [focus, setFocus] = useState(false)
   // HACK
@@ -188,39 +188,39 @@ export default function Board({ props }) {
     })
   }, [])
 
-    return (
-      <div css={styles.boardContainer}>
-        {board.map((content, index) => (
-          <Square key={index} props={{
-              circle: data.circles && data.circles[index],
-              darkmode,
-              content,
-              hoveredClue,
-              highlightedSquares,
-              selectedSquare,
-              filledInput,
-              movementDirection,
-              guesses,
-              focus,
-              name,
-              uploadGuess,
-              clientId,
-              guestHighlights,
-              showIncorrect,
-              nametagLocations,
-              nametagData,
-              setUploadGuess,
-              setFocus,
-              setBackspace,
-              setMovementDirection,
-              setSelectedSquare,
-              setFilledInput,
-              setGuesses,
-              setInputChangeToApi
-          }}
-            />
-            )
-        )}
-        </div>
+  return (
+    <div css={styles.boardContainer}>
+      {board.map((content, index) => (
+        <Square key={index} props={{
+          circle: data.circles && data.circles[index],
+          darkmode,
+          content,
+          hoveredClue,
+          highlightedSquares,
+          selectedSquare,
+          filledInput,
+          movementDirection,
+          guesses,
+          focus,
+          name,
+          uploadGuess,
+          clientId,
+          guestHighlights,
+          showIncorrect,
+          nametagLocations,
+          nametagData,
+          setUploadGuess,
+          setFocus,
+          setBackspace,
+          setMovementDirection,
+          setSelectedSquare,
+          setFilledInput,
+          setGuesses,
+          setInputChangeToApi
+        }}
+        />
       )
+      )}
+    </div>
+  )
 }

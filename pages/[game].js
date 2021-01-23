@@ -360,10 +360,12 @@ export default function Home() {
                 downGroupings,
                 acrossGroupings,
                 guestHighlights,
+                clueIndex,
+                setClueIndex,
                 handleSendToSocket,
                 guesses,
                 setGuesses
-                }}
+              }}
               />
 
               <div css={styles.crosswordClues}>
