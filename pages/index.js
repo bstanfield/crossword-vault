@@ -55,7 +55,7 @@ export default function Index() {
   return (
     <Fragment>
       <Head>
-        <title>Word Vault</title>
+        <title>WordVault</title>
         <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"></link>

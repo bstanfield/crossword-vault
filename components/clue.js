@@ -14,6 +14,9 @@ const clueStyle = (darkmode, highlight) => scale({
   transition: 'all 0.2s ease',
   transitionProperty: 'background-color, border',
   fontSize: [14, 14, 14, 'inherit'],
+  '&:hover': {
+    backgroundColor: darkmode ? highlight ? '#5c5cff' : '#2a2a6b' : `rgba(255, 165, 0, ${highlight ? 0.35 : 0.15})`,
+  }
 });
 
 export default function Clue({ props }) {
@@ -32,21 +35,22 @@ export default function Clue({ props }) {
   } = props
   const [highlight, setHighlight] = useState(false)
 
-  const hoverClue = () => {
-    if (lockout) {
-      if (Date.now() - lockout > 500) {
-        // Existing lockout more than 0.5s ago
-        setMovementDirection(direction)
-        setHoveredClue(Number(clue.split('.')[0]))
-      } else {
-        // Locked out!
-      }
-    } else {
-      // No existing lockout
-      setMovementDirection(direction)
-      setHoveredClue(Number(clue.split('.')[0]))
-    }
-  }
+  // Commented out to reduce highlighted clue chaos
+  // const hoverClue = () => {
+  //   if (lockout) {
+  //     if (Date.now() - lockout > 1000) {
+  //       // Existing lockout more than 1s ago
+  //       setMovementDirection(direction)
+  //       setHoveredClue(Number(clue.split('.')[0]))
+  //     } else {
+  //       // Locked out!
+  //     }
+  //   } else {
+  //     // No existing lockout
+  //     setMovementDirection(direction)
+  //     setHoveredClue(Number(clue.split('.')[0]))
+  //   }
+  // }
 
   useEffect(() => {
     if (index === clueIndex) {
@@ -69,10 +73,10 @@ export default function Clue({ props }) {
       css={clueStyle(darkmode, highlight)}
       onClick={() => {
         setNewFocus(index)
-        setLockout(Date.now())
+        setMovementDirection(direction)
       }}
-      onMouseLeave={() => setHoveredClue(false)}
-      onMouseEnter={() => hoverClue()}
+      // onMouseLeave={() => setHoveredClue(false)}
+      // onMouseEnter={() => hoverClue()}
       id={`${index}-${direction}`}
     >
       <strong>{clue.split('.')[0]}.</strong> <span dangerouslySetInnerHTML={{ __html: clue.substring(clue.indexOf('.') + 1) }} />

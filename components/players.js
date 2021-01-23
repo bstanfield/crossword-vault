@@ -26,7 +26,7 @@ export default function Players({ props }) {
         text: darkmode ? 'Lightmode' : 'Darkmode',
         icon: {
           name: darkmode ? 'sunny' : 'moon',
-          size: 16
+          size: 13
         }
       }} />
       <Button props={{

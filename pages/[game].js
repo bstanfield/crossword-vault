@@ -4,11 +4,9 @@ import { jsx } from '@emotion/react'
 import { fonts, ENDPOINT } from '../lib/helpers'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
 import Players from '../components/players'
-import Timer from '../components/timer'
 import Metadata from '../components/metadata'
 import Alert from '../components/alert'
 import Button from '../components/button'
@@ -16,6 +14,7 @@ import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
+import Board from '../components/board'
 import styles from '../lib/boardStyles'
 
 // board ratios (temp hardcode)
@@ -99,9 +98,11 @@ export default function Home() {
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
+  const [guestInputChange, setGuestInputChange] = useState([])
   const [showSidePanel, setShowSidePanel] = useState(false)
   const [showIncorrect, setShowIncorrect] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
+  const [room, setRoom] = useState(null)
 
   // Nametags
   const [name, setName] = useState(false)
@@ -109,7 +110,6 @@ export default function Home() {
   const [nametagData, setNametagData] = useState([])
 
   // CONSTRAIN USE TO MOVEMENT
-  const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
   const [clueIndex, setClueIndex] = useState(false)
   // Is a square focused?
@@ -118,15 +118,7 @@ export default function Home() {
   const [newFocus, setNewFocus] = useState(false)
   // Milliseconds for lockout of clue hover
   const [lockout, setLockout] = useState(false)
-  // HACK
-  const [uploadGuess, setUploadGuess] = useState(false)
-
   const [movementDirection, setMovementDirection] = useState('across')
-
-  // Keyboard shortcuts
-  const [backspace, setBackspace] = useState(false)
-  const [movementKey, setMovementKey] = useState(false)
-
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
 
@@ -134,14 +126,9 @@ export default function Home() {
   const [timestamp, setTimestamp] = useState(false)
   const [timer, setTimer] = useState(false)
   const [clientId, setClientId] = useState(false)
-  const [response, setResponse] = useState('')
   const [socketConnection, setSocketConnection] = useState(false)
-  const [emptyInput, setEmptyInput] = useState(false)
   const [guestHighlights, setGuestHighlights] = useState(false)
   const [players, setPlayers] = useState(false)
-  const [inputChange, setInputChange] = useState(false)
-  const [inputChangeToApi, setInputChangeToApi] = useState(false)
-
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -149,6 +136,7 @@ export default function Home() {
     let room = false
     if (path) {
       room = path.split('/')[1]
+      setRoom(room)
     }
 
     const connection = socketIOClient(ENDPOINT)
@@ -202,12 +190,11 @@ export default function Home() {
 
     // Sent once on client connection
     connection.on('guesses', data => {
-      setResponse(data)
+      setGuesses(data)
     })
 
     connection.on('inputChange', data => {
-      console.log('received input change: ', data)
-      setInputChange(data)
+      setGuestInputChange(data)
     })
 
     connection.on('newPlayer', data => {
@@ -236,19 +223,21 @@ export default function Home() {
     return () => connection.disconnect()
   }, []);
 
-  // Perhaps a duplicate useEffect?
-  // Check other [filledInput] dependent useEffect
-  useEffect(() => {
-    if (inputChangeToApi) {
-      socketConnection.send({ type: 'input', value: inputChangeToApi })
-    }
-  }, [inputChangeToApi])
-
   useEffect(() => {
     if (!name) {
       setShowPopup(true)
     }
   }, [])
+
+  useEffect(() => {
+    console.log('input change from guest: ', guestInputChange)
+    const { position, letter } = guestInputChange
+    console.log('guesses: ', guesses)
+    if (guesses[position] !== letter) {
+      guesses[position] = letter
+      setGuesses([...guesses])
+    }
+  }, [guestInputChange])
 
   useEffect(() => {
     if (name) {
@@ -258,10 +247,6 @@ export default function Home() {
   }, [name])
 
   useEffect(() => {
-    setGuesses(response)
-  }, [response])
-
-  useEffect(() => {
     if (data) {
       setBoard(
         createBoard(data, totalSquares, setDownGroupings, setAcrossGroupings, setGuesses)
@@ -269,143 +254,6 @@ export default function Home() {
     }
   }, [data])
 
-  useEffect(() => {
-    const { position, letter } = inputChange
-    if (guesses[position] !== letter) {
-      const newGuesses = guesses
-      newGuesses[position] = letter
-      setGuesses([...newGuesses])
-    }
-  }, [inputChange])
-
-  // Functions for across movement
-  useEffect(() => {
-    const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-    if (selectedSquare) {
-      groupingsToUse.map((group, index) => {
-        if (group.includes(selectedSquare)) {
-          setClueIndex(index)
-          setHighlightedSquares(group)
-          socketConnection.send({ type: 'newHighlight', value: group })
-          if (!hoveredClue) {
-            const clue = document.getElementById(`${index}-${movementDirection}`)
-            if (clue) {
-              clue.scrollIntoView({ behavior: 'smooth' })
-            }
-          }
-        }
-      })
-    } else {
-      // Default state with no squares highlighted
-      // This doesn't work rn
-      // setHighlightedSquares([])
-    }
-  }, [selectedSquare, movementDirection])
-
-  // Usecase: Click on clue, highlights corresponding squares and 
-  useEffect(() => {
-    if (newFocus !== false) {
-      const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-      document.getElementById(`input-${groupingsToUse[newFocus][0]}`).focus()
-    }
-  }, [newFocus])
-
-  // Moves user to next input
-  useEffect(() => {
-    if (filledInput) {
-      const { position } = filledInput
-      const currentLocation = highlightedSquares.indexOf(position)
-      const nextLocation = highlightedSquares[currentLocation + 1]
-
-      if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus()
-      } else {
-        setFilledInput(false)
-      }
-    }
-  }, [filledInput])
-
-  useEffect(() => {
-    if (backspace) {
-      const currentLocation = highlightedSquares.indexOf(selectedSquare)
-      const nextLocation = highlightedSquares[currentLocation - 1]
-
-      if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus()
-      }
-      // Reset
-      setBackspace(false)
-    }
-  }, [backspace])
-
-  // Only works for right arrow key
-  // Might want to make this _clue agnostic_ (just move to the next grid point)
-  useEffect(() => {
-    if (movementKey) {
-      // Sets each arrow keys movements in the grid
-      const arrowKeys = { 'ArrowRight': 1, 'ArrowLeft': -1, 'ArrowUp': -width, 'ArrowDown': width }
-      if (movementKey.includes('Arrow')) {
-        // Instead of next location within highlighted squares, just next location on
-        // board and determine if there should be a new set of highlighted squares (new clue)
-        if (selectedSquare) {
-          const nextLocation = selectedSquare + arrowKeys[movementKey]
-          const nextLocationInput = document.getElementById(`input-${nextLocation}`)
-          if (nextLocationInput) {
-            document.getElementById(`input-${nextLocation}`).focus()
-          }
-        }
-      }
-
-      if (movementKey === 'Tab') {
-        const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-        const nextClue = clueIndex + 1
-
-        // Creates boundary so you can't tab outside of board
-        if (nextClue < groupingsToUse.length) {
-          setClueIndex(nextClue)
-          setHighlightedSquares(groupingsToUse[nextClue])
-          const nextLocation = groupingsToUse[nextClue][0]
-          document.getElementById(`input-${nextLocation}`).focus()
-        }
-      }
-
-      // This is working properly but something is fucking it up
-      if (movementKey === 'Shift+Tab') {
-        const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-        const previousClue = clueIndex - 1
-        if (previousClue >= 0) {
-          setClueIndex(previousClue)
-          setHighlightedSquares(groupingsToUse[previousClue])
-          const previousLocation = groupingsToUse[previousClue][0]
-          document.getElementById(`input-${previousLocation}`).focus()
-        }
-      }
-
-      if (movementKey === ' ') {
-        setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
-      }
-
-      setMovementKey(false)
-    }
-  }, [movementKey])
-
-  useEffect(() => {
-    document.addEventListener('keydown', function (event) {
-      const acceptableKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ']
-
-      if (acceptableKeys.includes(event.key)) {
-        setMovementKey(event.key)
-
-      }
-
-      // Toggles back and forth between words
-      if (event.shiftKey && event.key === 'Tab') {
-        setMovementKey('Shift+Tab')
-      } else if (event.key === 'Tab') {
-        setMovementKey(event.key)
-      }
-    })
-  }, [])
 
   useEffect(() => {
     let incorrect = 0
@@ -414,6 +262,7 @@ export default function Home() {
     let black = 0
 
     if (guesses.length > 0) {
+      console.log('guesses: ', guesses);
       guesses.map((guess, index) => {
         if (guess === false) {
           black++
@@ -433,6 +282,7 @@ export default function Home() {
     setGrading({ correct, incorrect, blank, black })
   }, [guesses])
 
+  // Would display some awesome feel good banner
   useEffect(() => {
     if (guesses.length > 0 && grading) {
       if (grading.correct === totalSquares - grading.black) {
@@ -454,11 +304,15 @@ export default function Home() {
     }
   }, [timestamp])
 
+  const handleSendToSocket = (body) => {
+    socketConnection.send(body);
+  }
+
   if (!data || loading) {
     return (
       <div css={[styles.appBackground(darkmode), { height: '100vh' }]}>
         <Head>
-          <title>Word Vault</title>
+          <title>WordVault (Loading...)</title>
           <link rel="icon" href="/favicon.ico" />
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         </Head>
@@ -472,7 +326,7 @@ export default function Home() {
     return (
       <div css={styles.appBackground(darkmode)}>
         <Head>
-          <title>Word Vault</title>
+          <title>WordVault ({room ? room.slice(0, 1).toUpperCase() + room.substring(1) : '?'} room) </title>
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"></link>
@@ -480,6 +334,7 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
+
         <Popup props={{ showPopup, setName }} />
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
@@ -497,41 +352,29 @@ export default function Home() {
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
             <div css={styles.boardAndCluesContainer}>
-              <div css={styles.boardContainer}>
-                {board.map(
-                  (content, index) => (
-                    <Square key={index} props={{
-                      circle: data.circles && data.circles[index],
-                      darkmode,
-                      content,
-                      hoveredClue,
-                      highlightedSquares,
-                      selectedSquare,
-                      filledInput,
-                      movementDirection,
-                      guesses,
-                      focus,
-                      name,
-                      uploadGuess,
-                      clientId,
-                      guestHighlights,
-                      showIncorrect,
-                      nametagLocations,
-                      nametagData,
-                      setEmptyInput,
-                      setUploadGuess,
-                      setFocus,
-                      setBackspace,
-                      setMovementDirection,
-                      setSelectedSquare,
-                      setFilledInput,
-                      setGuesses,
-                      setInputChange,
-                      setInputChangeToApi
-                    }} />
-                  )
-                )}
-              </div>
+              <Board props={{
+                clientId,
+                board,
+                hoveredClue,
+                showIncorrect,
+                name,
+                nametagLocations,
+                nametagData,
+                darkmode,
+                data,
+                newFocus,
+                downGroupings,
+                acrossGroupings,
+                guestHighlights,
+                clueIndex,
+                movementDirection,
+                setClueIndex,
+                setMovementDirection,
+                handleSendToSocket,
+                guesses,
+                setGuesses
+              }}
+              />
 
               <div css={styles.crosswordClues}>
                 <h2 css={styles.clueHeader}>Across</h2>
