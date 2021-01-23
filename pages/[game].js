@@ -101,6 +101,7 @@ export default function Home() {
   const [showSidePanel, setShowSidePanel] = useState(false)
   const [showIncorrect, setShowIncorrect] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
+  const [room, setRoom] = useState(null)
 
   // Nametags
   const [name, setName] = useState(false)
@@ -143,6 +144,7 @@ export default function Home() {
     let room = false
     if (path) {
       room = path.split('/')[1]
+      setRoom(room)
     }
 
     const connection = socketIOClient(ENDPOINT)
@@ -307,7 +309,7 @@ export default function Home() {
     return (
       <div css={[styles.appBackground(darkmode), { height: '100vh' }]}>
         <Head>
-          <title>Word Vault</title>
+          <title>WordVault (Loading...)</title>
           <link rel="icon" href="/favicon.ico" />
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         </Head>
@@ -321,7 +323,7 @@ export default function Home() {
     return (
       <div css={styles.appBackground(darkmode)}>
         <Head>
-          <title>Word Vault</title>
+          <title>WordVault ({room ? room.slice(0, 1).toUpperCase() + room.substring(1) : '?'} room) </title>
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"></link>
