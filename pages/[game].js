@@ -329,6 +329,7 @@ export default function Home() {
           <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
           <link rel="icon" href="/favicon.ico" />
         </Head>
+        <input css={styles.hiddenInput} id='hidden-input'></input>
         <Popup props={{ showPopup, setName }} />
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
@@ -361,7 +362,9 @@ export default function Home() {
                 acrossGroupings,
                 guestHighlights,
                 clueIndex,
+                movementDirection,
                 setClueIndex,
+                setMovementDirection,
                 handleSendToSocket,
                 guesses,
                 setGuesses

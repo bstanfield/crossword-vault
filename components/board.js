@@ -16,6 +16,7 @@ export default function Board({ props }) {
     nametagLocations,
     nametagData,
     darkmode,
+    movementDirection,
     data,
     newFocus,
     clueIndex,
@@ -26,6 +27,7 @@ export default function Board({ props }) {
     guesses,
     setGuesses,
     setClueIndex,
+    setMovementDirection,
   } = props
   const { grid, clues } = data
   const [selectedSquare, setSelectedSquare] = useState(false)
@@ -37,8 +39,6 @@ export default function Board({ props }) {
   const [focus, setFocus] = useState(false)
   // HACK
   const [uploadGuess, setUploadGuess] = useState(false)
-
-  const [movementDirection, setMovementDirection] = useState('across')
 
   // Keyboard shortcuts
   const [backspace, setBackspace] = useState(false)
