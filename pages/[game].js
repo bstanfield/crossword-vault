@@ -108,7 +108,6 @@ export default function Home() {
   const [nametagData, setNametagData] = useState([])
 
   // CONSTRAIN USE TO MOVEMENT
-  const [filledInput, setFilledInput] = useState(false)
   // Determines which clue to highlight
   const [clueIndex, setClueIndex] = useState(false)
   // Is a square focused?
@@ -117,15 +116,7 @@ export default function Home() {
   const [newFocus, setNewFocus] = useState(false)
   // Milliseconds for lockout of clue hover
   const [lockout, setLockout] = useState(false)
-  // HACK
-  const [uploadGuess, setUploadGuess] = useState(false)
-
   const [movementDirection, setMovementDirection] = useState('across')
-
-  // Keyboard shortcuts
-  const [backspace, setBackspace] = useState(false)
-  const [movementKey, setMovementKey] = useState(false)
-
   const [downGroupings, setDownGroupings] = useState([])
   const [acrossGroupings, setAcrossGroupings] = useState([])
 
@@ -133,15 +124,19 @@ export default function Home() {
   const [timestamp, setTimestamp] = useState(false)
   const [timer, setTimer] = useState(false)
   const [clientId, setClientId] = useState(false)
-  const [response, setResponse] = useState('')
   const [socketConnection, setSocketConnection] = useState(false)
-  const [emptyInput, setEmptyInput] = useState(false)
   const [guestHighlights, setGuestHighlights] = useState(false)
   const [players, setPlayers] = useState(false)
-  const [inputChange, setInputChange] = useState(false)
-  const [inputChangeToApi, setInputChangeToApi] = useState(false)
-
   const [loading, setLoading] = useState(false)
+
+  const handleGuestInputChange = (inputChange) => {
+    const { position, letter } = inputChange
+    if (guesses[position] !== letter) {
+      const newGuesses = guesses
+      newGuesses[position] = letter
+      setGuesses([...newGuesses])
+    }
+  }
 
   useEffect(() => {
     const path = window.location.pathname
@@ -201,12 +196,11 @@ export default function Home() {
 
     // Sent once on client connection
     connection.on('guesses', data => {
-      setResponse(data)
+      setGuesses(data)
     })
 
     connection.on('inputChange', data => {
-      console.log('received input change: ', data)
-      setInputChange(data)
+      handleGuestInputChange(data)
     })
 
     connection.on('newPlayer', data => {
@@ -235,14 +229,6 @@ export default function Home() {
     return () => connection.disconnect()
   }, []);
 
-  // Perhaps a duplicate useEffect?
-  // Check other [filledInput] dependent useEffect
-  useEffect(() => {
-    if (inputChangeToApi) {
-      socketConnection.send({ type: 'input', value: inputChangeToApi })
-    }
-  }, [inputChangeToApi])
-
   useEffect(() => {
     if (!name) {
       setShowPopup(true)
@@ -257,10 +243,6 @@ export default function Home() {
   }, [name])
 
   useEffect(() => {
-    setGuesses(response)
-  }, [response])
-
-  useEffect(() => {
     if (data) {
       setBoard(
         createBoard(data, totalSquares, setDownGroupings, setAcrossGroupings, setGuesses)
@@ -268,14 +250,6 @@ export default function Home() {
     }
   }, [data])
 
-  useEffect(() => {
-    const { position, letter } = inputChange
-    if (guesses[position] !== letter) {
-      const newGuesses = guesses
-      newGuesses[position] = letter
-      setGuesses([...newGuesses])
-    }
-  }, [inputChange])
 
   useEffect(() => {
     let incorrect = 0
@@ -325,6 +299,10 @@ export default function Home() {
     }
   }, [timestamp])
 
+  const handleSendToSocket = (body) => {
+    socketConnection.send(body);
+  }
+
   if (!data || loading) {
     return (
       <div css={[styles.appBackground(darkmode), { height: '100vh' }]}>
@@ -369,7 +347,7 @@ export default function Home() {
             <Metadata props={{ data }} />
             <div css={styles.boardAndCluesContainer}>
               <Board props={{
-                  clientId,
+                clientId,
                 board,
                 hoveredClue,
                 showIncorrect,
@@ -382,6 +360,9 @@ export default function Home() {
                 downGroupings,
                 acrossGroupings,
                 guestHighlights,
+                handleSendToSocket,
+                guesses,
+                setGuesses
                 }}
               />
 

@@ -127,7 +127,6 @@ export default function Square({ props }) {
     content,
     hoveredClue,
     highlightedSquares,
-    selectedSquare,
     movementDirection,
     filledInput,
     showIncorrect,
@@ -148,6 +147,7 @@ export default function Square({ props }) {
     setGuesses,
     setInputChangeToApi
   } = props
+
 
   const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
@@ -180,10 +180,9 @@ export default function Square({ props }) {
 
   // Responds to API responses
   useEffect(() => {
-    if (guesses) {
-      if (guesses[content.position - 1] !== inputData) {
-        setInputData(guesses[content.position - 1])
-      }
+    // if guesses have been changed by guest, update square input value
+    if (guesses && guesses[content.position - 1] !== inputData) {
+      setInputData(guesses[content.position - 1])
     }
   }, [guesses])
 

@@ -21,9 +21,11 @@ export default function Board({ props }) {
     downGroupings,
     acrossGroupings,
     guestHighlights,
+    handleSendToSocket,
+    guesses,
+    setGuesses,
   } = props
   const { grid, clues } = data
-  const [guesses, setGuesses] = useState([])
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
 
@@ -55,6 +57,7 @@ export default function Board({ props }) {
           setHighlightedSquares(group)
           // TODO: Tell [game] that your movement direction changed as callback
           // socketConnection.send({ type: 'newHighlight', value: group })
+          handleSendToSocket({ type: 'newHighlight', value: group })
           if (!hoveredClue) {
             const clue = document.getElementById(`${index}-${movementDirection}`)
             if (clue) {
@@ -99,7 +102,7 @@ export default function Board({ props }) {
   }, [filledInput])
   useEffect(() => {
     if (inputChangeToApi) {
-      // socketConnection.send({ type: 'input', value: inputChangeToApi })
+      handleSendToSocket({ type: 'input', value: inputChangeToApi })
     }
   }, [inputChangeToApi])
 
