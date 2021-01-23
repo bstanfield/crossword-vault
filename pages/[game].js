@@ -98,6 +98,7 @@ export default function Home() {
   const [hoveredClue, setHoveredClue] = useState(false)
   const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
+  const [guestInputChange, setGuestInputChange] = useState([])
   const [showSidePanel, setShowSidePanel] = useState(false)
   const [showIncorrect, setShowIncorrect] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
@@ -129,15 +130,6 @@ export default function Home() {
   const [guestHighlights, setGuestHighlights] = useState(false)
   const [players, setPlayers] = useState(false)
   const [loading, setLoading] = useState(false)
-
-  const handleGuestInputChange = (inputChange) => {
-    const { position, letter } = inputChange
-    if (guesses[position] !== letter) {
-      const newGuesses = guesses
-      newGuesses[position] = letter
-      setGuesses([...newGuesses])
-    }
-  }
 
   useEffect(() => {
     const path = window.location.pathname
@@ -202,7 +194,7 @@ export default function Home() {
     })
 
     connection.on('inputChange', data => {
-      handleGuestInputChange(data)
+      setGuestInputChange(data)
     })
 
     connection.on('newPlayer', data => {
@@ -238,6 +230,16 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    console.log('input change from guest: ', guestInputChange)
+    const { position, letter } = guestInputChange
+    console.log('guesses: ', guesses)
+    if (guesses[position] !== letter) {
+      guesses[position] = letter
+      setGuesses([...guesses])
+    }
+  }, [guestInputChange])
+
+  useEffect(() => {
     if (name) {
       socketConnection.emit('name', name)
       setShowPopup(false)
@@ -260,6 +262,7 @@ export default function Home() {
     let black = 0
 
     if (guesses.length > 0) {
+      console.log('guesses: ', guesses);
       guesses.map((guess, index) => {
         if (guess === false) {
           black++
