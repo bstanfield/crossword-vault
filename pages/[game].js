@@ -4,11 +4,9 @@ import { jsx } from '@emotion/react'
 import { fonts, ENDPOINT } from '../lib/helpers'
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
-import Square from '../components/square'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
 import Players from '../components/players'
-import Timer from '../components/timer'
 import Metadata from '../components/metadata'
 import Alert from '../components/alert'
 import Button from '../components/button'
@@ -16,6 +14,7 @@ import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
+import Board from '../components/board'
 import styles from '../lib/boardStyles'
 
 // board ratios (temp hardcode)
@@ -278,135 +277,6 @@ export default function Home() {
     }
   }, [inputChange])
 
-  // Functions for across movement
-  useEffect(() => {
-    const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-    if (selectedSquare) {
-      groupingsToUse.map((group, index) => {
-        if (group.includes(selectedSquare)) {
-          setClueIndex(index)
-          setHighlightedSquares(group)
-          socketConnection.send({ type: 'newHighlight', value: group })
-          if (!hoveredClue) {
-            const clue = document.getElementById(`${index}-${movementDirection}`)
-            if (clue) {
-              clue.scrollIntoView({ behavior: 'smooth' })
-            }
-          }
-        }
-      })
-    } else {
-      // Default state with no squares highlighted
-      // This doesn't work rn
-      // setHighlightedSquares([])
-    }
-  }, [selectedSquare, movementDirection])
-
-  // Usecase: Click on clue, highlights corresponding squares and 
-  useEffect(() => {
-    if (newFocus !== false) {
-      const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-      document.getElementById(`input-${groupingsToUse[newFocus][0]}`).focus()
-    }
-  }, [newFocus])
-
-  // Moves user to next input
-  useEffect(() => {
-    if (filledInput) {
-      const { position } = filledInput
-      const currentLocation = highlightedSquares.indexOf(position)
-      const nextLocation = highlightedSquares[currentLocation + 1]
-
-      if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus()
-      } else {
-        setFilledInput(false)
-      }
-    }
-  }, [filledInput])
-
-  useEffect(() => {
-    if (backspace) {
-      const currentLocation = highlightedSquares.indexOf(selectedSquare)
-      const nextLocation = highlightedSquares[currentLocation - 1]
-
-      if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus()
-      }
-      // Reset
-      setBackspace(false)
-    }
-  }, [backspace])
-
-  // Only works for right arrow key
-  // Might want to make this _clue agnostic_ (just move to the next grid point)
-  useEffect(() => {
-    if (movementKey) {
-      // Sets each arrow keys movements in the grid
-      const arrowKeys = { 'ArrowRight': 1, 'ArrowLeft': -1, 'ArrowUp': -width, 'ArrowDown': width }
-      if (movementKey.includes('Arrow')) {
-        // Instead of next location within highlighted squares, just next location on
-        // board and determine if there should be a new set of highlighted squares (new clue)
-        if (selectedSquare) {
-          const nextLocation = selectedSquare + arrowKeys[movementKey]
-          const nextLocationInput = document.getElementById(`input-${nextLocation}`)
-          if (nextLocationInput) {
-            document.getElementById(`input-${nextLocation}`).focus()
-          }
-        }
-      }
-
-      if (movementKey === 'Tab') {
-        const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-        const nextClue = clueIndex + 1
-
-        // Creates boundary so you can't tab outside of board
-        if (nextClue < groupingsToUse.length) {
-          setClueIndex(nextClue)
-          setHighlightedSquares(groupingsToUse[nextClue])
-          const nextLocation = groupingsToUse[nextClue][0]
-          document.getElementById(`input-${nextLocation}`).focus()
-        }
-      }
-
-      // This is working properly but something is fucking it up
-      if (movementKey === 'Shift+Tab') {
-        const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-        const previousClue = clueIndex - 1
-        if (previousClue >= 0) {
-          setClueIndex(previousClue)
-          setHighlightedSquares(groupingsToUse[previousClue])
-          const previousLocation = groupingsToUse[previousClue][0]
-          document.getElementById(`input-${previousLocation}`).focus()
-        }
-      }
-
-      if (movementKey === ' ') {
-        setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
-      }
-
-      setMovementKey(false)
-    }
-  }, [movementKey])
-
-  useEffect(() => {
-    document.addEventListener('keydown', function (event) {
-      const acceptableKeys = ['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown', ' ']
-
-      if (acceptableKeys.includes(event.key)) {
-        setMovementKey(event.key)
-
-      }
-
-      // Toggles back and forth between words
-      if (event.shiftKey && event.key === 'Tab') {
-        setMovementKey('Shift+Tab')
-      } else if (event.key === 'Tab') {
-        setMovementKey(event.key)
-      }
-    })
-  }, [])
-
   useEffect(() => {
     let incorrect = 0
     let correct = 0
@@ -433,6 +303,7 @@ export default function Home() {
     setGrading({ correct, incorrect, blank, black })
   }, [guesses])
 
+  // Would display some awesome feel good banner
   useEffect(() => {
     if (guesses.length > 0 && grading) {
       if (grading.correct === totalSquares - grading.black) {
@@ -497,41 +368,22 @@ export default function Home() {
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
             <div css={styles.boardAndCluesContainer}>
-              <div css={styles.boardContainer}>
-                {board.map(
-                  (content, index) => (
-                    <Square key={index} props={{
-                      circle: data.circles && data.circles[index],
-                      darkmode,
-                      content,
-                      hoveredClue,
-                      highlightedSquares,
-                      selectedSquare,
-                      filledInput,
-                      movementDirection,
-                      guesses,
-                      focus,
-                      name,
-                      uploadGuess,
-                      clientId,
-                      guestHighlights,
-                      showIncorrect,
-                      nametagLocations,
-                      nametagData,
-                      setEmptyInput,
-                      setUploadGuess,
-                      setFocus,
-                      setBackspace,
-                      setMovementDirection,
-                      setSelectedSquare,
-                      setFilledInput,
-                      setGuesses,
-                      setInputChange,
-                      setInputChangeToApi
-                    }} />
-                  )
-                )}
-              </div>
+              <Board props={{
+                  clientId,
+                board,
+                hoveredClue,
+                showIncorrect,
+                name,
+                nametagLocations,
+                nametagData,
+                darkmode,
+                data,
+                newFocus,
+                downGroupings,
+                acrossGroupings,
+                guestHighlights,
+                }}
+              />
 
               <div css={styles.crosswordClues}>
                 <h2 css={styles.clueHeader}>Across</h2>

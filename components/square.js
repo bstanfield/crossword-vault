@@ -146,8 +146,6 @@ export default function Square({ props }) {
     setFilledInput,
     setBackspace,
     setGuesses,
-    setEmptyInput,
-    setInputChange,
     setInputChangeToApi
   } = props
 
@@ -331,6 +329,8 @@ export default function Square({ props }) {
               let newGuesses = guesses
               newGuesses[content.position - 1] = input.nativeEvent.data
               setGuesses([...newGuesses])
+              // TODO: Remove if array spread operator fixes useEffect
+              // picking up changes to state
               setUploadGuess(uploadGuess ? false : true)
             }
           }}
