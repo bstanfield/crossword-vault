@@ -230,9 +230,8 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    console.log('input change from guest: ', guestInputChange)
     const { position, letter } = guestInputChange
-    console.log('guesses: ', guesses)
+
     if (guesses[position] !== letter) {
       guesses[position] = letter
       setGuesses([...guesses])
@@ -262,7 +261,6 @@ export default function Home() {
     let black = 0
 
     if (guesses.length > 0) {
-      console.log('guesses: ', guesses);
       guesses.map((guess, index) => {
         if (guess === false) {
           black++
