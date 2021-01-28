@@ -130,6 +130,7 @@ export default function Home() {
   const [guestHighlights, setGuestHighlights] = useState(false)
   const [players, setPlayers] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [scores, setScores] = useState(null)
 
   useEffect(() => {
     const path = window.location.pathname
@@ -199,6 +200,12 @@ export default function Home() {
 
     connection.on('newPlayer', data => {
       setPlayers(data)
+    })
+
+    // Sends at end of game to show guest scores
+    connection.on('scores', data => {
+      console.log('setting scores: ', data)
+      setScores(data)
     })
 
     connection.on('newHighlight', data => {
@@ -302,7 +309,12 @@ export default function Home() {
     }
   }, [timestamp])
 
-  const handleSendToSocket = (body) => {
+  const handleSendToSocket = (data) => {
+    // add name to socket messages
+    let body = data
+    if (name) {
+      body = { ...data, ...{ name } }
+    }
     socketConnection.send(body);
   }
 
@@ -441,6 +453,12 @@ export default function Home() {
 
               <p css={{ display: 'inline-block', fontSize: 14, paddingLeft: 12 }}>Playing as <strong>{name || 'anonymous'}</strong></p>
             </div>
+            <p>Scores:</p>
+            {scores &&
+              <ul>
+                <li>{JSON.stringify(scores)}</li>
+              </ul>
+            }
           </main>
         </div>
       </div >
