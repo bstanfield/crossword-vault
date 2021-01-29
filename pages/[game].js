@@ -22,6 +22,47 @@ const width = 15
 const height = 15
 const totalSquares = width * height
 
+const setMedal = (place) => {
+  let medal;
+  switch (place) {
+    case 0:
+      medal = '🥇  '
+      break
+    case 1:
+      medal = '🥈  '
+      break
+    case 2:
+      medal = '🥉  '
+      break
+    default:
+      medal = <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+      break
+  }
+  return medal
+}
+
+const calculateScores = (scores) => {
+  let users = []
+  for (const [key, val] of Object.entries(scores)) {
+    if (key !== 'claimedGuesses') {
+      users.push([key, val.correct, val.correct / (val.correct + val.incorrect) * 100])
+    }
+  }
+
+  users.sort((a, b) => {
+    if (a[2] > b[2]) {
+      return -1
+    }
+    if (b[2] > a[2]) {
+      return 1
+    }
+    return 0
+  })
+  return (
+    users.map((user, index) => <li><strong>{setMedal(index)}{user[0]}:</strong> {Math.round(user[2])}% accuracy ({user[1]} squares)</li>)
+  )
+}
+
 const createDownGroupings = (crossword) => {
   const { grid } = crossword
 
@@ -103,6 +144,7 @@ export default function Home() {
   const [showIncorrect, setShowIncorrect] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [room, setRoom] = useState(null)
+  const [complete, setComplete] = useState(false)
 
   // Nametags
   const [name, setName] = useState(false)
@@ -204,7 +246,6 @@ export default function Home() {
 
     // Sends at end of game to show guest scores
     connection.on('scores', data => {
-      console.log('setting scores: ', data)
       setScores(data)
     })
 
@@ -289,9 +330,17 @@ export default function Home() {
 
   // Would display some awesome feel good banner
   useEffect(() => {
-    if (guesses.length > 0 && grading) {
-      if (grading.correct === totalSquares - grading.black) {
-        // Alert goes here
+    if (guesses) {
+      // Success!
+      console.log('correct: ', grading.correct)
+      console.log('grading black: ', grading.black)
+
+      if (grading.correct === 225 - grading.black) {
+        return setComplete(true)
+      }
+      // Incorrect answers
+      if (grading.correct + grading.incorrect === guesses.length - grading.black) {
+        return setComplete(false)
       }
     }
   }, [grading])
@@ -316,6 +365,32 @@ export default function Home() {
       body = { ...data, ...{ name } }
     }
     socketConnection.send(body);
+  }
+
+  // Username logic
+  const [input, setInput] = useState('')
+  const [error, setError] = useState(false)
+
+  const checkName = (name) => {
+    if (name.length <= 5) {
+      setName(input)
+    } else {
+      setError(true)
+    }
+  }
+
+  const handleKeyDown = e => {
+    if (e.key === 'Enter') {
+      checkName(input)
+    }
+  };
+
+  const handleChange = (i) => {
+    if (i.nativeEvent.data) {
+      return setInput(input + i.nativeEvent.data)
+    } else if (i.nativeEvent.data === null) {
+      return setInput(input.slice(0, -1))
+    }
   }
 
   if (!data || loading) {
@@ -345,7 +420,28 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Popup props={{ showPopup, setName }} />
+        {name && complete &&
+          <Popup>
+            <h1>Crossword solved!</h1>
+            {scores &&
+              <ul css={styles.scores}>
+                {calculateScores(scores)}
+              </ul>
+            }
+            <br />
+            <Button props={{ onClickFn: () => setComplete(false), darkmode: false, text: 'Back to puzzle', icon: { name: 'arrow-back-circle', size: 16 } }} />
+          </Popup>
+        }
+        {!name &&
+          <Popup>
+            <h1>Enter a username</h1>
+            <p>Must be <strong>5 or fewer</strong> letters.</p>
+            <br />
+            <input autoFocus onKeyDown={handleKeyDown} css={styles.textInput} value={input} onChange={(i) => handleChange(i)} placeholder='Username' type='text'></input>
+            <Button props={{ onClickFn: () => checkName(input), darkmode: false, text: 'Save', icon: { name: 'checkmark-circle', size: 16 } }} />
+          </Popup>
+        }
+
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>
@@ -453,12 +549,6 @@ export default function Home() {
 
               <p css={{ display: 'inline-block', fontSize: 14, paddingLeft: 12 }}>Playing as <strong>{name || 'anonymous'}</strong></p>
             </div>
-            <p>Scores:</p>
-            {scores &&
-              <ul>
-                <li>{JSON.stringify(scores)}</li>
-              </ul>
-            }
           </main>
         </div>
       </div >
