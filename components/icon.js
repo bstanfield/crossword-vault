@@ -17,12 +17,13 @@ export default function Icon({ props }) {
     color,
     size,
     name,
+    height,
   } = props
 
   const iconStyles = scale({
     position: 'relative',
     width: 23,
-    height: 10,
+    height: height || 10,
     display: 'inline-block',
     color: color,
     fontSize: size || 'inherit',
