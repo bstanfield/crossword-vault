@@ -25,7 +25,6 @@ const totalSquares = width * height
 
 // Takes data from backend and neatens it up
 const calculateScores = (scores) => {
-  console.log('scores: ', scores)
   // Hotstreak
   let hotStreakScores = {}
   for (const [key, val] of Object.entries(scores.hotStreak)) {
@@ -65,14 +64,34 @@ const calculateScores = (scores) => {
     }
   }
 
+  // Thief
+  let highscoreThief = { name: '', score: 0 }
+  for (const [key, val] of Object.entries(scores.thief)) {
+    if (val > highscoreThief.score) {
+      highscoreThief = { name: key, score: val }
+    }
+  }
+
+  // Benchwarmer
+  let lowscoreBenchwarmer = { name: '', score: 0 }
+  for (const [key, val] of Object.entries(scores.benchwarmer)) {
+    if (lowscoreBenchwarmer.score === 0) {
+      lowscoreBenchwarmer = { name: key, score: val }
+    } else {
+      if (val < lowscoreBenchwarmer.score) {
+        lowscoreBenchwarmer = { name: key, score: val }
+      }
+    }
+  }
 
   return (
     <Fragment>
-      <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> Hotstreak ({highScoreHotStreak.score} correct letters in a row)</li>
-      <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> Marksman ({highscoreAccuracy.score}% accuracy)</li>
-      <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> Longest Word ({Object.values(scores.longestWord)[0]})</li>
-      {highscoreToughLetters.score > 0 && <li><Icon props={{ color: 'green', name: 'sparkles', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> Tough Letters ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
-
+      <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
+      {highscoreAccuracy.score > 50 && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
+      {/* <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li> */}
+      {highscoreThief.score > 0 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; ({Object.values(scores.thief)[0]} words with only one letter filled)</li>}
+      {highscoreToughLetters.score > 0 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
+      {lowscoreBenchwarmer.score < 30 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
     </Fragment>
   )
 }
@@ -431,21 +450,16 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        {name && !complete &&
+        {name && complete &&
           <Popup>
             <h1>Crossword solved!</h1>
             {scores &&
               <ul css={styles.scores}>
                 {calculateScores(scores)}
-                {/* <li><Icon props={{ color: 'gold', name: 'star', size: 16, height: 14 }} /><strong>Ben: </strong>Longest Word (&#8220;Supercalifragilstic&#8221;)</li> */}
-                {/* <li><Icon props={{ color: 'green', name: 'shield-checkmark', size: 16, height: 14 }} /><strong>Mimi: </strong>The Last Word (&#8220;Zipit&#8221;)</li> */}
-                {/* <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>Ben: </strong>Hot Streak (15 straight correct letters)</li>
-                <li><Icon props={{ color: 'orange', name: 'warning', size: 16, height: 14 }} /><strong>Ben: </strong>Thief (Completed the last letter of 9 words)</li>
-                <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>Mimi: </strong>Marksman (90% accuracy)</li> */}
               </ul>
             }
             <br />
-            <Button props={{ onClickFn: () => setComplete(true), darkmode: false, text: 'Back to puzzle', icon: { name: 'arrow-back-circle', size: 16 } }} />
+            <Button props={{ onClickFn: () => setComplete(false), darkmode: false, text: 'Back to puzzle', icon: { name: 'arrow-back-circle', size: 16 } }} />
           </Popup>
         }
         {!name &&
