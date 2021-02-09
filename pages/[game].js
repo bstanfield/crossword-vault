@@ -3,7 +3,7 @@
 import { jsx } from '@emotion/react'
 import { fonts, ENDPOINT } from '../lib/helpers'
 import Head from 'next/head'
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import Clue from '../components/clue'
 import socketIOClient from 'socket.io-client';
 import Players from '../components/players'
@@ -16,11 +16,85 @@ import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
 import Board from '../components/board'
 import styles from '../lib/boardStyles'
+import Icon from '../components/icon'
 
 // board ratios (temp hardcode)
 const width = 15
 const height = 15
 const totalSquares = width * height
+
+// Takes data from backend and neatens it up
+const calculateScores = (scores) => {
+  // Hotstreak
+  let hotStreakScores = {}
+  for (const [key, val] of Object.entries(scores.hotStreak)) {
+    const highScore = val.reduce((i, x) => {
+      if (!i) return x;
+      if (x > i) return x;
+      return i;
+    })
+    hotStreakScores[key] = highScore;
+  }
+  let highScoreHotStreak = { name: '', score: 0 }
+  for (const [key, val] of Object.entries(hotStreakScores)) {
+    if (val > highScoreHotStreak.score) {
+      highScoreHotStreak = { name: key, score: val }
+    }
+  }
+
+  // Marksman
+  let marksmanScores = {}
+  for (const [key, val] of Object.entries(scores.highestAccuracy)) {
+    const accuracy = val.correct / (val.correct + val.incorrect)
+    marksmanScores[key] = accuracy;
+  }
+
+  let highscoreAccuracy = { name: '', score: 0 }
+  for (const [key, val] of Object.entries(marksmanScores)) {
+    if (val > highscoreAccuracy.score) {
+      highscoreAccuracy = { name: key, score: Math.round(val * 100) }
+    }
+  }
+
+  // Tough letters
+  let highscoreToughLetters = { name: '', score: 0 }
+  for (const [key, val] of Object.entries(scores.toughLetters)) {
+    if (val > highscoreToughLetters.score) {
+      highscoreToughLetters = { name: key, score: val }
+    }
+  }
+
+  // Thief
+  let highscoreThief = { name: '', score: 0 }
+  for (const [key, val] of Object.entries(scores.thief)) {
+    if (val > highscoreThief.score) {
+      highscoreThief = { name: key, score: val }
+    }
+  }
+
+  // Benchwarmer
+  let lowscoreBenchwarmer = { name: '', score: 0 }
+  for (const [key, val] of Object.entries(scores.benchwarmer)) {
+    if (lowscoreBenchwarmer.score === 0) {
+      lowscoreBenchwarmer = { name: key, score: val }
+    } else {
+      if (val < lowscoreBenchwarmer.score) {
+        lowscoreBenchwarmer = { name: key, score: val }
+      }
+    }
+  }
+
+  return (
+    <Fragment>
+      <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
+      {highscoreAccuracy.score > 50 && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
+      {/* <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li> */}
+      {highscoreThief.score > 0 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; ({Object.values(scores.thief)[0]} words with only one letter filled)</li>}
+      {highscoreToughLetters.score > 0 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
+      {lowscoreBenchwarmer.score < 30 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
+    </Fragment>
+  )
+}
 
 const createDownGroupings = (crossword) => {
   const { grid } = crossword
@@ -103,6 +177,7 @@ export default function Home() {
   const [showIncorrect, setShowIncorrect] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [room, setRoom] = useState(null)
+  const [complete, setComplete] = useState(false)
 
   // Nametags
   const [name, setName] = useState(false)
@@ -130,6 +205,7 @@ export default function Home() {
   const [guestHighlights, setGuestHighlights] = useState(false)
   const [players, setPlayers] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [scores, setScores] = useState(null)
 
   useEffect(() => {
     const path = window.location.pathname
@@ -199,6 +275,11 @@ export default function Home() {
 
     connection.on('newPlayer', data => {
       setPlayers(data)
+    })
+
+    // Sends at end of game to show guest scores
+    connection.on('scores', data => {
+      setScores(data)
     })
 
     connection.on('newHighlight', data => {
@@ -282,9 +363,14 @@ export default function Home() {
 
   // Would display some awesome feel good banner
   useEffect(() => {
-    if (guesses.length > 0 && grading) {
-      if (grading.correct === totalSquares - grading.black) {
-        // Alert goes here
+    if (guesses) {
+      // Success!
+      if (grading.correct === 225 - grading.black) {
+        return setComplete(true)
+      }
+      // Incorrect answers
+      if (grading.correct + grading.incorrect === guesses.length - grading.black) {
+        return setComplete(false)
       }
     }
   }, [grading])
@@ -302,8 +388,39 @@ export default function Home() {
     }
   }, [timestamp])
 
-  const handleSendToSocket = (body) => {
+  const handleSendToSocket = (data) => {
+    // add name to socket messages
+    let body = data
+    if (name) {
+      body = { ...data, ...{ name } }
+    }
     socketConnection.send(body);
+  }
+
+  // Username logic
+  const [input, setInput] = useState('')
+  const [error, setError] = useState(false)
+
+  const checkName = (name) => {
+    if (name.length <= 5) {
+      setName(input)
+    } else {
+      setError(true)
+    }
+  }
+
+  const handleKeyDown = e => {
+    if (e.key === 'Enter') {
+      checkName(input)
+    }
+  };
+
+  const handleChange = (i) => {
+    if (i.nativeEvent.data) {
+      return setInput(input + i.nativeEvent.data)
+    } else if (i.nativeEvent.data === null) {
+      return setInput(input.slice(0, -1))
+    }
   }
 
   if (!data || loading) {
@@ -333,7 +450,28 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        <Popup props={{ showPopup, setName }} />
+        {name && complete &&
+          <Popup>
+            <h1>Crossword solved!</h1>
+            {scores &&
+              <ul css={styles.scores}>
+                {calculateScores(scores)}
+              </ul>
+            }
+            <br />
+            <Button props={{ onClickFn: () => setComplete(false), darkmode: false, text: 'Back to puzzle', icon: { name: 'arrow-back-circle', size: 16 } }} />
+          </Popup>
+        }
+        {!name &&
+          <Popup>
+            <h1>Enter a username</h1>
+            <p>Must be <strong>5 or fewer</strong> letters.</p>
+            <br />
+            <input autoFocus onKeyDown={handleKeyDown} css={styles.textInput} value={input} onChange={(i) => handleChange(i)} placeholder='Username' type='text'></input>
+            <Button props={{ onClickFn: () => checkName(input), darkmode: false, text: 'Save', icon: { name: 'checkmark-circle', size: 16 } }} />
+          </Popup>
+        }
+
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>

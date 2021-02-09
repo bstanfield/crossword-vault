@@ -27,6 +27,7 @@ export default function Alert({ props }) {
   const [status, setStatus] = useState('incorrect')
   const [text, setText] = useState(false)
 
+  // TODO: completely remove this and replace on [game]
   useEffect(() => {
     if (guesses) {
       // Success!
