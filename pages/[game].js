@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from '@emotion/react'
-import { fonts, ENDPOINT } from '../lib/helpers'
+import { fonts, ENDPOINT, formatTime } from '../lib/helpers'
 import Head from 'next/head'
 import { Fragment, useEffect, useState } from 'react'
 import Clue from '../components/clue'
@@ -24,7 +24,7 @@ const height = 15
 const totalSquares = width * height
 
 // Takes data from backend and neatens it up
-const calculateScores = (scores) => {
+const calculateScores = (timestamp, completedAtTimestamp, scores) => {
   // Hotstreak
   let hotStreakScores = {}
   for (const [key, val] of Object.entries(scores.hotStreak)) {
@@ -84,8 +84,18 @@ const calculateScores = (scores) => {
     }
   }
 
+  const minutesHoursOrDaysToComplete = (timestamp, completedAtTimestamp) => {
+    // startDate = beginning of crossword
+    const startDate = new Date(timestamp)
+    const completedAt = new Date(completedAtTimestamp)
+
+    const secondsToComplete = (completedAt.getTime() - startDate.getTime()) / 1000;
+    return formatTime(secondsToComplete);
+  }
+
   return (
     <Fragment>
+      {completedAtTimestamp && <li><Icon props={{ color: 'orange', name: 'stopwatch', size: 18, height: 14 }} />Completed in: {minutesHoursOrDaysToComplete(timestamp, completedAtTimestamp)}</li>}
       <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
       {highscoreAccuracy.score > 50 && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
       {/* <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li> */}
@@ -199,6 +209,7 @@ export default function Home() {
 
   // API
   const [timestamp, setTimestamp] = useState(false)
+  const [completedAtTimestamp, setCompletedAtTimestamp] = useState(false)
   const [timer, setTimer] = useState(false)
   const [clientId, setClientId] = useState(false)
   const [socketConnection, setSocketConnection] = useState(false)
@@ -244,7 +255,13 @@ export default function Home() {
 
     // Sends board time once on connect
     connection.on('timestamp', time => {
+      console.log('setting timestamp: ', time)
       setTimestamp(time)
+    })
+
+    connection.on('completed', time => {
+      console.log('completed at: ', time)
+      setCompletedAtTimestamp(time)
     })
 
     connection.on('board', board => {
@@ -375,19 +392,6 @@ export default function Home() {
     }
   }, [grading])
 
-  useEffect(() => {
-    if (timestamp) {
-      let seconds = timestamp / 1000
-      let timeElapsed = Date.now() / 1000 - seconds
-      const intervalId = setInterval(() => {
-        timeElapsed++
-        setTimer(timeElapsed)
-      }, 1000)
-
-      return () => clearInterval(intervalId);
-    }
-  }, [timestamp])
-
   const handleSendToSocket = (data) => {
     // add name to socket messages
     let body = data
@@ -455,7 +459,7 @@ export default function Home() {
             <h1>Crossword solved!</h1>
             {scores &&
               <ul css={styles.scores}>
-                {calculateScores(scores)}
+                {calculateScores(timestamp, completedAtTimestamp, scores)}
               </ul>
             }
             <br />
