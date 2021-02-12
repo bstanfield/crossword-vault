@@ -98,7 +98,7 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
       {completedAtTimestamp && <li><Icon props={{ color: 'orange', name: 'stopwatch', size: 18, height: 14 }} />Completed in: {minutesHoursOrDaysToComplete(timestamp, completedAtTimestamp)}</li>}
       <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
       {highscoreAccuracy.score > 50 && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
-      {/* <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li> */}
+      <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li>
       {highscoreThief.score > 0 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; ({Object.values(scores.thief)[0]} words with only one letter filled)</li>}
       {highscoreToughLetters.score > 0 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
       {lowscoreBenchwarmer.score < 30 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
@@ -260,7 +260,6 @@ export default function Home() {
     })
 
     connection.on('completed', time => {
-      console.log('completed at: ', time)
       setCompletedAtTimestamp(time)
     })
 

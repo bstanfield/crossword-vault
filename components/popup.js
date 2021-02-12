@@ -35,6 +35,7 @@ export default function Popup({ children }) {
   const content = scale({
     width: '100%',
     height: 'auto',
+    color: colors.slate,
     backgroundColor: 'white',
     padding: '60px',
     position: 'relative',
