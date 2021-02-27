@@ -98,6 +98,20 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
     }
   }
 
+  // Editor
+  let highscoreEditor = { name: '', score: 0 }
+  if (scores.editor) {
+    for (const [key, val] of Object.entries(scores.editor)) {
+      if (highscoreEditor.score === 0) {
+        highscoreEditor = { name: key, score: val }
+      } else {
+        if (val > highscoreEditor.score) {
+          highscoreEditor = { name: key, score: val }
+        }
+      }
+    }
+  }
+
   const minutesHoursOrDaysToComplete = (timestamp, completedAtTimestamp) => {
     // startDate = beginning of crossword
     const startDate = new Date(timestamp)
@@ -114,10 +128,11 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
       {(highscoreAccuracy.score > 50 && highscoreAccuracy.score < 100) && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
       {highscoreAccuracy.score > 99 && <li><Icon props={{ color: 'green', name: 'shield-checkmark', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Perfectionist&rdquo; (100% accuracy)</li>}
       <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li>
-      {highscoreThief.score > 0 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; (Answered the last letter of {Object.values(scores.thief)[0]} words)</li>}
-      {highscoreToughLetters.score > 0 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
-      {lowscoreBenchwarmer.score < 30 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
-      {highscoreWorkhorse.score > 0 && <li><Icon props={{ color: 'purple', name: 'barbell', size: 16, height: 14 }} /><strong>{highscoreWorkhorse.name}:</strong> &ldquo;Heavy lifter&rdquo; ({highscoreWorkhorse.score} correct answers)</li>}
+      {highscoreThief.score > 2 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; (Answered the last letter of {Object.values(scores.thief)[0]} words)</li>}
+      {highscoreToughLetters.score >= 4 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
+      {lowscoreBenchwarmer.score < 35 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
+      {highscoreWorkhorse.score > 75 && <li><Icon props={{ color: 'purple', name: 'barbell', size: 16, height: 14 }} /><strong>{highscoreWorkhorse.name}:</strong> &ldquo;Heavy lifter&rdquo; ({highscoreWorkhorse.score} correct answers)</li>}
+      {highscoreEditor.score > 2 && <li><Icon props={{ color: 'red', name: 'medical', size: 18, height: 14 }} /><strong>{highscoreEditor.name}:</strong> &ldquo;Medic&rdquo; (Fixed {highscoreEditor.score} incorrect guesses)</li>}
     </Fragment >
   )
 }
@@ -469,7 +484,7 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        {name && complete &&
+        {name && !complete &&
           <Popup>
             <h1>Crossword solved!</h1>
             {scores &&
