@@ -51,7 +51,7 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
 
   let highscoreAccuracy = { name: '', score: 0 }
   for (const [key, val] of Object.entries(marksmanScores)) {
-    if (val > highscoreAccuracy.score) {
+    if (Math.round(val * 100) > highscoreAccuracy.score) {
       highscoreAccuracy = { name: key, score: Math.round(val * 100) }
     }
   }
@@ -84,6 +84,20 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
     }
   }
 
+  // Workhorse
+  let highscoreWorkhorse = { name: '', score: 0 }
+  if (scores.workhorse) {
+    for (const [key, val] of Object.entries(scores.workhorse)) {
+      if (highscoreWorkhorse.score === 0) {
+        highscoreWorkhorse = { name: key, score: val }
+      } else {
+        if (val > highscoreWorkhorse.score) {
+          highscoreWorkhorse = { name: key, score: val }
+        }
+      }
+    }
+  }
+
   const minutesHoursOrDaysToComplete = (timestamp, completedAtTimestamp) => {
     // startDate = beginning of crossword
     const startDate = new Date(timestamp)
@@ -97,12 +111,14 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
     <Fragment>
       {completedAtTimestamp && <li><Icon props={{ color: 'orange', name: 'stopwatch', size: 18, height: 14 }} />Completed in: {minutesHoursOrDaysToComplete(timestamp, completedAtTimestamp)}</li>}
       <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
-      {highscoreAccuracy.score > 50 && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
+      {(highscoreAccuracy.score > 50 && highscoreAccuracy.score < 100) && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
+      {highscoreAccuracy.score > 99 && <li><Icon props={{ color: 'green', name: 'shield-checkmark', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Perfectionist&rdquo; (100% accuracy)</li>}
       <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li>
-      {highscoreThief.score > 0 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; ({Object.values(scores.thief)[0]} words with only one letter filled)</li>}
+      {highscoreThief.score > 0 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; (Answered the last letter of {Object.values(scores.thief)[0]} words)</li>}
       {highscoreToughLetters.score > 0 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
       {lowscoreBenchwarmer.score < 30 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
-    </Fragment>
+      {highscoreWorkhorse.score > 0 && <li><Icon props={{ color: 'purple', name: 'barbell', size: 16, height: 14 }} /><strong>{highscoreWorkhorse.name}:</strong> &ldquo;Heavy lifter&rdquo; ({highscoreWorkhorse.score} correct answers)</li>}
+    </Fragment >
   )
 }
 
@@ -255,7 +271,6 @@ export default function Home() {
 
     // Sends board time once on connect
     connection.on('timestamp', time => {
-      console.log('setting timestamp: ', time)
       setTimestamp(time)
     })
 
@@ -295,6 +310,7 @@ export default function Home() {
 
     // Sends at end of game to show guest scores
     connection.on('scores', data => {
+      console.log('scores: ', data)
       setScores(data)
     })
 
@@ -568,7 +584,7 @@ export default function Home() {
             {/* <Timer props={{ timer, grading }} /> */}
 
             <div css={{ marginTop: 6 }}>
-              <Alert props={{ guesses, grading, showIncorrect, setShowIncorrect }} />
+              <Alert props={{ guesses, grading, showIncorrect, setShowIncorrect, setComplete }} />
               <span css={{ marginRight: 8 }} onClick={() => setShowSidePanel(showSidePanel ? false : true)}>
                 <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
               </span>

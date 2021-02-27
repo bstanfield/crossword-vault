@@ -23,6 +23,7 @@ export default function Alert({ props }) {
     guesses,
     showIncorrect,
     setShowIncorrect,
+    setComplete,
   } = props
   const [status, setStatus] = useState('incorrect')
   const [text, setText] = useState(false)
@@ -33,7 +34,7 @@ export default function Alert({ props }) {
       // Success!
       if (grading.correct === 225 - grading.black) {
         setStatus('correct')
-        return setText('Crossword solved!')
+        return setText('Solved! (show stats)')
       }
       // Incorrect answers
       if (grading.correct + grading.incorrect === guesses.length - grading.black) {
@@ -49,7 +50,7 @@ export default function Alert({ props }) {
 
   if (text) {
     return (
-      <p onClick={() => setShowIncorrect(!showIncorrect)} css={alertStyles(status)}>{text} {status === 'incorrect' && (showIncorrect ? '(hide)' : '(show)')}</p>
+      <p onClick={() => status === 'correct' ? setComplete(true) : setShowIncorrect(!showIncorrect)} css={alertStyles(status)}>{text} {status === 'incorrect' && (showIncorrect ? '(hide)' : '(show)')}</p>
     )
   } else {
     return null
