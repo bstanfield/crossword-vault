@@ -40,7 +40,7 @@ export default function Popup({ children }) {
     padding: '60px',
     position: 'relative',
     margin: 'auto',
-    marginTop: 80,
+    marginTop: 60,
     borderRadius: 6,
     h1: {
       margin: 0,

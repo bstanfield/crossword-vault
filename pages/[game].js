@@ -133,6 +133,7 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
       {lowscoreBenchwarmer.score < 35 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
       {highscoreWorkhorse.score > 75 && <li><Icon props={{ color: 'purple', name: 'barbell', size: 16, height: 14 }} /><strong>{highscoreWorkhorse.name}:</strong> &ldquo;Heavy lifter&rdquo; ({highscoreWorkhorse.score} correct answers)</li>}
       {highscoreEditor.score > 2 && <li><Icon props={{ color: 'red', name: 'medical', size: 18, height: 14 }} /><strong>{highscoreEditor.name}:</strong> &ldquo;Medic&rdquo; (Fixed {highscoreEditor.score} incorrect guesses)</li>}
+      <li css={{ marginTop: 6 }}><Icon props={{ color: 'green', name: 'leaf', size: 16, height: 14 }} /><strong css={{ color: 'green' }}>Crossword for Climate</strong><br /><div css={{ marginLeft: 24, marginTop: 4, marginBottom: 8, lineHeight: 1.5 }}>$0.50 contributed to the Wren Climate Fund as a reward for finishing a crossword on Word Vault!</div></li>
     </Fragment >
   )
 }
@@ -484,7 +485,7 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        {name && !complete &&
+        {name && complete &&
           <Popup>
             <h1>Crossword solved!</h1>
             {scores &&
