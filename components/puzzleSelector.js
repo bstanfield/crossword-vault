@@ -29,7 +29,7 @@ export default function PuzzleSelector({ props }) {
 
   return (
     <select
-      onChange={(event) => socketConnection.send({ type: 'newPuzzle', value: event.target.value })}
+      onChange={(event) => socketConnection.send({ type: 'newPuzzle', value: { dow: event.target.value, daily: false } })}
       css={selectStyles(darkmode)}
       name="newPuzzle"
       id="newPuzzle"

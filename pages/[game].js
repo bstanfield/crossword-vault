@@ -510,7 +510,7 @@ export default function Home() {
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>
-            <Players props={{ darkmode, setDarkmode, players }} />
+            <Players props={{ darkmode, setDarkmode, players, socketConnection }} />
 
             <div>
               <p css={{ maxWidth: 300, margin: 'auto', fontFamily: fonts.headline, fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 36, textAlign: 'center', marginTop: 3 }}>Word Vault</p>

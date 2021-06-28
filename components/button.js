@@ -5,11 +5,11 @@ import { scale } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 import Icon from './icon'
 
-const buttonStyles = (inactive, darkmode) => scale({
+const buttonStyles = (inactive, darkmode, backgroundColor) => scale({
   display: 'inline-block',
   margin: 0,
   padding: 8,
-  backgroundColor: inactive ? 'transparent' : darkmode ? '#333' : '#eee',
+  backgroundColor: backgroundColor ? backgroundColor : inactive ? 'transparent' : darkmode ? '#333' : '#eee',
   fontSize: 13,
   color: darkmode ? '#f5f5f5' : '#333333',
   borderRadius: 2,
@@ -28,11 +28,12 @@ export default function Button({ props }) {
     inactive,
     darkmode,
     onClickFn,
+    backgroundColor,
   } = props
   const [status, setStatus] = useState('incorrect')
 
   return (
-    <p onClick={onClickFn} css={buttonStyles(inactive, darkmode)}>{icon && <Icon props={{ name: icon.name, size: icon.size }} />}{text}</p>
+    <p onClick={onClickFn} css={buttonStyles(inactive, darkmode, backgroundColor)}>{icon && <Icon props={{ name: icon.name, size: icon.size }} />}{text}</p>
   )
 
 
