@@ -14,6 +14,7 @@ import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
+import DateSelector from '../components/DateSelector'
 import Board from '../components/board'
 import styles from '../lib/boardStyles'
 import Icon from '../components/icon'
@@ -127,7 +128,7 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
       <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
       {(highscoreAccuracy.score > 50 && highscoreAccuracy.score < 100) && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
       {highscoreAccuracy.score > 99 && <li><Icon props={{ color: 'green', name: 'shield-checkmark', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Perfectionist&rdquo; (100% accuracy)</li>}
-      <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li>
+      {/* <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li> */}
       {highscoreThief.score > 2 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; (Answered the last letter of {Object.values(scores.thief)[0]} words)</li>}
       {highscoreToughLetters.score >= 4 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
       {lowscoreBenchwarmer.score < 35 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
@@ -220,6 +221,7 @@ export default function Home() {
   const [showPopup, setShowPopup] = useState(false)
   const [room, setRoom] = useState(null)
   const [complete, setComplete] = useState(false)
+  const [dateRange, setDateRange] = useState(false)
 
   // Nametags
   const [name, setName] = useState(false)
@@ -605,9 +607,21 @@ export default function Home() {
                 <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
               </span>
 
+              <span css={{ marginRight: 8 }}>
+                <DateSelector
+                  props={{
+                    darkmode,
+                    socketConnection,
+                    dateRange,
+                    setDateRange,
+                  }}
+                />
+              </span>
+
               <PuzzleSelector
                 props={{
                   darkmode,
+                  dateRange,
                   socketConnection
                 }}
               />

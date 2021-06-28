@@ -3,10 +3,10 @@
 import { jsx } from '@emotion/react'
 import { scale, colors, fonts } from '../lib/helpers'
 
-export default function PuzzleSelector({ props }) {
+export default function DateSelector({ props }) {
   const {
     darkmode,
-    socketConnection,
+    setDateRange,
     dateRange
   } = props
 
@@ -30,19 +30,17 @@ export default function PuzzleSelector({ props }) {
 
   return (
     <select
-      onChange={(event) => socketConnection.send({ type: 'newPuzzle', value: { dow: event.target.value, daily: false, dateRange } })}
+      onChange={(event) => setDateRange(event.target.value)}
       css={selectStyles(darkmode)}
       name="newPuzzle"
       id="newPuzzle"
     >
-      <option value="" disabled selected>New puzzle ▼</option>
-      <option value="Monday">Monday</option>
-      <option value="Tuesday">Tuesday</option>
-      <option value="Wednesday">Wednesday</option>
-      <option value="Thursday">Thursday</option>
-      <option value="Friday">Friday</option>
-      <option value="Saturday">Saturday</option>
-      <option value="Sunday" disabled>Sunday</option>
+      <option value="" disabled selected>{dateRange || 'Range'}</option>
+      <option value="All">All</option>
+      <option value="2005+">2005+</option>
+      <option value="2010+">2010+</option>
+      <option value="2015+">2015+</option>
+      <option value="2021">2021</option>
     </select>
   )
 }
