@@ -9,6 +9,9 @@ const playersBox = scale({
   float: 'right',
   marginTop: 2,
   fontSize: 20,
+  p: {
+    marginLeft: 12
+  }
 })
 
 export default function Players({ props }) {
@@ -16,10 +19,22 @@ export default function Players({ props }) {
     darkmode,
     players,
     setDarkmode,
+    socketConnection
   } = props
 
   return (
     <div css={playersBox}>
+
+      <Button props={{
+        onClickFn: () => socketConnection.send({ type: 'newPuzzle', value: { dow: null, daily: true } }),
+        darkmode,
+        text: "Today's Puzzle!",
+        icon: {
+          name: 'star',
+          size: 14
+        },
+        backgroundColor: '#ffa500',
+      }} />
       <Button props={{
         onClickFn: () => setDarkmode(!darkmode),
         darkmode,

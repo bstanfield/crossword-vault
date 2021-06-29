@@ -14,6 +14,7 @@ import Shortcuts from '../components/shortcuts'
 import smoothscroll from 'smoothscroll-polyfill';
 import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
+import DateSelector from '../components/DateSelector'
 import Board from '../components/board'
 import styles from '../lib/boardStyles'
 import Icon from '../components/icon'
@@ -127,12 +128,13 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
       <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
       {(highscoreAccuracy.score > 50 && highscoreAccuracy.score < 100) && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
       {highscoreAccuracy.score > 99 && <li><Icon props={{ color: 'green', name: 'shield-checkmark', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Perfectionist&rdquo; (100% accuracy)</li>}
-      <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li>
+      {/* <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li> */}
       {highscoreThief.score > 2 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; (Answered the last letter of {Object.values(scores.thief)[0]} words)</li>}
       {highscoreToughLetters.score >= 4 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
       {lowscoreBenchwarmer.score < 35 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
       {highscoreWorkhorse.score > 75 && <li><Icon props={{ color: 'purple', name: 'barbell', size: 16, height: 14 }} /><strong>{highscoreWorkhorse.name}:</strong> &ldquo;Heavy lifter&rdquo; ({highscoreWorkhorse.score} correct answers)</li>}
       {highscoreEditor.score > 2 && <li><Icon props={{ color: 'red', name: 'medical', size: 18, height: 14 }} /><strong>{highscoreEditor.name}:</strong> &ldquo;Medic&rdquo; (Fixed {highscoreEditor.score} incorrect guesses)</li>}
+      <li css={{ marginTop: 6 }}><Icon props={{ color: 'green', name: 'leaf', size: 16, height: 14 }} /><strong css={{ color: 'green' }}>Crossword for Climate</strong><br /><div css={{ marginLeft: 24, marginTop: 4, marginBottom: 8, lineHeight: 1.5 }}>$0.50 contributed to the Wren Climate Fund as a reward for finishing a crossword on Word Vault!</div></li>
     </Fragment >
   )
 }
@@ -219,6 +221,7 @@ export default function Home() {
   const [showPopup, setShowPopup] = useState(false)
   const [room, setRoom] = useState(null)
   const [complete, setComplete] = useState(false)
+  const [dateRange, setDateRange] = useState(false)
 
   // Nametags
   const [name, setName] = useState(false)
@@ -484,7 +487,7 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
 
-        {name && !complete &&
+        {name && complete &&
           <Popup>
             <h1>Crossword solved!</h1>
             {scores &&
@@ -509,7 +512,7 @@ export default function Home() {
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={{ padding: '0 32px' }}>
-            <Players props={{ darkmode, setDarkmode, players }} />
+            <Players props={{ darkmode, setDarkmode, players, socketConnection }} />
 
             <div>
               <p css={{ maxWidth: 300, margin: 'auto', fontFamily: fonts.headline, fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 36, textAlign: 'center', marginTop: 3 }}>Word Vault</p>
@@ -604,9 +607,21 @@ export default function Home() {
                 <Button props={{ darkmode, text: 'Shortcuts', icon: { name: 'flash', size: 14 } }} />
               </span>
 
+              <span css={{ marginRight: 8 }}>
+                <DateSelector
+                  props={{
+                    darkmode,
+                    socketConnection,
+                    dateRange,
+                    setDateRange,
+                  }}
+                />
+              </span>
+
               <PuzzleSelector
                 props={{
                   darkmode,
+                  dateRange,
                   socketConnection
                 }}
               />
