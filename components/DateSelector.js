@@ -35,7 +35,7 @@ export default function DateSelector({ props }) {
       name="newPuzzle"
       id="newPuzzle"
     >
-      <option value="" disabled selected>{dateRange || 'Range'}</option>
+      <option value="" disabled selected>{dateRange || 'Range ▼'}</option>
       <option value="All">All</option>
       <option value="2005+">2005+</option>
       <option value="2010+">2010+</option>
