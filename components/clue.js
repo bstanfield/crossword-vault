@@ -31,7 +31,8 @@ export default function Clue({ props }) {
     setNewFocus,
     setLockout,
     setMovementDirection,
-    setHoveredClue
+    setHoveredClue,
+    setCurrentClueText
   } = props
   const [highlight, setHighlight] = useState(false)
 
@@ -56,6 +57,7 @@ export default function Clue({ props }) {
     if (index === clueIndex) {
       if (direction === movementDirection) {
         // Checks to see if clue direction matches user direction
+        setCurrentClueText(clue)
         setHighlight(true)
       } else {
         setHighlight(false)

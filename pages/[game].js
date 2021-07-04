@@ -222,6 +222,7 @@ export default function Home() {
   const [room, setRoom] = useState(null)
   const [complete, setComplete] = useState(false)
   const [dateRange, setDateRange] = useState(false)
+  const [currentClueText, setCurrentClueText] = useState(false)
 
   // Nametags
   const [name, setName] = useState(false)
@@ -327,8 +328,8 @@ export default function Home() {
     })
 
     // Sends at end of game to show guest scores
+    // TODO: Is this slowing down app/firing too often?
     connection.on('scores', data => {
-      console.log('scores: ', data)
       setScores(data)
     })
 
@@ -464,7 +465,10 @@ export default function Home() {
     return (
       <div css={[styles.appBackground(darkmode), { height: '100vh' }]}>
         <Head>
-          <title>WordVault (Loading...)</title>
+          <title>WordVault</title>
+          <meta property="og:image" content="https://i.imgur.com/NfmSRhc.png" />
+          <meta property="og:description" content="Solve crosswords, collaboratively. Play by yourself, or with up to twenty friends!" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
           <link rel="icon" href="/favicon.ico" />
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         </Head>
@@ -479,6 +483,7 @@ export default function Home() {
       <div css={styles.appBackground(darkmode)}>
         <Head>
           <title>WordVault ({room ? room.slice(0, 1).toUpperCase() + room.substring(1) : '?'} room) </title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
           <link rel="preconnect" href="https://fonts.gstatic.com" />
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"></link>
@@ -511,11 +516,11 @@ export default function Home() {
 
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
         <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
-          <div css={{ padding: '0 32px' }}>
+          <div css={styles.navContainer}>
             <Players props={{ darkmode, setDarkmode, players, socketConnection }} />
 
             <div>
-              <p css={{ maxWidth: 300, margin: 'auto', fontFamily: fonts.headline, fontWeight: 400, fontStyle: 'italic', letterSpacing: -3, fontSize: 36, textAlign: 'center', marginTop: 3 }}>Word Vault</p>
+              <p css={styles.logo}>Word Vault</p>
             </div>
           </div>
         </div>
@@ -524,6 +529,7 @@ export default function Home() {
 
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
+            <p css={styles.mobileClueCard}><strong>{currentClueText}</strong></p>
             <div css={styles.boardAndCluesContainer}>
               <Board props={{
                 clientId,
@@ -567,7 +573,8 @@ export default function Home() {
                         setNewFocus,
                         setMovementDirection,
                         setHoveredClue,
-                        setFocus
+                        setFocus,
+                        setCurrentClueText
                       }}
                     />
                   ))}
@@ -591,7 +598,8 @@ export default function Home() {
                         setNewFocus,
                         setMovementDirection,
                         setHoveredClue,
-                        setFocus
+                        setFocus,
+                        setCurrentClueText
                       }}
                     />
                   ))}

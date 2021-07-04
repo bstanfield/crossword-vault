@@ -47,9 +47,7 @@ export default function Players({ props }) {
       <Button props={{
         darkmode,
         inactive: true,
-        text: players
-          ? `${players} Player${players > 1 ? 's' : ''}`
-          : '? Players',
+        text: players,
         icon: { name: 'people', size: 14 }
       }} />
     </div>
