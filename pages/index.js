@@ -66,7 +66,7 @@ export default function Index() {
         <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div css={{ textAlign: 'center', position: 'absolute', top: 0, bottom: 0, right: 0, left: 0, height: 200, margin: 'auto' }}>
+      <div css={{ textAlign: 'center', position: 'absolute', top: '60vh', bottom: 0, right: 0, left: 0, margin: 'auto' }}>
         <h1>Enter your key</h1>
         <input autoFocus onKeyDown={handleKeyDown} css={textInput} value={key} onChange={(i) => handleChange(i)} placeholder="Your key" type="text"></input>
         <Button props={{ onClickFn: () => checkKey(key), darkmode: false, text: 'Enter', icon: { name: 'enter-outline', size: 16 } }} />
