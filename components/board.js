@@ -79,10 +79,7 @@ export default function Board({ props }) {
   useEffect(() => {
     if (newFocus !== false) {
       const groupingsToUse = movementDirection === 'across' ? acrossGroupings : downGroupings
-      document.getElementById(`input-${groupingsToUse[newFocus][0]}`).focus((e) => {
-        e.preventDefault();
-        e.target.focus({ preventScroll: true });
-      })
+      document.getElementById(`input-${groupingsToUse[newFocus][0]}`).focus()
     }
   }, [newFocus])
 
@@ -97,7 +94,7 @@ export default function Board({ props }) {
       const nextLocation = highlightedSquares[currentLocation + 1]
 
       if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus({ preventScroll: true })
+        document.getElementById(`input-${nextLocation}`).focus()
       } else {
         setFilledInput(false)
       }
@@ -116,10 +113,7 @@ export default function Board({ props }) {
       const nextLocation = highlightedSquares[currentLocation - 1]
 
       if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus((e) => {
-          e.preventDefault();
-          e.target.focus({ preventScroll: true });
-        })
+        document.getElementById(`input-${nextLocation}`).focus()
       }
       // Reset
       setBackspace(false)
@@ -139,10 +133,7 @@ export default function Board({ props }) {
           const nextLocation = selectedSquare + arrowKeys[movementKey]
           const nextLocationInput = document.getElementById(`input-${nextLocation}`)
           if (nextLocationInput) {
-            document.getElementById(`input-${nextLocation}`).focus((e) => {
-              e.preventDefault();
-              e.target.focus({ preventScroll: true });
-            })
+            document.getElementById(`input-${nextLocation}`).focus()
           }
         }
       }
@@ -156,10 +147,7 @@ export default function Board({ props }) {
           setClueIndex(nextClue)
           setHighlightedSquares(groupingsToUse[nextClue])
           const nextLocation = groupingsToUse[nextClue][0]
-          document.getElementById(`input-${nextLocation}`).focus((e) => {
-            e.preventDefault();
-            e.target.focus({ preventScroll: true });
-          })
+          document.getElementById(`input-${nextLocation}`).focus()
         }
       }
 
@@ -171,10 +159,7 @@ export default function Board({ props }) {
           setClueIndex(previousClue)
           setHighlightedSquares(groupingsToUse[previousClue])
           const previousLocation = groupingsToUse[previousClue][0]
-          document.getElementById(`input-${previousLocation}`).focus((e) => {
-            e.preventDefault();
-            e.target.focus({ preventScroll: true });
-          })
+          document.getElementById(`input-${previousLocation}`).focus()
         }
       }
 

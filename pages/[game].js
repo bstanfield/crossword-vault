@@ -255,8 +255,6 @@ export default function Home() {
   const [scores, setScores] = useState(null)
 
   useEffect(() => {
-    // TEMPORARY
-    console.log('scroll position: ', window.scrollY);
     const path = window.location.pathname
     let room = false
     if (path) {
