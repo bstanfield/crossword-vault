@@ -128,13 +128,14 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
       <li><Icon props={{ color: 'red', name: 'flame', size: 16, height: 14 }} /><strong>{highScoreHotStreak.name}:</strong> &ldquo;Hotstreak&rdquo; ({highScoreHotStreak.score} correct letters in a row)</li>
       {(highscoreAccuracy.score > 50 && highscoreAccuracy.score < 100) && <li><Icon props={{ color: 'green', name: 'disc', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Marksman&rdquo; ({highscoreAccuracy.score}% accuracy)</li>}
       {highscoreAccuracy.score > 99 && <li><Icon props={{ color: 'green', name: 'shield-checkmark', size: 16, height: 14 }} /><strong>{highscoreAccuracy.name}:</strong> &ldquo;Perfectionist&rdquo; (100% accuracy)</li>}
-      {/* <li><Icon props={{ color: 'orange', name: 'trophy', size: 18, height: 14 }} /><strong>{Object.keys(scores.longestWord)[0]}:</strong> &ldquo;Longest Word&rdquo; ({Object.values(scores.longestWord)[0]})</li> */}
+
       {highscoreThief.score > 2 && <li><Icon props={{ color: 'purple', name: 'sad', size: 16, height: 14 }} /><strong>{Object.keys(scores.thief)[0]}:</strong> &ldquo;Thief&rdquo; (Answered the last letter of {Object.values(scores.thief)[0]} words)</li>}
       {highscoreToughLetters.score >= 4 && <li><Icon props={{ color: 'navy', name: 'school', size: 16, height: 14 }} /><strong>{highscoreToughLetters.name}:</strong> &ldquo;Tough Letters&rdquo; ({highscoreToughLetters.score} X, Y, or Z letters)</li>}
       {lowscoreBenchwarmer.score < 35 && lowscoreBenchwarmer.score > 0 && <li><Icon props={{ color: 'skyblue', name: 'snow', size: 16, height: 14 }} /><strong>{lowscoreBenchwarmer.name}:</strong> &ldquo;Still warming up...&rdquo; (Only {lowscoreBenchwarmer.score} correct letters)</li>}
       {highscoreWorkhorse.score > 75 && <li><Icon props={{ color: 'purple', name: 'barbell', size: 16, height: 14 }} /><strong>{highscoreWorkhorse.name}:</strong> &ldquo;Heavy lifter&rdquo; ({highscoreWorkhorse.score} correct answers)</li>}
       {highscoreEditor.score > 2 && <li><Icon props={{ color: 'red', name: 'medical', size: 18, height: 14 }} /><strong>{highscoreEditor.name}:</strong> &ldquo;Medic&rdquo; (Fixed {highscoreEditor.score} incorrect guesses)</li>}
-      <li css={{ marginTop: 6 }}><Icon props={{ color: 'green', name: 'leaf', size: 16, height: 14 }} /><strong css={{ color: 'green' }}>Crossword for Climate</strong><br /><div css={{ marginLeft: 24, marginTop: 4, marginBottom: 8, lineHeight: 1.5 }}>$0.50 contributed to the Wren Climate Fund as a reward for finishing a crossword on Word Vault!</div></li>
+
+      {/* <li css={{ marginTop: 6 }}><Icon props={{ color: 'green', name: 'leaf', size: 16, height: 14 }} /><strong css={{ color: 'green' }}>Crossword for Climate</strong><br /><div css={{ marginLeft: 24, marginTop: 4, marginBottom: 8, lineHeight: 1.5 }}>$0.50 contributed to the Wren Climate Fund as a reward for finishing a crossword on Word Vault!</div></li> */}
     </Fragment >
   )
 }
@@ -254,6 +255,8 @@ export default function Home() {
   const [scores, setScores] = useState(null)
 
   useEffect(() => {
+    // TEMPORARY
+    console.log('scroll position: ', window.scrollY);
     const path = window.location.pathname
     let room = false
     if (path) {
@@ -468,7 +471,7 @@ export default function Home() {
           <title>WordVault</title>
           <meta property="og:image" content="https://i.imgur.com/NfmSRhc.png" />
           <meta property="og:description" content="Solve crosswords, collaboratively. Play by yourself, or with up to twenty friends!" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+          <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
           <link rel="icon" href="/favicon.ico" />
           <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         </Head>
@@ -529,7 +532,7 @@ export default function Home() {
 
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
-            <p css={styles.mobileClueCard}><strong>{currentClueText}</strong></p>
+            <p css={styles.mobileClueCard(darkmode)} dangerouslySetInnerHTML={{ __html: currentClueText }} />
             <div css={styles.boardAndCluesContainer}>
               <Board props={{
                 clientId,

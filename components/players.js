@@ -38,7 +38,7 @@ export default function Players({ props }) {
       <Button props={{
         onClickFn: () => setDarkmode(!darkmode),
         darkmode,
-        text: darkmode ? 'Lightmode' : 'Darkmode',
+        text: darkmode ? 'Light' : 'Dark',
         icon: {
           name: darkmode ? 'sunny' : 'moon',
           size: 13

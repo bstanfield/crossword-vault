@@ -225,7 +225,7 @@ export default function Square({ props }) {
   }, [guestHighlights])
 
   useEffect(() => {
-    document.ontouchmove = () => {
+    document.ontouchmove = (e) => {
       e.preventDefault()
     }
   })

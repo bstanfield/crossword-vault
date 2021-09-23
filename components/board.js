@@ -202,11 +202,6 @@ export default function Board({ props }) {
         setMovementKey(event.key)
       }
     })
-
-    // Why doesn't this work??
-    document.addEventListener('blur', () => {
-      window.scrollTo(0, 0)
-    })
   }, [])
 
   return (
