@@ -37,7 +37,7 @@ export default function Popup({ children }) {
     height: 'auto',
     color: colors.slate,
     backgroundColor: 'white',
-    padding: '60px',
+    padding: ['30px', '60px'],
     position: 'relative',
     margin: 'auto',
     marginTop: 60,

@@ -148,7 +148,6 @@ export default function Square({ props }) {
     setInputChangeToApi
   } = props
 
-
   const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
   const [inputData, setInputData] = useState('')
@@ -227,7 +226,6 @@ export default function Square({ props }) {
 
   useEffect(() => {
     document.ontouchmove = () => {
-      e.preventDefault()
     }
   })
 
@@ -242,7 +240,7 @@ export default function Square({ props }) {
     color: darkmode ? colors.offwhite : colors.slate,
     textTransform: 'uppercase',
     textAlign: 'center',
-    fontSize: '25px',
+    fontSize: ['17px', '20px', '25px', '25px'],
     lineHeight: 0,
     paddingTop: 4,
     fontWeight: 500,
@@ -302,11 +300,26 @@ export default function Square({ props }) {
         {content.letter !== '.' && <input
           onKeyDown={handleKeyDown}
           autoComplete='off'
-          onFocus={() => {
+          onPaste={(e) => {
+            e.preventDefault()
+            return false;
+          }}
+          onDrop={(e) => {
+            e.preventDefault()
+            return false;
+          }}
+          onCopy={(e) => {
+            e.preventDefault()
+            return false;
+          }}
+          onFocus={(e) => {
+            e.preventDefault()
             setFocus(content.position)
             setSelectedSquare(content.position)
           }}
-          onBlur={() => { setClickCount(0) }}
+          onBlur={() => {
+            setClickCount(0);
+          }}
           onClick={() => {
             setSelectedSquare(content.position)
             setClickCount(clickCount + 1)

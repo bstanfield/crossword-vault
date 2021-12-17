@@ -100,6 +100,7 @@ export default function Board({ props }) {
       }
     }
   }, [filledInput])
+
   useEffect(() => {
     if (inputChangeToApi) {
       handleSendToSocket({ type: 'input', value: inputChangeToApi })

@@ -56,6 +56,9 @@ export default function Index() {
     <Fragment>
       <Head>
         <title>WordVault</title>
+        <meta property="og:image" content="https://i.imgur.com/NfmSRhc.png" />
+        <meta property="og:description" content="Solve crosswords, collaboratively. Play by yourself, or with up to twenty friends!" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <script src="https://unpkg.com/ionicons@5.2.3/dist/ionicons.js"></script>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet"></link>
@@ -63,7 +66,7 @@ export default function Index() {
         <link href="https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"></link>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div css={{ textAlign: 'center', position: 'absolute', top: 0, bottom: 0, right: 0, left: 0, height: 200, margin: 'auto' }}>
+      <div css={{ textAlign: 'center', position: 'absolute', top: '60vh', bottom: 0, right: 0, left: 0, margin: 'auto' }}>
         <h1>Enter your key</h1>
         <input autoFocus onKeyDown={handleKeyDown} css={textInput} value={key} onChange={(i) => handleChange(i)} placeholder="Your key" type="text"></input>
         <Button props={{ onClickFn: () => checkKey(key), darkmode: false, text: 'Enter', icon: { name: 'enter-outline', size: 16 } }} />
