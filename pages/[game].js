@@ -224,6 +224,9 @@ export default function Home() {
   const [complete, setComplete] = useState(false)
   const [dateRange, setDateRange] = useState(false)
   const [currentClueText, setCurrentClueText] = useState(false)
+  
+  // invis-input stuff
+  const [inputData, setInputData] = useState('')
 
   // Nametags
   const [name, setName] = useState(false)
@@ -531,6 +534,69 @@ export default function Home() {
           <main css={{ marginTop: 8 }}>
             <Metadata props={{ data }} />
             <p css={styles.mobileClueCard(darkmode)} dangerouslySetInnerHTML={{ __html: currentClueText }} />
+            <input
+              css={{ opacity: 0 }}
+              onKeyDown={(e) => {
+                if (e.code == 'Space') {
+                  e.preventDefault()
+                }
+              }}
+              type="text"
+              id="invis-input"
+              autoComplete="off"
+              value={inputData.letter}
+              onBeforeInput={(input) => {
+                input.preventDefault()
+                if (input.nativeEvent.data && input.nativeEvent.data !== '') {
+                  setInputData({ letter: input.nativeEvent.data, position: selectedSquare })
+                  let newGuesses = guesses
+                  newGuesses[selectedSquare] = input.nativeEvent.data
+                  setGuesses([...newGuesses])
+                  // setSelectionIterator(selectionIterator + 1)
+    
+                  // TODO: This sends data to API and NEEDS to be added back
+                  // const inputToFill = { position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator }
+                  // setFilledInput({ ...inputToFill })
+                  // setInputChangeToApi({ ...inputToFill })
+    
+                  // TODO: Add "content" to global state somehow
+                  // let newGuesses = guesses
+                  // newGuesses[content.position - 1] = input.nativeEvent.data
+                  // setGuesses([...newGuesses])
+
+                  // picking up changes to state
+                  // setUploadGuess(uploadGuess ? false : true)
+                }
+              }}
+              // onKeyDown={(event) => {
+              //   event.target.blur(); 
+              // }}
+              onChange={(input) => {
+                input.preventDefault()
+                // This is the big kahuna
+                // TODO: Make this happen based off a trigger from invis-input...
+                if (input.nativeEvent.data && input.nativeEvent.data !== '') {
+                  setInputData({ letter: input.nativeEvent.data, position: selectedSquare })
+                  let newGuesses = guesses
+                  newGuesses[selectedSquare] = input.nativeEvent.data
+                  setGuesses([...newGuesses])
+                  // setSelectionIterator(selectionIterator + 1)
+    
+                  // TODO: This sends data to API and NEEDS to be added back
+                  // const inputToFill = { position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator }
+                  // setFilledInput({ ...inputToFill })
+                  // setInputChangeToApi({ ...inputToFill })
+    
+                  // TODO: Add "content" to global state somehow
+                  // let newGuesses = guesses
+                  // newGuesses[content.position - 1] = input.nativeEvent.data
+                  // setGuesses([...newGuesses])
+
+                  // picking up changes to state
+                  // setUploadGuess(uploadGuess ? false : true)
+                }
+              }}
+            />
             <div css={styles.boardAndCluesContainer}>
               <Board props={{
                 clientId,
@@ -552,7 +618,11 @@ export default function Home() {
                 setMovementDirection,
                 handleSendToSocket,
                 guesses,
-                setGuesses
+                setGuesses,
+                inputData,
+                setInputData,
+                selectedSquare,
+                setSelectedSquare
               }}
               />
 

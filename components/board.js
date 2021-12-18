@@ -28,10 +28,13 @@ export default function Board({ props }) {
     setGuesses,
     setClueIndex,
     setMovementDirection,
+    inputData,
+    setSelectedSquare,
+    selectedSquare
   } = props
   const { grid, clues } = data
-  const [selectedSquare, setSelectedSquare] = useState(false)
   const [highlightedSquares, setHighlightedSquares] = useState([])
+  const [clickCount, setClickCount] = useState(0)
 
   // CONSTRAIN USE TO MOVEMENT
   const [filledInput, setFilledInput] = useState(false)
@@ -46,6 +49,24 @@ export default function Board({ props }) {
 
   // API
   const [inputChangeToApi, setInputChangeToApi] = useState(false)
+
+  // Functions for invis input
+  useEffect(() => {
+    // Todo: 
+      // Add state to invis-input, including:
+        // - square position
+        // - some ability to fill square?
+    
+    // document.getElementById('invis-input').setAttribute('autofocus', 'autofocus')
+    // document.getElementById('invis-input').focus()
+    setClickCount(0)
+  }, [selectedSquare])
+
+  useEffect(() => {
+    if (clickCount % 1 == 0) {
+      setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
+    }
+  }, [clickCount])
 
   // Functions for across movement
   useEffect(() => {
@@ -217,7 +238,10 @@ export default function Board({ props }) {
           setSelectedSquare,
           setFilledInput,
           setGuesses,
-          setInputChangeToApi
+          setInputChangeToApi,
+          clickCount,
+          setClickCount,
+          inputData,
         }}
         />
       )

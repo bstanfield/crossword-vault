@@ -145,12 +145,13 @@ export default function Square({ props }) {
     setFilledInput,
     setBackspace,
     setGuesses,
-    setInputChangeToApi
+    setInputChangeToApi,
+    clickCount,
+    setClickCount,
+    inputData
   } = props
 
-  const [clickCount, setClickCount] = useState(0)
   const [highlight, setHighlight] = useState(false)
-  const [inputData, setInputData] = useState('')
   const [selectionIterator, setSelectionIterator] = useState(0)
   const [guestHighlight, setGuestHighlight] = useState(false)
 
@@ -164,12 +165,6 @@ export default function Square({ props }) {
   }, [hover])
 
   useEffect(() => {
-    if (clickCount > 1) {
-      setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
-    }
-  }, [clickCount])
-
-  useEffect(() => {
     if (highlightedSquares.includes(content.position)) {
       setHighlight(true)
     } else {
@@ -179,30 +174,31 @@ export default function Square({ props }) {
 
   // Responds to API responses
   useEffect(() => {
+    // TODO: Do something with this but new
     // if guesses have been changed by guest, update square input value
-    if (guesses && guesses[content.position - 1] !== inputData) {
-      setInputData(guesses[content.position - 1])
-    }
+    // if (guesses && guesses[content.position - 1] !== inputData) {
+    //   setInputData(guesses[content.position - 1])
+    // }
   }, [guesses])
 
-  const handleKeyDown = e => {
-    if (e.key === ' ') {
-      e.preventDefault();
-    }
+  // const handleKeyDown = e => {
+  //   if (e.key === ' ') {
+  //     e.preventDefault();
+  //   }
 
-    if (e.key === 'Backspace') {
-      // This is a dumb method. Just see if the box is empty. If it is, move back
-      if (!inputData) {
-        setBackspace(true)
-      }
-      setInputData('')
-      const inputToFill = { position: content.position, letter: '', iterator: 0 }
-      setInputChangeToApi({ ...inputToFill })
-      let newGuesses = guesses
-      newGuesses[content.position - 1] = ''
-      setGuesses([...newGuesses])
-    }
-  };
+  //   if (e.key === 'Backspace') {
+  //     // This is a dumb method. Just see if the box is empty. If it is, move back
+  //     if (!inputData) {
+  //       setBackspace(true)
+  //     }
+  //     setInputData('')
+  //     const inputToFill = { position: content.position, letter: '', iterator: 0 }
+  //     setInputChangeToApi({ ...inputToFill })
+  //     let newGuesses = guesses
+  //     newGuesses[content.position - 1] = ''
+  //     setGuesses([...newGuesses])
+  //   }
+  // };
 
   const isGuestHighlight = () => {
     if (guestHighlights) {
@@ -278,7 +274,7 @@ export default function Square({ props }) {
 
   return (
     <div id={content.position} css={squareBox}>
-      <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
+      <div css={form}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
 
         {/* Shows client username above square */}
@@ -297,57 +293,43 @@ export default function Square({ props }) {
         />
 
         {/* Skips rendering input for black squares */}
-        {content.letter !== '.' && <input
-          onKeyDown={handleKeyDown}
+        {/* This is normally an input */}
+        {content.letter !== '.' && <div
           autoComplete='off'
-          onPaste={(e) => {
-            e.preventDefault()
-            return false;
-          }}
-          onDrop={(e) => {
-            e.preventDefault()
-            return false;
-          }}
-          onCopy={(e) => {
-            e.preventDefault()
-            return false;
-          }}
-          onFocus={(e) => {
-            e.preventDefault()
+          onClick={() => {
+            // This needs to work even after getting click off...
+            setClickCount(clickCount + 1)
             setFocus(content.position)
             setSelectedSquare(content.position)
-          }}
-          onBlur={() => {
-            setClickCount(0);
-          }}
-          onClick={() => {
-            setSelectedSquare(content.position)
-            setClickCount(clickCount + 1)
+            document.getElementById('invis-input').setAttribute('autofocus', 'autofocus')
+            document.getElementById('invis-input').focus({ preventScroll: true })
           }}
           css={squareInput}
           type='text'
           id={`input-${content.position}`}
-          value={inputData}
           onChange={(input) => {
+            // This is the big kahuna
+            // TODO: Make this happen based off a trigger from invis-input...
             if (input.nativeEvent.data && input.nativeEvent.data !== '') {
-              setInputData(input.nativeEvent.data)
-              setSelectionIterator(selectionIterator + 1)
+              // setInputData(input.nativeEvent.data)
+              // setSelectionIterator(selectionIterator + 1)
 
               // TODO: Rename
-              const inputToFill = { position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator }
-              setFilledInput({ ...inputToFill })
-              setInputChangeToApi({ ...inputToFill })
+              // const inputToFill = { position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator }
+              // setFilledInput({ ...inputToFill })
+              // setInputChangeToApi({ ...inputToFill })
 
-              let newGuesses = guesses
-              newGuesses[content.position - 1] = input.nativeEvent.data
-              setGuesses([...newGuesses])
+              // let newGuesses = guesses
+              // newGuesses[content.position - 1] = input.nativeEvent.data
+              // setGuesses([...newGuesses])
               // TODO: Remove if array spread operator fixes useEffect
               // picking up changes to state
-              setUploadGuess(uploadGuess ? false : true)
+              // setUploadGuess(uploadGuess ? false : true)
             }
           }}
-          name={content.letter} />}
-      </form>
+          name={content.letter}>
+          <p css={{ fontSize: 12 }}>{guesses[content.position] && guesses[content.position]}</p></div>}
+      </div>
       {circle === 1 && <div css={circleClue}></div>}
     </div >
   )
