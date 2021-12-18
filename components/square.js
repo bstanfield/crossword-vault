@@ -328,7 +328,8 @@ export default function Square({ props }) {
           type='text'
           id={`input-${content.position}`}
           value={inputData}
-          onChange={(input) => {
+          onBeforeInput={(input) => {
+            input.preventDefault()
             if (input.nativeEvent.data && input.nativeEvent.data !== '') {
               setInputData(input.nativeEvent.data)
               setSelectionIterator(selectionIterator + 1)
