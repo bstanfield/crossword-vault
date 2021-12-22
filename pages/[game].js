@@ -357,6 +357,11 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    // If username is in storage, don't ask again
+    if (localStorage.getItem('username')) {
+      setName(localStorage.getItem('username'))
+      setShowPopup(false)
+    }
     if (!name) {
       setShowPopup(true)
     }
@@ -443,6 +448,7 @@ export default function Home() {
   const checkName = (name) => {
     if (name.length <= 5) {
       setName(input)
+      localStorage.setItem('username', input)
     } else {
       setError(true)
     }
@@ -528,7 +534,7 @@ export default function Home() {
         <div css={styles.appContainer}>
 
 
-          <main css={{ marginTop: 8 }}>
+          <main>
             <Metadata props={{ data }} />
             <p css={styles.mobileClueCard(darkmode)} dangerouslySetInnerHTML={{ __html: currentClueText }} />
             <div css={styles.boardAndCluesContainer}>
