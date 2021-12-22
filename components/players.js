@@ -37,8 +37,8 @@ export default function Players({ props }) {
       }} />
       <Button props={{
         onClickFn: () => {
+          localStorage.setItem('darkmode', !darkmode)
           setDarkmode(!darkmode)
-          localStorage.setItem('darkmode', darkmode)
         },
         darkmode,
         text: darkmode ? 'Light' : 'Dark',

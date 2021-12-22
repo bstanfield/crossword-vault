@@ -367,8 +367,9 @@ export default function Home() {
     }
 
     // If darkmode is in storage, default to it
-    if (localStorage.getItem('darkmode')) {
-      setDarkmode(localStorage.getItem('darkmode'))
+    // localstorage boolean gets saved as string :(
+    if (localStorage.getItem('darkmode').includes('true')) {
+      setDarkmode(true)
     }
   }, [])
 
