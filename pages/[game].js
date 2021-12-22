@@ -365,6 +365,11 @@ export default function Home() {
     if (!name) {
       setShowPopup(true)
     }
+
+    // If darkmode is in storage, default to it
+    if (localStorage.getItem('darkmode')) {
+      setDarkmode(localStorage.getItem('darkmode'))
+    }
   }, [])
 
   useEffect(() => {
@@ -449,6 +454,7 @@ export default function Home() {
     if (name.length <= 5) {
       setName(input)
       localStorage.setItem('username', input)
+      setError(false)
     } else {
       setError(true)
     }
@@ -481,7 +487,7 @@ export default function Home() {
         </Head>
         <div css={styles.loadingSpinner}>
           <div css={styles.loadingRing}><div></div><div></div></div>
-          <p>Loading puzzle...</p>
+          {name ? <p>Joining puzzle as <b>{name}</b>...</p> : <p>Loading puzzle...</p>}
         </div>
       </div>
     )
@@ -517,12 +523,13 @@ export default function Home() {
             <p>Must be <strong>5 or fewer</strong> letters.</p>
             <br />
             <input autoFocus onKeyDown={handleKeyDown} css={styles.textInput} value={input} onChange={(i) => handleChange(i)} placeholder='Username' type='text'></input>
-            <Button props={{ onClickFn: () => checkName(input), darkmode: false, text: 'Save', icon: { name: 'checkmark-circle', size: 16 } }} />
+          <Button props={{ onClickFn: () => checkName(input), darkmode: false, text: 'Save', icon: { name: 'checkmark-circle', size: 16 } }} />
+          {error && <p css={{ fontSize: 14, padding: 0, color: 'red' }}>Too many letters!</p>}
           </Popup>
         }
 
         <Shortcuts props={{ show: showSidePanel, darkmode }} />
-        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '55px', top: 12, left: 0, right: 0, margin: 'auto' }}>
+        <div css={{ borderBottom: `1px solid ${darkmode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`, zIndex: 2, position: 'absolute', width: '100%', height: '50px', top: 12, left: 0, right: 0, margin: 'auto' }}>
           <div css={styles.navContainer}>
             <Players props={{ darkmode, setDarkmode, players, socketConnection }} />
 
@@ -641,7 +648,7 @@ export default function Home() {
                 }}
               />
 
-              <p css={{ display: 'inline-block', fontSize: 14, paddingLeft: 12 }}>Playing as <strong>{name || 'anonymous'}</strong></p>
+              <p css={{ display: 'inline-block', fontSize: 14, paddingLeft: 12, paddingRight: 4 }}>Playing as <strong>{name || 'anon'}</strong></p><a css={{ fontSize: 14, color: darkmode ? '#8e8e8e' : 'blue', textDecoration: 'underline', cursor: 'pointer' }} onClick={() => setName(false)}>edit</a>
             </div>
           </main>
         </div>
