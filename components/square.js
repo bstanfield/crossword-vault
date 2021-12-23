@@ -14,9 +14,9 @@ const colorLookup = {
     dark_low: 'transparent',
   },
   'grey': {
-    high: colors.slate,
+    high: 'black',
     low: colors.lightgrey,
-    dark_high: colors.slate,
+    dark_high: 'black',
     dark_low: colors.lightgrey,
   },
   'red': {

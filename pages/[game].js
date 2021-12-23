@@ -368,7 +368,7 @@ export default function Home() {
 
     // If darkmode is in storage, default to it
     // localstorage boolean gets saved as string :(
-    if (localStorage.getItem('darkmode').includes('true')) {
+    if (localStorage.getItem('darkmode') && localStorage.getItem('darkmode').includes('true')) {
       setDarkmode(true)
     }
   }, [])
@@ -452,7 +452,7 @@ export default function Home() {
   const [error, setError] = useState(false)
 
   const checkName = (name) => {
-    if (name.length <= 5) {
+    if (name.length <= 6) {
       setName(input)
       localStorage.setItem('username', input)
       setError(false)
@@ -521,7 +521,7 @@ export default function Home() {
         {!name &&
           <Popup>
             <h1>Enter a username</h1>
-            <p>Must be <strong>5 or fewer</strong> letters.</p>
+            <p>Must be <strong>6 or fewer</strong> letters.</p>
             <br />
             <input autoFocus onKeyDown={handleKeyDown} css={styles.textInput} value={input} onChange={(i) => handleChange(i)} placeholder='Username' type='text'></input>
           <Button props={{ onClickFn: () => checkName(input), darkmode: false, text: 'Save', icon: { name: 'checkmark-circle', size: 16 } }} />
