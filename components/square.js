@@ -19,11 +19,11 @@ const colorLookup = {
     dark_high: 'black',
     dark_low: colors.lightgrey,
   },
-  'red': {
-    high: 'rgb(255, 40, 101)',
-    low: '#E7D6DB',
-    dark_high: 'rgb(70, 17, 32)',
-    dark_low: '#635156'
+  'green': {
+    high: '#19A450',
+    low: '#CAEAD6',
+    dark_high: '#1B482D',
+    dark_low: '#526058'
   },
   'purple': {
     high: 'rgb(161, 59, 224)',
