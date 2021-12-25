@@ -5,7 +5,6 @@ import { scale, colors, fonts } from '../lib/helpers'
 import { useEffect, useState } from 'react'
 import Nametag from './nametag'
 
-// Only have matching dark colors for red
 const colorLookup = {
   'transparent': {
     high: 'transparent',
@@ -34,8 +33,14 @@ const colorLookup = {
   'blue': {
     high: 'rgb(40, 203, 255)',
     low: '#CFE2E8',
-    dark_high: 'rgb(70, 17, 32)',
-    dark_low: '#635156'
+    dark_high: '#07374F',
+    dark_low: '#3C5560'
+  },
+  'orange': {
+    high: '#EA8D21',
+    low: '#FAE9D5',
+    dark_high: '#59350A',
+    dark_low: '#736654'
   }
 }
 
