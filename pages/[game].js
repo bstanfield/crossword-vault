@@ -5,24 +5,19 @@ import { fonts, ENDPOINT, formatTime } from '../lib/helpers'
 import Head from 'next/head'
 import { Fragment, useEffect, useState } from 'react'
 import Clue from '../components/clue'
-import socketIOClient from 'socket.io-client';
+import socketIOClient from 'socket.io-client'
 import Players from '../components/players'
 import Metadata from '../components/metadata'
 import Alert from '../components/alert'
 import Button from '../components/button'
 import Shortcuts from '../components/shortcuts'
-import smoothscroll from 'smoothscroll-polyfill';
+import smoothscroll from 'smoothscroll-polyfill'
 import Popup from '../components/popup'
 import PuzzleSelector from '../components/puzzleSelector'
 import DateSelector from '../components/DateSelector'
 import Board from '../components/board'
 import styles from '../lib/boardStyles'
 import Icon from '../components/icon'
-
-// board ratios (temp hardcode)
-const width = 15
-const height = 15
-const totalSquares = width * height
 
 // Takes data from backend and neatens it up
 const calculateScores = (timestamp, completedAtTimestamp, scores) => {
@@ -143,16 +138,20 @@ const calculateScores = (timestamp, completedAtTimestamp, scores) => {
 const createDownGroupings = (crossword) => {
   const { grid } = crossword
 
+  const tempWidth = crossword.size.rows
+  const tempHeight = crossword.size.cols
+  const tempTotalSquares = tempWidth * tempHeight
+
   let position = 1
   let grouping = []
-  while (position <= totalSquares) {
+  while (position <= tempTotalSquares) {
     if (grid[position - 1] !== '.') {
       let match = false
       if (grouping.length === 0) {
         grouping.push([position])
       } else {
         grouping.map((group, index) => {
-          if (group.includes(position - width)) {
+          if (group.includes(position - tempWidth)) {
             match = true
             grouping[index].push(position)
           }
@@ -167,8 +166,14 @@ const createDownGroupings = (crossword) => {
   return grouping
 }
 
-const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings, setGuesses) => {
+const createBoard = (crossword, setDownGroupings, setAcrossGroupings, setGuesses) => {
   const { grid, gridnums } = crossword
+
+  // board ratios (dynamic)
+  const width = crossword.size.rows
+  const height = crossword.size.cols
+  const totalSquares = width * height
+
   let partial = 0
   let arr = []
   let acrossGrouping = []
@@ -176,7 +181,7 @@ const createBoard = (crossword, total, setDownGroupings, setAcrossGroupings, set
   let rowPosition = 0
   let guesses = []
 
-  while (partial < total) {
+  while (partial < totalSquares) {
     partial++
     rowPosition++
 
@@ -209,7 +214,13 @@ export default function Home() {
 
   // Darkmode
   const [darkmode, setDarkmode] = useState(false)
+  
+  // For dynamic crossword sizes (15x15, etc.)
+  const [width, setWidth] = useState(false)
+  const [height, setHeight] = useState(false)
+  const [totalSquares, setTotalSquares] = useState(false)
 
+  // Board
   const [board, setBoard] = useState([])
   const [grading, setGrading] = useState(false)
   const [guesses, setGuesses] = useState([])
@@ -299,6 +310,7 @@ export default function Home() {
     })
 
     connection.on('board', board => {
+      console.log('resetting board!')
       setData(board)
     })
 
@@ -392,13 +404,20 @@ export default function Home() {
   useEffect(() => {
     if (data) {
       setBoard(
-        createBoard(data, totalSquares, setDownGroupings, setAcrossGroupings, setGuesses)
+        createBoard(data, setDownGroupings, setAcrossGroupings, setGuesses)
       )
+    }
+
+    if (data) {
+      setWidth(data.size.rows)
+      setHeight(data.size.cols)
+      setTotalSquares(width * height)
     }
   }, [data])
 
 
   useEffect(() => {
+    console.log('grading!')
     let incorrect = 0
     let correct = 0
     let blank = 0
@@ -547,7 +566,7 @@ export default function Home() {
           <main>
             <Metadata props={{ data }} />
             <p css={styles.mobileClueCard(darkmode)} dangerouslySetInnerHTML={{ __html: currentClueText }} />
-            <div css={styles.boardAndCluesContainer}>
+            <div css={styles.boardAndCluesContainer(data.size.rows, data.size.cols)}>
               <Board props={{
                 clientId,
                 board,
@@ -568,7 +587,9 @@ export default function Home() {
                 setMovementDirection,
                 handleSendToSocket,
                 guesses,
-                setGuesses
+                setGuesses,
+                width: data.size.rows,
+                height: data.size.cols,
               }}
               />
 
