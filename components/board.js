@@ -4,7 +4,6 @@ import { jsx } from '@emotion/react'
 import { useEffect, useState } from 'react'
 import styles from '../lib/boardStyles'
 import Square from './square';
-import { width } from '../lib/constants'
 
 export default function Board({ props }) {
   const {
@@ -28,6 +27,8 @@ export default function Board({ props }) {
     setGuesses,
     setClueIndex,
     setMovementDirection,
+    width,
+    height
   } = props
   const { grid, clues } = data
   const [selectedSquare, setSelectedSquare] = useState(false)
@@ -190,7 +191,7 @@ export default function Board({ props }) {
   }, [])
 
   return (
-    <div css={styles.boardContainer}>
+    <div css={styles.boardContainer(width, height)}>
       {board.map((content, index) => (
         <Square key={index} props={{
           circle: data.circles && data.circles[index],

@@ -46,8 +46,9 @@ export default function Metadata({ props }) {
 
   return (
     <div>
-      <h1 css={fancyHeader}>{data && data.hasTitle ? data.title : `${data.dow}, ${formatDate(data.date)}`}</h1>
+      <h1 css={fancyHeader}>{data && data.dow === 'Sunday' ? data.title : `${data.dow}, ${formatDate(data.date)}`}</h1>
       <p css={{ padding: 0, marginLeft: 8, marginTop: 6, marginBottom: -8, display: 'inline-block' }}>{data ? `by ${data.author}` : 'Retrieving puzzle details...'}</p>
+      {(data && data.dow === 'Sunday') && <p css={{ padding: 0, marginTop: 6, marginBottom: -8  }}>{formatDate(data.date)}</p>}
     </div>
   )
 }
