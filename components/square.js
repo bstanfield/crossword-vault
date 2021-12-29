@@ -332,7 +332,7 @@ export default function Square({ props }) {
           css={squareInput}
           type='text'
           id={`input-${content.position}`}
-          value={inputData}
+          defaultValue={inputData}
           onBeforeInput={(input) => {
             input.preventDefault()
             if (input.nativeEvent.data && input.nativeEvent.data !== '') {

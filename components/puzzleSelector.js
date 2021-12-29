@@ -24,8 +24,8 @@ export default function PuzzleSelector({ props }) {
     '&:hover': {
       border: darkmode ? `1px solid ${colors.lightgrey}` : `1px solid ${colors.slate}`,
     },
-    '-webkit-appearance': 'none',
-    '-moz-appearance': 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
   })
 
   return (
@@ -34,8 +34,9 @@ export default function PuzzleSelector({ props }) {
       css={selectStyles(darkmode)}
       name="newPuzzle"
       id="newPuzzle"
+      defaultValue="New puzzle ▼"
     >
-      <option value="" disabled selected>New puzzle ▼</option>
+      <option value="New puzzle ▼" disabled>New puzzle ▼</option>
       <option value="Monday">Monday</option>
       <option value="Tuesday">Tuesday</option>
       <option value="Wednesday">Wednesday</option>

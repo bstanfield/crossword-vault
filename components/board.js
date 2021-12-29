@@ -188,6 +188,9 @@ export default function Board({ props }) {
         setMovementKey(event.key)
       }
     })
+
+    return () => {
+    }
   }, [])
 
   return (
