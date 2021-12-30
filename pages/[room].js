@@ -35,6 +35,7 @@ export default function Room() {
   const [nametagLocations, setNametagLocations] = useState([]);
   const [nametagData, setNametagData] = useState([]);
   const [focus, setFocus] = useState(false);
+  const [dateRange, setDateRange] = useState(false);
   const [darkmode, setDarkmode] = useState(false);
   // Username
   const [name, setName] = useState(false);
@@ -309,11 +310,13 @@ export default function Room() {
                 setDarkmode,
                 name,
                 setName,
+                complete,
+                setComplete,
               }}
             />
 
             <div css={{ marginTop: 6 }}>
-              <Alert
+              {/* <Alert
                 props={{
                   guesses,
                   grading,
@@ -321,7 +324,7 @@ export default function Room() {
                   setShowIncorrect,
                   setComplete,
                 }}
-              />
+              /> */}
               <span
                 css={{ marginRight: 8 }}
                 onClick={() => setShowSidePanel(showSidePanel ? false : true)}

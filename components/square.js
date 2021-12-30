@@ -1,143 +1,182 @@
 /** @jsx jsx */
 
-import { jsx } from '@emotion/react'
-import { scale, colors, fonts } from '../lib/helpers'
-import { useEffect, useState } from 'react'
-import Nametag from './nametag'
+import { jsx } from "@emotion/react";
+import { scale, colors, fonts } from "../lib/helpers";
+import { useEffect, useState } from "react";
+import Nametag from "./nametag";
 
 const colorLookup = {
-  'transparent': {
-    high: 'transparent',
-    low: 'transparent',
-    dark_high: 'transparent',
-    dark_low: 'transparent',
+  transparent: {
+    high: "transparent",
+    low: "transparent",
+    dark_high: "transparent",
+    dark_low: "transparent",
   },
-  'grey': {
-    high: 'black',
+  grey: {
+    high: "black",
     low: colors.lightgrey,
-    dark_high: 'black',
+    dark_high: "black",
     dark_low: colors.lightgrey,
   },
-  'green': {
-    high: '#19A450',
-    low: '#CAEAD6',
-    dark_high: '#1B482D',
-    dark_low: '#526058'
+  green: {
+    high: "#19A450",
+    low: "#CAEAD6",
+    dark_high: "#1B482D",
+    dark_low: "#526058",
   },
-  'purple': {
-    high: 'rgb(161, 59, 224)',
-    low: '#DDD1E4',
-    dark_high: '#332d4a',
-    dark_low: '#5c5577'
+  purple: {
+    high: "rgb(161, 59, 224)",
+    low: "#DDD1E4",
+    dark_high: "#332d4a",
+    dark_low: "#5c5577",
   },
-  'blue': {
-    high: 'rgb(40, 203, 255)',
-    low: '#CFE2E8',
-    dark_high: '#07374F',
-    dark_low: '#3C5560'
+  blue: {
+    high: "rgb(40, 203, 255)",
+    low: "#CFE2E8",
+    dark_high: "#07374F",
+    dark_low: "#3C5560",
   },
-  'orange': {
-    high: '#EA8D21',
-    low: '#FAE9D5',
-    dark_high: '#59350A',
-    dark_low: '#736654'
-  }
-}
+  orange: {
+    high: "#EA8D21",
+    low: "#FAE9D5",
+    dark_high: "#59350A",
+    dark_low: "#736654",
+  },
+};
 
 const blockNumber = scale({
   fontWeight: 400,
   fontSize: 8,
-  top: '1px !important',
+  top: "1px !important",
 });
 
-const setBackgroundColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData) => {
-  if (focus === content.position) {
+const setBackgroundColor = (
+  darkmode,
+  filled,
+  relevantHighlightedSquare,
+  content,
+  isFocused,
+  guestHighlight,
+  showIncorrect,
+  inputData
+) => {
+  if (isFocused) {
     // Maybe replace with: #ffa600
-    return darkmode ? '#5c5cff' : '#7cc9ff'
+    return darkmode ? "#5c5cff" : "#7cc9ff";
   }
-  if (filled || highlightedSquares.includes(content.position)) {
-    return darkmode ? '#885c88' : '#f5c46c'
+  if (filled || relevantHighlightedSquare) {
+    return darkmode ? "#885c88" : "#f5c46c";
   }
   if (guestHighlight) {
-    return darkmode ? guestHighlight.color.dark_low : guestHighlight.color.low
+    return darkmode ? guestHighlight.color.dark_low : guestHighlight.color.low;
   }
-  if (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) {
-    return darkmode ? '#555563' : '#ffcfcf'
+  if (
+    showIncorrect &&
+    inputData &&
+    content.letter !== inputData.toUpperCase()
+  ) {
+    return darkmode ? "#555563" : "#ffcfcf";
   }
-  return darkmode ? '#555563' : '#f5f5f5'
-}
+  return darkmode ? "#555563" : "#f5f5f5";
+};
 
-const setBorderColor = (darkmode, filled, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData) => {
+const setBorderColor = (
+  darkmode,
+  filled,
+  relevantHighlightedSquare,
+  content,
+  isFocused,
+  guestHighlight,
+  showIncorrect,
+  inputData
+) => {
   // z index is bad
-  if (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) {
-    return `2px solid ${colors.error}`
+  if (
+    showIncorrect &&
+    inputData &&
+    content.letter !== inputData.toUpperCase()
+  ) {
+    return `2px solid ${colors.error}`;
   }
-  if (focus === content.position) {
-    return '2px solid black'
+  if (isFocused) {
+    return "2px solid black";
   }
-  if (filled || highlightedSquares.includes(content.position)) {
-    return '2px solid black'
+  if (filled || relevantHighlightedSquare) {
+    return "2px solid black";
   }
   if (guestHighlight) {
-    return `2px solid ${darkmode ? guestHighlight.color.dark_high : guestHighlight.color.high}`
+    return `2px solid ${
+      darkmode ? guestHighlight.color.dark_high : guestHighlight.color.high
+    }`;
   }
-  return darkmode ? `2px solid ${colors.slate}` : '2px solid black'
-}
+  return darkmode ? `2px solid ${colors.slate}` : "2px solid black";
+};
 
-const setZIndex = (showIncorrect, inputData, content, filledInput, highlight, guestHighlight) => {
+const setZIndex = (
+  showIncorrect,
+  inputData,
+  content,
+  filledInput,
+  highlight,
+  guestHighlight
+) => {
   // show incorrect results
-  if (showIncorrect && inputData && content.letter !== inputData.toUpperCase()) {
-    return 5
+  if (
+    showIncorrect &&
+    inputData &&
+    content.letter !== inputData.toUpperCase()
+  ) {
+    return 5;
   }
 
   if (filledInput === content.position) {
-    return 3
+    return 3;
   }
 
   // local client
   if (highlight) {
-    return 3
+    return 3;
   }
 
   // other clients
   if (guestHighlight) {
-    return 2
+    return 2;
   }
 
   // default
-  return 1
-}
+  return 1;
+};
 
 const form = scale({
   padding: 0,
   margin: 0,
-  height: '100%'
-})
+  height: "100%",
+});
 
 const circleClue = scale({
-  width: '100%',
-  height: '100%',
+  width: "100%",
+  height: "100%",
   border: `1px solid ${colors.slate}`,
   opacity: 1,
-  borderRadius: '50%',
-  position: 'absolute',
+  borderRadius: "50%",
+  position: "absolute",
   top: 0,
-  pointerEvents: 'none',
-})
+  pointerEvents: "none",
+});
 
-export default function Square({ props }) {
+function Square({ props }) {
   const {
     circle,
     darkmode,
     content,
     hoveredClue,
-    highlightedSquares,
     movementDirection,
     filledInput,
     showIncorrect,
-    focus,
+    isFocused,
     name,
-    guesses,
+    relevantHighlightedSquare,
+    relevantGuess,
     nametagLocations,
     nametagData,
     clientId,
@@ -150,146 +189,177 @@ export default function Square({ props }) {
     setFilledInput,
     setBackspace,
     setGuesses,
-    setInputChangeToApi
-  } = props
+    setInputChangeToApi,
+  } = props;
 
-  const [clickCount, setClickCount] = useState(0)
-  const [highlight, setHighlight] = useState(false)
-  const [inputData, setInputData] = useState('')
-  const [selectionIterator, setSelectionIterator] = useState(0)
-  const [guestHighlight, setGuestHighlight] = useState(false)
+  const [clickCount, setClickCount] = useState(0);
+  const [highlight, setHighlight] = useState(false);
+  const [inputData, setInputData] = useState("");
+  const [selectionIterator, setSelectionIterator] = useState(0);
+  const [guestHighlight, setGuestHighlight] = useState(false);
 
-  const hover = content.number === Number(hoveredClue)
+  const hover = content.number === Number(hoveredClue);
 
   // If user hovers over corresponding clue...
   useEffect(() => {
     if (hoveredClue && hover) {
-      setSelectedSquare(content.position)
+      setSelectedSquare(content.position);
     }
-  }, [hover])
+  }, [hover]);
 
+  // Good
   useEffect(() => {
     if (clickCount > 1) {
-      setMovementDirection(movementDirection === 'across' ? 'down' : 'across')
+      setMovementDirection(movementDirection === "across" ? "down" : "across");
     }
-  }, [clickCount])
+  }, [clickCount]);
 
+  // Runs every time the user moves!
+  // Good
   useEffect(() => {
-    if (highlightedSquares.includes(content.position)) {
-      setHighlight(true)
+    if (relevantHighlightedSquare) {
+      setHighlight(true);
     } else {
-      setHighlight(false)
+      setHighlight(false);
     }
-  }, [highlightedSquares])
+  }, [relevantHighlightedSquare]);
 
   // Responds to API responses
+  // Good
   useEffect(() => {
     // if guesses have been changed by guest, update square input value
-    if (guesses && guesses[content.position - 1] !== inputData) {
-      setInputData(guesses[content.position - 1])
+    if (relevantGuess && relevantGuess !== inputData) {
+      setInputData(relevantGuess);
     }
-  }, [guesses])
+  }, [relevantGuess]);
 
-  const handleKeyDown = e => {
-    if (e.key === ' ') {
+  const handleKeyDown = (e) => {
+    if (e.key === " ") {
       e.preventDefault();
     }
 
-    if (e.key === 'Backspace') {
+    if (e.key === "Backspace") {
       // This is a dumb method. Just see if the box is empty. If it is, move back
       if (!inputData) {
-        setBackspace(true)
+        setBackspace(true);
       }
-      setInputData('')
-      const inputToFill = { position: content.position, letter: '', iterator: 0 }
-      setInputChangeToApi({ ...inputToFill })
-      let newGuesses = guesses
-      newGuesses[content.position - 1] = ''
-      setGuesses([...newGuesses])
+      setInputData("");
+      const inputToFill = {
+        position: content.position,
+        letter: "",
+        iterator: 0,
+      };
+      setInputChangeToApi({ ...inputToFill });
+      // TODO: setGuesses probably shouldn't happen at square level...
+      // TODO: MUST UNCOMMENT
+      // let newGuesses = guesses;
+      // newGuesses[content.position - 1] = "";
+      // setGuesses([...newGuesses]);
     }
   };
 
   const isGuestHighlight = () => {
     if (guestHighlights) {
       // Replace this deletion with a new method outside of Square
-      const filteredHighlights = guestHighlights
-      delete filteredHighlights[clientId]
+      const filteredHighlights = guestHighlights;
+      delete filteredHighlights[clientId];
       for (const [id, obj] of Object.entries(filteredHighlights)) {
-        const { color, squares } = obj
+        const { color, squares } = obj;
         if (squares.includes(content.position)) {
-          setGuestHighlight({ id, color: colorLookup[color] })
-          return
+          setGuestHighlight({ id, color: colorLookup[color] });
+          return;
         }
       }
-      setGuestHighlight(false)
+      setGuestHighlight(false);
     }
-  }
+  };
 
+  // Good
   useEffect(() => {
-    isGuestHighlight()
-  }, [guestHighlights])
-
-  useEffect(() => {
-    document.ontouchmove = () => {
-    }
-  })
+    isGuestHighlight();
+  }, [guestHighlights]);
 
   const squareInput = scale({
-    caretColor: 'transparent',
+    caretColor: "transparent",
     outlineWidth: 0,
-    border: 'none',
-    width: '100%',
-    height: '100%',
+    border: "none",
+    width: "100%",
+    height: "100%",
     padding: 0,
     margin: 0,
     color: darkmode ? colors.offwhite : colors.slate,
-    textTransform: 'uppercase',
-    textAlign: 'center',
-    fontSize: ['17px', '20px', '25px', '25px'],
+    textTransform: "uppercase",
+    textAlign: "center",
+    fontSize: ["17px", "20px", "25px", "25px"],
     lineHeight: 0,
     paddingTop: 4,
     fontWeight: 500,
     borderRadius: 0,
     webkitBorderRadius: 0,
     fontFamily: fonts.sans,
-    backgroundColor: setBackgroundColor(darkmode, filledInput === content.position, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData),
+    backgroundColor: setBackgroundColor(
+      darkmode,
+      filledInput === content.position,
+      relevantHighlightedSquare,
+      content,
+      isFocused,
+      guestHighlight,
+      showIncorrect,
+      inputData
+    ),
     // transition: 'background-color 0.1s ease-in-out',
-  })
+  });
 
   const squareBox = scale({
-    position: 'relative',
+    position: "relative",
     margin: 0,
     padding: 0,
     marginLeft: -2,
     marginBottom: -2,
     borderRadius: 2,
-    border: setBorderColor(darkmode, filledInput === content.position, highlightedSquares, content, focus, guestHighlight, showIncorrect, inputData),
-    zIndex: setZIndex(showIncorrect, inputData, content, filledInput, highlight, guestHighlight),
+    border: setBorderColor(
+      darkmode,
+      filledInput === content.position,
+      relevantHighlightedSquare,
+      content,
+      isFocused,
+      guestHighlight,
+      showIncorrect,
+      inputData
+    ),
+    zIndex: setZIndex(
+      showIncorrect,
+      inputData,
+      content,
+      filledInput,
+      highlight,
+      guestHighlight
+    ),
     color: colors.slate,
     // transition: 'border 0.1s ease-in-out',
     span: {
-      color: darkmode ? colors.offwhite : 'black',
-      position: 'absolute',
+      color: darkmode ? colors.offwhite : "black",
+      position: "absolute",
       top: 2,
       left: 2,
-      webkitTouchCallout: 'none',
-      webkitUserSelect: 'none',
-      khtmlUserSelect: 'none',
-      mozUserSelect: 'none',
-      msUserSelect: 'none',
-      userSelect: 'none',
-    }
-  })
+      webkitTouchCallout: "none",
+      webkitUserSelect: "none",
+      khtmlUserSelect: "none",
+      mozUserSelect: "none",
+      msUserSelect: "none",
+      userSelect: "none",
+    },
+  });
 
   return (
     <div id={content.position} css={squareBox}>
-      <form css={form} autoComplete='off' onSubmit={(e) => e.preventDefault()}>
+      <form css={form} autoComplete="off" onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
 
         {/* Shows client username above square */}
         <Nametag
           props={{
-            focus: focus === content.position,
+            isFocused,
             clientId,
             colorLookup,
             name,
@@ -302,59 +372,106 @@ export default function Square({ props }) {
         />
 
         {/* Skips rendering input for black squares */}
-        {content.letter !== '.' && <input
-          onKeyDown={handleKeyDown}
-          autoComplete='off'
-          onPaste={(e) => {
-            e.preventDefault()
-            return false;
-          }}
-          onDrop={(e) => {
-            e.preventDefault()
-            return false;
-          }}
-          onCopy={(e) => {
-            e.preventDefault()
-            return false;
-          }}
-          onFocus={(e) => {
-            e.preventDefault()
-            setFocus(content.position)
-            setSelectedSquare(content.position)
-          }}
-          onBlur={() => {
-            setClickCount(0);
-          }}
-          onClick={() => {
-            setSelectedSquare(content.position)
-            setClickCount(clickCount + 1)
-          }}
-          css={squareInput}
-          type='text'
-          id={`input-${content.position}`}
-          defaultValue={inputData}
-          onBeforeInput={(input) => {
-            input.preventDefault()
-            if (input.nativeEvent.data && input.nativeEvent.data !== '') {
-              setInputData(input.nativeEvent.data)
-              setSelectionIterator(selectionIterator + 1)
+        {content.letter !== "." && (
+          <input
+            onKeyDown={handleKeyDown}
+            autoComplete="off"
+            onPaste={(e) => {
+              e.preventDefault();
+              return false;
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              return false;
+            }}
+            onCopy={(e) => {
+              e.preventDefault();
+              return false;
+            }}
+            onFocus={(e) => {
+              e.preventDefault();
+              setFocus(content.position);
+              setSelectedSquare(content.position);
+            }}
+            onBlur={() => {
+              setClickCount(0);
+            }}
+            onClick={() => {
+              setSelectedSquare(content.position);
+              setClickCount(clickCount + 1);
+            }}
+            css={squareInput}
+            type="text"
+            id={`input-${content.position}`}
+            defaultValue={inputData}
+            onBeforeInput={(input) => {
+              input.preventDefault();
+              if (input.nativeEvent.data && input.nativeEvent.data !== "") {
+                setInputData(input.nativeEvent.data);
+                setSelectionIterator(selectionIterator + 1);
 
-              // TODO: Rename
-              const inputToFill = { position: content.position, letter: input.nativeEvent.data, iterator: selectionIterator }
-              setFilledInput({ ...inputToFill })
-              setInputChangeToApi({ ...inputToFill })
+                // TODO: Rename
+                const inputToFill = {
+                  position: content.position,
+                  letter: input.nativeEvent.data,
+                  iterator: selectionIterator,
+                };
+                setFilledInput({ ...inputToFill });
+                setInputChangeToApi({ ...inputToFill });
 
-              let newGuesses = guesses
-              newGuesses[content.position - 1] = input.nativeEvent.data
-              setGuesses([...newGuesses])
-              // TODO: Remove if array spread operator fixes useEffect
-              // picking up changes to state
-              setUploadGuess(uploadGuess ? false : true)
-            }
-          }}
-          name={content.letter} />}
+                // let newGuesses = guesses;
+                // newGuesses[content.position - 1] = input.nativeEvent.data;
+                // setGuesses([...newGuesses]);
+                // TODO: Remove if array spread operator fixes useEffect
+                // picking up changes to state
+                // setUploadGuess(uploadGuess ? false : true);
+              }
+            }}
+            name={content.letter}
+          />
+        )}
       </form>
       {circle === 1 && <div css={circleClue}></div>}
-    </div >
-  )
+    </div>
+  );
 }
+
+function shallowEqual(object1, object2) {
+  const keys1 = Object.keys(object1);
+  const keys2 = Object.keys(object2);
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+  for (let key of keys1) {
+    if (object1[key] !== object2[key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function areEqual(prevProps, nextProps) {
+  /*
+  return true if passing nextProps to render would return
+  the same result as passing prevProps to render,
+  otherwise return false
+  */
+  // if (prevProps.props.isFocused !== nextProps.props.isFocused) {
+  //   return false;
+  // }
+
+  // if (
+  //   prevProps.props.relevantHighlightedSquare ===
+  //   nextProps.props.relevantHighlightedSquare
+  // ) {
+  //   return true;
+  // }
+  // return false;
+  if (shallowEqual(prevProps.props, nextProps.props)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export default React.memo(Square, areEqual);

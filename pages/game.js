@@ -10,10 +10,6 @@ import {
 } from "../lib/helpers";
 import { Fragment, useEffect, useState, useRef } from "react";
 import Clue from "../components/clue";
-import Alert from "../components/alert";
-import Button from "../components/button";
-import PuzzleSelector from "../components/puzzleSelector";
-import DateSelector from "../components/DateSelector";
 import Board from "../components/board";
 import styles from "../lib/boardStyles";
 
@@ -39,6 +35,8 @@ export default function Game({ props }) {
     setName,
     darkmode,
     setDarkmode,
+    complete,
+    setComplete,
   } = props;
   const { grid, clues } = data;
 
@@ -55,7 +53,6 @@ export default function Game({ props }) {
   const [guestInputChange, setGuestInputChange] = useState([]);
   const [showIncorrect, setShowIncorrect] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  const [dateRange, setDateRange] = useState(false);
   const [currentClueText, setCurrentClueText] = useState(false);
 
   // CONSTRAIN USE TO MOVEMENT
