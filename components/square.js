@@ -231,7 +231,10 @@ function Square({ props }) {
   // Good
   useEffect(() => {
     // if guesses have been changed by guest, update square input value
-    if (relevantGuess && relevantGuess !== inputData) {
+    console.log("relevant guess: ", relevantGuess);
+    console.log("input data: ", inputData);
+    if (relevantGuess !== inputData) {
+      console.log("setting new input to: ", relevantGuess);
       setInputData(relevantGuess);
     }
   }, [relevantGuess]);
@@ -252,6 +255,8 @@ function Square({ props }) {
         letter: "",
         iterator: 0,
       };
+
+      console.log("input to fill: ", inputToFill);
       setInputChangeToApi({ ...inputToFill });
       // TODO: setGuesses probably shouldn't happen at square level...
       let newGuesses = guesses;
@@ -456,6 +461,8 @@ function shallowEqual(object1, object2) {
 function areEqual(prevProps, nextProps) {
   const previous = prevProps.props;
   const next = nextProps.props;
+
+  // TODO:
 
   // TODO: This doesn't work well--nametags re-render on each move. much better than before,
   // but I think the issue is we need to re - render the first square of a word since that is
