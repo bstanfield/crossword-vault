@@ -1,17 +1,12 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/react";
-import {
-  fonts,
-  ENDPOINT,
-  formatTime,
-  calculateScores,
-  createBoard,
-} from "../lib/helpers";
+import { fonts, ENDPOINT, formatTime, createBoard } from "../lib/helpers";
 import { Fragment, useEffect, useState, useRef } from "react";
-import Clue from "../components/clue";
 import Board from "../components/board";
+import Clues from "../components/clues";
 import styles from "../lib/boardStyles";
+import Alert from "../components/alert";
 
 export default function Game({ props }) {
   const {
@@ -37,8 +32,14 @@ export default function Game({ props }) {
     setDarkmode,
     complete,
     setComplete,
+    hoveredClue,
+    setHoveredClue,
+    showIncorrect,
+    setShowIncorrect,
+    initialGuesses,
+    guestInputChange,
+    setGuestInputChange,
   } = props;
-  const { grid, clues } = data;
 
   // For dynamic crossword sizes (15x15, etc.)
   const [width, setWidth] = useState(false);
@@ -49,9 +50,6 @@ export default function Game({ props }) {
   const [board, setBoard] = useState([]);
   const [guesses, setGuesses] = useState([]);
   const [grading, setGrading] = useState(false);
-  const [hoveredClue, setHoveredClue] = useState(false);
-  const [guestInputChange, setGuestInputChange] = useState([]);
-  const [showIncorrect, setShowIncorrect] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [currentClueText, setCurrentClueText] = useState(false);
 
@@ -65,6 +63,11 @@ export default function Game({ props }) {
   const [movementDirection, setMovementDirection] = useState("across");
   const [downGroupings, setDownGroupings] = useState([]);
   const [acrossGroupings, setAcrossGroupings] = useState([]);
+
+  // HACK
+  useEffect(() => {
+    setGuesses(initialGuesses);
+  }, [initialGuesses]);
 
   useEffect(() => {
     // If username is in storage, don't ask again
@@ -85,16 +88,6 @@ export default function Game({ props }) {
       setDarkmode(true);
     }
   }, []);
-
-  // Socket connection stuff
-  useEffect(() => {
-    if (socketConnection) {
-      socketConnection.on("guesses", (data) => {
-        console.log("GUESSES");
-        setGuesses(data);
-      });
-    }
-  }, [socketConnection]);
 
   useEffect(() => {
     const { position, letter } = guestInputChange;
@@ -178,16 +171,6 @@ export default function Game({ props }) {
     socketConnection.send(body);
   };
 
-  const checkName = (name) => {
-    if (name.length <= 6) {
-      setName(input);
-      localStorage.setItem("username", input);
-      setError(false);
-    } else {
-      setError(true);
-    }
-  };
-
   return (
     <Fragment>
       <p
@@ -222,59 +205,31 @@ export default function Game({ props }) {
           }}
         />
 
-        <div css={styles.crosswordClues}>
-          <h2 css={styles.clueHeader}>Across</h2>
-          <ul>
-            {clues &&
-              clues.across.map((clue, index) => (
-                <Clue
-                  key={index}
-                  props={{
-                    darkmode,
-                    lockout,
-                    index,
-                    clue,
-                    clueIndex,
-                    movementDirection,
-                    direction: "across",
-                    setLockout,
-                    setNewFocus,
-                    setMovementDirection,
-                    setHoveredClue,
-                    setFocus,
-                    setCurrentClueText,
-                  }}
-                />
-              ))}
-          </ul>
-        </div>
-        <div css={styles.crosswordClues}>
-          <h2 css={styles.clueHeader}>Down</h2>
-          <ul>
-            {clues &&
-              clues.down.map((clue, index) => (
-                <Clue
-                  key={index}
-                  props={{
-                    darkmode,
-                    lockout,
-                    index,
-                    clue,
-                    clueIndex,
-                    movementDirection,
-                    direction: "down",
-                    setLockout,
-                    setNewFocus,
-                    setMovementDirection,
-                    setHoveredClue,
-                    setFocus,
-                    setCurrentClueText,
-                  }}
-                />
-              ))}
-          </ul>
-        </div>
+        <Clues
+          props={{
+            data,
+            darkmode,
+            lockout,
+            movementDirection,
+            setLockout,
+            setNewFocus,
+            setMovementDirection,
+            setHoveredClue,
+            setFocus,
+            clueIndex,
+            setCurrentClueText,
+          }}
+        />
       </div>
+      <Alert
+        props={{
+          guesses,
+          grading,
+          showIncorrect,
+          setShowIncorrect,
+          setComplete,
+        }}
+      />
     </Fragment>
   );
 }

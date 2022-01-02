@@ -16,6 +16,7 @@ const alertStyles = (status) =>
     color: colors.offwhite,
     borderRadius: 2,
     fontFamily: fonts.monospace,
+    marginTop: 12,
   });
 
 export default function Alert({ props }) {

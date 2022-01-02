@@ -30,7 +30,6 @@ export default function Board({ props }) {
     width,
     height,
   } = props;
-  const { grid, clues } = data;
   const [selectedSquare, setSelectedSquare] = useState(false);
   const [highlightedSquares, setHighlightedSquares] = useState([]);
 
@@ -223,12 +222,17 @@ export default function Board({ props }) {
             hoveredClue,
             filledInput,
             movementDirection,
-            // Make sure the -1 is OK
             // New stuff
             relevantHighlightedSquare: highlightedSquares.includes(
               content.position
             ),
             relevantGuess: guesses[content.position - 1],
+            relevantGuestHighlight: Object.keys(guestHighlights)
+              .map((guest) => guestHighlights[guest].squares)
+              .flat()
+              .includes(content.position),
+            relevantGuestNametag:
+              nametagLocations.indexOf(content.position) > -1,
             isFocused: focus === content.position,
             name,
             uploadGuess,
@@ -245,6 +249,7 @@ export default function Board({ props }) {
             setFilledInput,
             setGuesses,
             setInputChangeToApi,
+            guesses,
           }}
         />
       ))}

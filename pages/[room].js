@@ -4,7 +4,7 @@ import { jsx } from "@emotion/react";
 import Game from "./game";
 import { Fragment, useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
-import { fonts, ENDPOINT } from "../lib/helpers";
+import { fonts, ENDPOINT, calculateScores } from "../lib/helpers";
 import smoothscroll from "smoothscroll-polyfill";
 import styles from "../lib/boardStyles";
 import Header from "../components/header";
@@ -16,7 +16,7 @@ import Button from "../components/button";
 import Alert from "../components/alert";
 import PuzzleSelector from "../components/puzzleSelector";
 import DateSelector from "../components/DateSelector";
-import Icon from "../components/icon";
+import Nav from "../components/nav";
 
 export default function Room() {
   const [room, setRoom] = useState(null);
@@ -37,6 +37,11 @@ export default function Room() {
   const [focus, setFocus] = useState(false);
   const [dateRange, setDateRange] = useState(false);
   const [darkmode, setDarkmode] = useState(false);
+  const [hoveredClue, setHoveredClue] = useState(false);
+  const [showIncorrect, setShowIncorrect] = useState(false);
+  const [initialGuesses, setInitialGuesses] = useState([]);
+  const [guestInputChange, setGuestInputChange] = useState([]);
+
   // Username
   const [name, setName] = useState(false);
   // Username logic
@@ -49,7 +54,7 @@ export default function Room() {
   const [complete, setComplete] = useState(false);
 
   // TODO: Move things that fire on input change to game.js!
-  // TODO: Move stuff that *will* change like setGuesses out of here
+  // TODO: Move stuff that *will* change like setInitialGuesses out of here
   // TODO: Only stuff that *should* be here is stuff that hardly changes,
   // and is needed for metadata and other pieces that should not re - render
   useEffect(() => {
@@ -98,9 +103,12 @@ export default function Room() {
     // Good
     connection.on("completed", (time) => {
       if (time) {
-        console.log("setting timestamp");
         setCompletedAtTimestamp(time);
       }
+    });
+
+    connection.on("guesses", (data) => {
+      setInitialGuesses(data);
     });
 
     // Good
@@ -174,6 +182,17 @@ export default function Room() {
     }
   };
 
+  // NEXT TODO: remove guesses from <Square/>
+  const checkName = (name) => {
+    if (name.length <= 6) {
+      setName(input);
+      localStorage.setItem("username", input);
+      setError(false);
+    } else {
+      setError(true);
+    }
+  };
+
   const handleChange = (i) => {
     if (i.nativeEvent.data) {
       return setInput(input + i.nativeEvent.data);
@@ -181,8 +200,6 @@ export default function Room() {
       return setInput(input.slice(0, -1));
     }
   };
-
-  console.log("Rendering room");
 
   if (!data || loading || !socketConnection) {
     return (
@@ -259,32 +276,9 @@ export default function Room() {
           </Popup>
         )}
 
-        <Shortcuts props={{ show: showSidePanel, darkmode }} />
-        <div
-          css={{
-            borderBottom: `1px solid ${
-              darkmode ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.2)"
-            }`,
-            zIndex: 2,
-            position: "absolute",
-            width: "100%",
-            height: "50px",
-            top: 12,
-            left: 0,
-            right: 0,
-            margin: "auto",
-          }}
-        >
-          <div css={styles.navContainer}>
-            <Players
-              props={{ darkmode, setDarkmode, players, socketConnection }}
-            />
-
-            <div>
-              <p css={styles.logo}>Word Vault</p>
-            </div>
-          </div>
-        </div>
+        {/* Causing issue on-reload in Safari */}
+        {/* <Shortcuts props={{ show: showSidePanel, darkmode }} /> */}
+        <Nav props={{ darkmode, setDarkmode, players, socketConnection }} />
         <div css={styles.appContainer}>
           <main>
             <Metadata props={{ data }} />
@@ -312,20 +306,18 @@ export default function Room() {
                 setName,
                 complete,
                 setComplete,
+                hoveredClue,
+                setHoveredClue,
+                showIncorrect,
+                setShowIncorrect,
+                initialGuesses,
+                guestInputChange,
+                setGuestInputChange,
               }}
             />
 
             <div css={{ marginTop: 6 }}>
-              {/* <Alert
-                props={{
-                  guesses,
-                  grading,
-                  showIncorrect,
-                  setShowIncorrect,
-                  setComplete,
-                }}
-              /> */}
-              <span
+              {/* <span
                 css={{ marginRight: 8 }}
                 onClick={() => setShowSidePanel(showSidePanel ? false : true)}
               >
@@ -336,7 +328,7 @@ export default function Room() {
                     icon: { name: "flash", size: 14 },
                   }}
                 />
-              </span>
+              </span> */}
 
               <span css={{ marginRight: 8 }}>
                 <DateSelector

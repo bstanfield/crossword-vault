@@ -177,6 +177,7 @@ function Square({ props }) {
     name,
     relevantHighlightedSquare,
     relevantGuess,
+    relevantGuestHighlight,
     nametagLocations,
     nametagData,
     clientId,
@@ -190,6 +191,8 @@ function Square({ props }) {
     setBackspace,
     setGuesses,
     setInputChangeToApi,
+    guesses,
+    relevantGuestNametag,
   } = props;
 
   const [clickCount, setClickCount] = useState(0);
@@ -251,10 +254,9 @@ function Square({ props }) {
       };
       setInputChangeToApi({ ...inputToFill });
       // TODO: setGuesses probably shouldn't happen at square level...
-      // TODO: MUST UNCOMMENT
-      // let newGuesses = guesses;
-      // newGuesses[content.position - 1] = "";
-      // setGuesses([...newGuesses]);
+      let newGuesses = guesses;
+      newGuesses[content.position - 1] = "";
+      setGuesses([...newGuesses]);
     }
   };
 
@@ -419,12 +421,12 @@ function Square({ props }) {
                 setFilledInput({ ...inputToFill });
                 setInputChangeToApi({ ...inputToFill });
 
-                // let newGuesses = guesses;
-                // newGuesses[content.position - 1] = input.nativeEvent.data;
-                // setGuesses([...newGuesses]);
+                let newGuesses = guesses;
+                newGuesses[content.position - 1] = input.nativeEvent.data;
+                setGuesses([...newGuesses]);
                 // TODO: Remove if array spread operator fixes useEffect
                 // picking up changes to state
-                // setUploadGuess(uploadGuess ? false : true);
+                setUploadGuess(uploadGuess ? false : true);
               }
             }}
             name={content.letter}
@@ -436,6 +438,7 @@ function Square({ props }) {
   );
 }
 
+// Maybe use this instead or a variant of it?
 function shallowEqual(object1, object2) {
   const keys1 = Object.keys(object1);
   const keys2 = Object.keys(object2);
@@ -451,27 +454,36 @@ function shallowEqual(object1, object2) {
 }
 
 function areEqual(prevProps, nextProps) {
-  /*
-  return true if passing nextProps to render would return
-  the same result as passing prevProps to render,
-  otherwise return false
-  */
-  // if (prevProps.props.isFocused !== nextProps.props.isFocused) {
-  //   return false;
-  // }
+  const previous = prevProps.props;
+  const next = nextProps.props;
 
-  // if (
-  //   prevProps.props.relevantHighlightedSquare ===
-  //   nextProps.props.relevantHighlightedSquare
-  // ) {
-  //   return true;
-  // }
-  // return false;
-  if (shallowEqual(prevProps.props, nextProps.props)) {
-    return true;
-  } else {
+  // TODO: This doesn't work well--nametags re-render on each move. much better than before,
+  // but I think the issue is we need to re - render the first square of a word since that is
+  // where nametag is displayed
+  if (next.relevantGuestNametag) {
     return false;
   }
+
+  if (previous.relevantGuestHighlight !== next.relevantGuestHighlight) {
+    return false;
+  }
+
+  if (previous.darkmode !== next.darkmode) {
+    return false;
+  }
+
+  if (previous.isFocused !== next.isFocused) {
+    return false;
+  }
+
+  if (previous.relevantGuess !== next.relevantGuess) {
+    return false;
+  }
+
+  if (previous.relevantHighlightedSquare === next.relevantHighlightedSquare) {
+    return true;
+  }
+  return false;
 }
 
 export default React.memo(Square, areEqual);
