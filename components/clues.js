@@ -83,6 +83,10 @@ function areEqual(prevProps, nextProps) {
   const previous = prevProps.props;
   const next = nextProps.props;
 
+  if (previous.darkmode !== next.darkmode) {
+    return false;
+  }
+
   if (previous.movementDirection !== next.movementDirection) {
     return false;
   }

@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { jsx } from "@emotion/react";
-import Game from "./game";
+import Game from "../components/game";
 import { Fragment, useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
 import { fonts, ENDPOINT, calculateScores } from "../lib/helpers";
