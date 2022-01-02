@@ -20,17 +20,23 @@ const alertStyles = (status) =>
   });
 
 export default function Alert({ props }) {
-  const { grading, guesses, showIncorrect, setShowIncorrect, setComplete } =
-    props;
+  const {
+    data,
+    grading,
+    guesses,
+    showIncorrect,
+    setShowIncorrect,
+    setComplete,
+  } = props;
   const [status, setStatus] = useState("incorrect");
   const [text, setText] = useState(false);
 
   // TODO: completely remove this and replace on [game]
-  // TODO: This NEXT!!
+  // TODO: Un-hardcode this
   useEffect(() => {
     if (guesses) {
       // Success!
-      if (grading.correct === 225 - grading.black) {
+      if (grading.correct === data.size.rows * data.size.cols - grading.black) {
         setStatus("correct");
         return setText("Solved! (show stats)");
       }

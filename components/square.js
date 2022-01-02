@@ -231,10 +231,7 @@ function Square({ props }) {
   // Good
   useEffect(() => {
     // if guesses have been changed by guest, update square input value
-    console.log("relevant guess: ", relevantGuess);
-    console.log("input data: ", inputData);
     if (relevantGuess !== inputData) {
-      console.log("setting new input to: ", relevantGuess);
       setInputData(relevantGuess);
     }
   }, [relevantGuess]);
@@ -256,7 +253,6 @@ function Square({ props }) {
         iterator: 0,
       };
 
-      console.log("input to fill: ", inputToFill);
       setInputChangeToApi({ ...inputToFill });
       // TODO: setGuesses probably shouldn't happen at square level...
       let newGuesses = guesses;

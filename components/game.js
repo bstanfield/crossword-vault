@@ -149,7 +149,7 @@ export default function Game({ props }) {
   useEffect(() => {
     if (guesses) {
       // Success!
-      if (grading.correct === 225 - grading.black) {
+      if (grading.correct === data.size.rows * data.size.cols - grading.black) {
         return setComplete(true);
       }
       // Incorrect answers
@@ -223,6 +223,7 @@ export default function Game({ props }) {
       </div>
       <Alert
         props={{
+          data,
           guesses,
           grading,
           showIncorrect,

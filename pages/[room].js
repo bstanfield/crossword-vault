@@ -2,18 +2,15 @@
 
 import { jsx } from "@emotion/react";
 import Game from "../components/game";
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
-import { fonts, ENDPOINT, calculateScores } from "../lib/helpers";
+import { ENDPOINT, calculateScores } from "../lib/helpers";
 import smoothscroll from "smoothscroll-polyfill";
 import styles from "../lib/boardStyles";
 import Header from "../components/header";
-import Shortcuts from "../components/shortcuts";
 import Popup from "../components/popup";
-import Players from "../components/players";
 import Metadata from "../components/metadata";
 import Button from "../components/button";
-import Alert from "../components/alert";
 import PuzzleSelector from "../components/puzzleSelector";
 import DateSelector from "../components/DateSelector";
 import Nav from "../components/nav";
@@ -140,10 +137,11 @@ export default function Room() {
     });
 
     // Sends at end of game to show guest scores
-    // TODO: Why does this fire all the time?
     // Good for now...
     connection.on("scores", (data) => {
+      console.log("receiving scores!");
       if (completedAtTimestamp) {
+        console.log("setting scores!");
         setScores(data);
       }
     });
@@ -221,6 +219,9 @@ export default function Room() {
       </div>
     );
   } else {
+    console.log("scores: ", scores);
+    console.log("timestamp: ", timestamp);
+    console.log("completedAt: ", completedAtTimestamp);
     return (
       <div css={styles.appBackground(darkmode)}>
         <Header props={{ isLoading: false, room }} />
