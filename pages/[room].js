@@ -92,12 +92,11 @@ export default function Room() {
     });
 
     // Sends board time once on connect
-    // Good
     connection.on("timestamp", (time) => {
       setTimestamp(time);
     });
 
-    // Good
+    // Perhaps this should just be passed as a property of "scores"?
     connection.on("completed", (time) => {
       if (time) {
         setCompletedAtTimestamp(time);
@@ -108,7 +107,6 @@ export default function Room() {
       setInitialGuesses(data);
     });
 
-    // Good
     connection.on("board", (board) => {
       setData(board);
     });
@@ -139,11 +137,7 @@ export default function Room() {
     // Sends at end of game to show guest scores
     // Good for now...
     connection.on("scores", (data) => {
-      console.log("receiving scores!");
-      if (completedAtTimestamp) {
-        console.log("setting scores!");
-        setScores(data);
-      }
+      setScores(data);
     });
 
     // Good
@@ -219,9 +213,6 @@ export default function Room() {
       </div>
     );
   } else {
-    console.log("scores: ", scores);
-    console.log("timestamp: ", timestamp);
-    console.log("completedAt: ", completedAtTimestamp);
     return (
       <div css={styles.appBackground(darkmode)}>
         <Header props={{ isLoading: false, room }} />
