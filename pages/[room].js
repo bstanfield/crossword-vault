@@ -48,12 +48,8 @@ export default function Room() {
   const [showSidePanel, setShowSidePanel] = useState(false);
 
   // Finish screen
-  const [complete, setComplete] = useState(false);
+  const [showFinishScreen, setShowFinishScreen] = useState(false);
 
-  // TODO: Move things that fire on input change to game.js!
-  // TODO: Move stuff that *will* change like setInitialGuesses out of here
-  // TODO: Only stuff that *should* be here is stuff that hardly changes,
-  // and is needed for metadata and other pieces that should not re - render
   useEffect(() => {
     const path = window.location.pathname;
     let room = false;
@@ -174,7 +170,7 @@ export default function Room() {
     }
   };
 
-  // NEXT TODO: remove guesses from <Square/>
+  // IMPORTANT TODO: remove guesses from <Square/>
   const checkName = (name) => {
     if (name.length <= 6) {
       setName(input);
@@ -217,7 +213,7 @@ export default function Room() {
       <div css={styles.appBackground(darkmode)}>
         <Header props={{ isLoading: false, room }} />
 
-        {name && complete && (
+        {name && showFinishScreen && (
           <Popup>
             <h1>Crossword solved!</h1>
             {scores && (
@@ -228,7 +224,7 @@ export default function Room() {
             <br />
             <Button
               props={{
-                onClickFn: () => setComplete(false),
+                onClickFn: () => setShowFinishScreen(false),
                 darkmode: false,
                 text: "Back to puzzle",
                 icon: { name: "arrow-back-circle", size: 16 },
@@ -276,6 +272,7 @@ export default function Room() {
             <Metadata props={{ data }} />
             <Game
               props={{
+                completedAtTimestamp,
                 socketConnection,
                 data,
                 room,
@@ -296,8 +293,9 @@ export default function Room() {
                 setDarkmode,
                 name,
                 setName,
-                complete,
-                setComplete,
+                showFinishScreen,
+                setShowFinishScreen,
+                showFinishScreen,
                 hoveredClue,
                 setHoveredClue,
                 showIncorrect,

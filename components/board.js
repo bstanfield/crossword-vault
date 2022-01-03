@@ -56,8 +56,6 @@ export default function Board({ props }) {
         if (group.includes(selectedSquare)) {
           setClueIndex(index);
           setHighlightedSquares(group);
-          // TODO: Tell [game] that your movement direction changed as callback
-          // socketConnection.send({ type: 'newHighlight', value: group })
           handleSendToSocket({ type: "newHighlight", value: group });
           if (!hoveredClue) {
             const clue = document.getElementById(

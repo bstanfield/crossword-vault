@@ -254,7 +254,7 @@ function Square({ props }) {
       };
 
       setInputChangeToApi({ ...inputToFill });
-      // TODO: setGuesses probably shouldn't happen at square level...
+      // TODO: setGuesses shouldn't happen at square level...
       let newGuesses = guesses;
       newGuesses[content.position - 1] = "";
       setGuesses([...newGuesses]);
@@ -458,7 +458,9 @@ function areEqual(prevProps, nextProps) {
   const previous = prevProps.props;
   const next = nextProps.props;
 
-  // TODO:
+  if (previous.showIncorrect !== next.showIncorrect) {
+    return false;
+  }
 
   // TODO: This doesn't work well--nametags re-render on each move. much better than before,
   // but I think the issue is we need to re - render the first square of a word since that is

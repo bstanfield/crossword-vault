@@ -10,35 +10,26 @@ import Alert from "../components/alert";
 
 export default function Game({ props }) {
   const {
+    completedAtTimestamp,
     socketConnection,
     data,
-    room,
-    scores,
-    setScores,
     clientId,
-    timestamp,
-    completedAtTimestamp,
-    timer,
     guestHighlights,
-    players,
     nametagLocations,
     nametagData,
-    loading,
-    focus,
     setFocus,
     name,
     setName,
     darkmode,
     setDarkmode,
-    complete,
-    setComplete,
+    setShowFinishScreen,
     hoveredClue,
     setHoveredClue,
     showIncorrect,
     setShowIncorrect,
     initialGuesses,
     guestInputChange,
-    setGuestInputChange,
+    showFinishScreen,
   } = props;
 
   // For dynamic crossword sizes (15x15, etc.)
@@ -150,14 +141,14 @@ export default function Game({ props }) {
     if (guesses) {
       // Success!
       if (grading.correct === data.size.rows * data.size.cols - grading.black) {
-        return setComplete(true);
+        return setShowFinishScreen(true);
       }
       // Incorrect answers
       if (
         grading.correct + grading.incorrect ===
         guesses.length - grading.black
       ) {
-        return setComplete(false);
+        return setShowFinishScreen(false);
       }
     }
   }, [grading]);
@@ -223,12 +214,14 @@ export default function Game({ props }) {
       </div>
       <Alert
         props={{
+          completedAtTimestamp,
+          showFinishScreen,
           data,
           guesses,
           grading,
           showIncorrect,
           setShowIncorrect,
-          setComplete,
+          setShowFinishScreen,
         }}
       />
     </Fragment>

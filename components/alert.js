@@ -2,16 +2,15 @@
 
 import { jsx } from "@emotion/react";
 import { colors, fonts, scale } from "../lib/helpers";
-import { useEffect, useState } from "react";
 
-const alertStyles = (status) =>
+const alertStyles = (complete) =>
   scale({
     cursor: "pointer",
     display: "inline-block",
     margin: 0,
     padding: 8,
     marginRight: 6,
-    backgroundColor: status === "correct" ? colors.success : colors.error,
+    backgroundColor: complete ? colors.success : colors.error,
     fontSize: 13,
     color: colors.offwhite,
     borderRadius: 2,
@@ -20,52 +19,24 @@ const alertStyles = (status) =>
   });
 
 export default function Alert({ props }) {
-  const {
-    data,
-    grading,
-    guesses,
-    showIncorrect,
-    setShowIncorrect,
-    setComplete,
-  } = props;
-  const [status, setStatus] = useState("incorrect");
-  const [text, setText] = useState(false);
+  const { grading, showIncorrect, setShowIncorrect, setShowFinishScreen } =
+    props;
 
-  // TODO: completely remove this and replace on [game]
-  // TODO: Un-hardcode this
-  useEffect(() => {
-    if (guesses) {
-      // Success!
-      if (grading.correct === data.size.rows * data.size.cols - grading.black) {
-        setStatus("correct");
-        return setText("Solved! (show stats)");
-      }
-      // Incorrect answers
-      // Added guesses.length > 0 to prevent 0 = 0 render
-      if (
-        guesses.length > 0 &&
-        grading.correct + grading.incorrect === guesses.length - grading.black
-      ) {
-        setStatus("incorrect");
-        return setText(`${grading.incorrect} wrong`);
-      }
-
-      // Do not show
-      setText(false);
-    }
-  }, [grading]);
-
-  if (text) {
+  if (grading.blank == 0) {
     return (
       <p
         onClick={() =>
-          status === "correct"
-            ? setComplete(true)
+          grading.incorrect == 0
+            ? setShowFinishScreen(true)
             : setShowIncorrect(!showIncorrect)
         }
-        css={alertStyles(status)}
+        css={alertStyles(grading.incorrect == 0)}
       >
-        {text} {status === "incorrect" && (showIncorrect ? "(hide)" : "(show)")}
+        {grading.incorrect == 0
+          ? "Solved! (show stats)"
+          : `${grading.incorrect} wrong ${
+              showIncorrect ? "(hide)" : "(show)"
+            }`}{" "}
       </p>
     );
   } else {
