@@ -104,8 +104,8 @@ export default function Game({ props }) {
     }
 
     if (data) {
-      setWidth(data.size.rows);
-      setHeight(data.size.cols);
+      setWidth(data.size.cols);
+      setHeight(data.size.rows);
       setTotalSquares(width * height);
     }
   }, [data]);
@@ -191,8 +191,8 @@ export default function Game({ props }) {
             handleSendToSocket,
             guesses,
             setGuesses,
-            width: data.size.rows,
-            height: data.size.cols,
+            width: data.size.cols,
+            height: data.size.rows,
           }}
         />
 
