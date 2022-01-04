@@ -24,8 +24,8 @@ export default function DateSelector({ props }) {
     '&:hover': {
       border: darkmode ? `1px solid ${colors.lightgrey}` : `1px solid ${colors.slate}`,
     },
-    '-webkit-appearance': 'none',
-    '-moz-appearance': 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
   })
 
   return (
@@ -34,8 +34,9 @@ export default function DateSelector({ props }) {
       css={selectStyles(darkmode)}
       name="newPuzzle"
       id="newPuzzle"
+      defaultValue={'Range ▼'}
     >
-      <option value="" disabled selected>{dateRange || 'Range ▼'}</option>
+      <option disabled value="Range ▼">{dateRange || 'Range ▼'}</option>
       <option value="All">All</option>
       <option value="2005+">2005+</option>
       <option value="2010+">2010+</option>
