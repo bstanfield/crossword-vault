@@ -4,7 +4,7 @@ import { jsx } from "@emotion/react";
 import Game from "../components/game";
 import { useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
-import { ENDPOINT, calculateScores } from "../lib/helpers";
+import { ENDPOINT, formatScores } from "../lib/helpers";
 import smoothscroll from "smoothscroll-polyfill";
 import styles from "../lib/boardStyles";
 import Header from "../components/header";
@@ -107,7 +107,6 @@ export default function Room() {
       setData(board);
     });
 
-    // Alert should do more than just setLoading...
     connection.on("loading", (boolean) => {
       setLoading(boolean);
 
@@ -134,6 +133,9 @@ export default function Room() {
     // Good for now...
     connection.on("scores", (data) => {
       setScores(data);
+      if (data && data.incorrects && data.incorrects.length == 0) {
+        setShowFinishScreen(true);
+      }
     });
 
     // Good
@@ -218,7 +220,7 @@ export default function Room() {
             <h1>Crossword solved!</h1>
             {scores && (
               <ul css={styles.scores}>
-                {calculateScores(timestamp, completedAtTimestamp, scores)}
+                {formatScores(timestamp, completedAtTimestamp, scores)}
               </ul>
             )}
             <br />

@@ -18,11 +18,17 @@ const alertStyles = (complete) =>
     marginTop: 12,
   });
 
+// This should be entirely dictated by the server (scores.incorrects)
 export default function Alert({ props }) {
-  const { grading, showIncorrect, setShowIncorrect, setShowFinishScreen } =
-    props;
+  const {
+    scores,
+    grading,
+    showIncorrect,
+    setShowIncorrect,
+    setShowFinishScreen,
+  } = props;
 
-  if (grading.blank == 0) {
+  if (scores && scores.incorrects && scores.incorrects.length > 0) {
     return (
       <p
         onClick={() =>
@@ -34,7 +40,7 @@ export default function Alert({ props }) {
       >
         {grading.incorrect == 0
           ? "Solved! (show stats)"
-          : `${grading.incorrect} wrong ${
+          : `${scores.incorrects.length} wrong ${
               showIncorrect ? "(hide)" : "(show)"
             }`}{" "}
       </p>
