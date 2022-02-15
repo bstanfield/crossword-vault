@@ -19,7 +19,7 @@ export default function Room() {
   const [room, setRoom] = useState(null);
   const [data, setData] = useState(false);
   const [socketConnection, setSocketConnection] = useState(false);
-  const [scores, setScores] = useState(null);
+  const [scores, setScores] = useState(undefined);
   const [clientId, setClientId] = useState(false);
   const [timestamp, setTimestamp] = useState(false);
   const [selectedSquare, setSelectedSquare] = useState(false);

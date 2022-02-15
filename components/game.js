@@ -183,6 +183,25 @@ export default function Game({ props }) {
           setShowFinishScreen,
         }}
       />
+      {/* <div>
+        <p>Scores:</p>
+        {scores && (
+          <ul>
+            <li>
+              Incorrects:{" "}
+              {scores.incorrects && scores.incorrects.length > 10
+                ? scores.incorrects.length
+                : scores.incorrects}
+            </li>
+            <li>
+              Claimed guesses:{" "}
+              {scores.claimedGuesses && scores.claimedGuesses.length > 10
+                ? scores.claimedGuesses.length
+                : scores.claimedGuesses.map((guess) => <span>{guess}, </span>)}
+            </li>
+          </ul>
+        )}
+      </div> */}
     </Fragment>
   );
 }
