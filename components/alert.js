@@ -19,22 +19,28 @@ const alertStyles = (complete) =>
   });
 
 export default function Alert({ props }) {
-  const { grading, showIncorrect, setShowIncorrect, setShowFinishScreen } =
-    props;
+  const {
+    scores,
+    showIncorrect,
+    setShowIncorrect,
+    setShowFinishScreen,
+    completedAtTimestamp,
+    filledAtTimestamp,
+  } = props;
 
-  if (grading.blank == 0) {
+  if (completedAtTimestamp || filledAtTimestamp) {
     return (
       <p
         onClick={() =>
-          grading.incorrect == 0
+          scores.incorrects.length == 0
             ? setShowFinishScreen(true)
             : setShowIncorrect(!showIncorrect)
         }
-        css={alertStyles(grading.incorrect == 0)}
+        css={alertStyles(scores.incorrects.length == 0)}
       >
-        {grading.incorrect == 0
+        {scores.incorrects.length == 0
           ? "Solved! (show stats)"
-          : `${grading.incorrect} wrong ${
+          : `${scores.incorrects.length} wrong ${
               showIncorrect ? "(hide)" : "(show)"
             }`}{" "}
       </p>

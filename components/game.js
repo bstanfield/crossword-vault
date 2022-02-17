@@ -10,6 +10,8 @@ import Alert from "../components/alert";
 
 export default function Game({ props }) {
   const {
+    scores,
+    filledAtTimestamp,
     completedAtTimestamp,
     socketConnection,
     data,
@@ -110,49 +112,6 @@ export default function Game({ props }) {
     }
   }, [data]);
 
-  useEffect(() => {
-    let incorrect = 0;
-    let correct = 0;
-    let blank = 0;
-    let black = 0;
-
-    if (guesses.length > 0) {
-      guesses.map((guess, index) => {
-        if (guess === false) {
-          black++;
-          return;
-        }
-        if (guess === "") {
-          blank++;
-          return;
-        }
-        if (guess.toUpperCase() === board[index].letter) {
-          correct++;
-          return;
-        }
-        incorrect++;
-      });
-    }
-    setGrading({ correct, incorrect, blank, black });
-  }, [guesses]);
-
-  // Would display some awesome feel good banner
-  useEffect(() => {
-    if (guesses) {
-      // Success!
-      if (grading.correct === data.size.rows * data.size.cols - grading.black) {
-        return setShowFinishScreen(true);
-      }
-      // Incorrect answers
-      if (
-        grading.correct + grading.incorrect ===
-        guesses.length - grading.black
-      ) {
-        return setShowFinishScreen(false);
-      }
-    }
-  }, [grading]);
-
   const handleSendToSocket = (data) => {
     // add name to socket messages
     let body = data;
@@ -214,6 +173,8 @@ export default function Game({ props }) {
       </div>
       <Alert
         props={{
+          scores,
+          filledAtTimestamp,
           completedAtTimestamp,
           showFinishScreen,
           data,
@@ -224,6 +185,25 @@ export default function Game({ props }) {
           setShowFinishScreen,
         }}
       />
+      {/* <div>
+        <p>Scores:</p>
+        {scores && (
+          <ul>
+            <li>
+              Incorrects:{" "}
+              {scores.incorrects && scores.incorrects.length > 10
+                ? scores.incorrects.length
+                : scores.incorrects}
+            </li>
+            <li>
+              Claimed guesses:{" "}
+              {scores.claimedGuesses && scores.claimedGuesses.length > 10
+                ? scores.claimedGuesses.length
+                : scores.claimedGuesses.map((guess) => <span>{guess}, </span>)}
+            </li>
+          </ul>
+        )}
+      </div> */}
     </Fragment>
   );
 }

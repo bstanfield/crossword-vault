@@ -208,12 +208,29 @@ export default function Board({ props }) {
     return () => {};
   }, []);
 
+  const isRelevantGuestNametag = (nametagLocations, content) => {
+    let isRelevant = false;
+    nametagLocations.map((location) => {
+      if (movementDirection === "across") {
+        if (content.acrossGrouping.includes(location)) {
+          isRelevant = true;
+        }
+      } else {
+        if (content.downGrouping && content.downGrouping.includes(location)) {
+          isRelevant = true;
+        }
+      }
+    });
+    return isRelevant;
+  };
+
   return (
     <div css={styles.boardContainer(width, height)}>
       {board.map((content, index) => (
         <Square
           key={index}
           props={{
+            id: index,
             circle: data.circles && data.circles[index],
             darkmode,
             content,
@@ -229,8 +246,10 @@ export default function Board({ props }) {
               .map((guest) => guestHighlights[guest].squares)
               .flat()
               .includes(content.position),
-            relevantGuestNametag:
-              nametagLocations.indexOf(content.position) > -1,
+            relevantGuestNametag: isRelevantGuestNametag(
+              nametagLocations,
+              content
+            ),
             isFocused: focus === content.position,
             name,
             uploadGuess,

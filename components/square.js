@@ -50,6 +50,13 @@ const blockNumber = scale({
   top: "1px !important",
 });
 
+const blockLetter = scale({
+  fontWeight: 400,
+  fontSize: 10,
+  top: "1px !important",
+  paddingLeft: 25,
+});
+
 const setBackgroundColor = (
   darkmode,
   filled,
@@ -166,6 +173,7 @@ const circleClue = scale({
 
 function Square({ props }) {
   const {
+    id,
     circle,
     darkmode,
     content,
@@ -358,6 +366,9 @@ function Square({ props }) {
     <div id={content.position} css={squareBox}>
       <form css={form} autoComplete="off" onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
+        {/* {content.leter !== "." && (
+          <span css={blockLetter}>{content.letter}</span>
+        )} */}
 
         {/* Shows client username above square */}
         <Nametag
@@ -458,14 +469,11 @@ function areEqual(prevProps, nextProps) {
   const previous = prevProps.props;
   const next = nextProps.props;
 
-  if (previous.showIncorrect !== next.showIncorrect) {
+  if (next.relevantGuestNametag) {
     return false;
   }
 
-  // TODO: This doesn't work well--nametags re-render on each move. much better than before,
-  // but I think the issue is we need to re - render the first square of a word since that is
-  // where nametag is displayed
-  if (next.relevantGuestNametag) {
+  if (previous.showIncorrect !== next.showIncorrect) {
     return false;
   }
 
@@ -491,4 +499,7 @@ function areEqual(prevProps, nextProps) {
   return false;
 }
 
+// export default Square;
+
+// // Turn back on if you want memoization
 export default React.memo(Square, areEqual);

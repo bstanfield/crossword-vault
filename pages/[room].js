@@ -4,7 +4,7 @@ import { jsx } from "@emotion/react";
 import Game from "../components/game";
 import { useEffect, useState } from "react";
 import socketIOClient from "socket.io-client";
-import { ENDPOINT, calculateScores } from "../lib/helpers";
+import { ENDPOINT, formatScores } from "../lib/helpers";
 import smoothscroll from "smoothscroll-polyfill";
 import styles from "../lib/boardStyles";
 import Header from "../components/header";
@@ -19,12 +19,13 @@ export default function Room() {
   const [room, setRoom] = useState(null);
   const [data, setData] = useState(false);
   const [socketConnection, setSocketConnection] = useState(false);
-  const [scores, setScores] = useState(null);
+  const [scores, setScores] = useState(undefined);
   const [clientId, setClientId] = useState(false);
   const [timestamp, setTimestamp] = useState(false);
   const [selectedSquare, setSelectedSquare] = useState(false);
   const [highlightedSquares, setHighlightedSquares] = useState([]);
   const [completedAtTimestamp, setCompletedAtTimestamp] = useState(false);
+  const [filledAtTimestamp, setFilledAtTimestamp] = useState(false);
   const [timer, setTimer] = useState(false);
   const [guestHighlights, setGuestHighlights] = useState(false);
   const [players, setPlayers] = useState(false);
@@ -99,6 +100,12 @@ export default function Room() {
       }
     });
 
+    connection.on("filled", (time) => {
+      if (time) {
+        setFilledAtTimestamp(time);
+      }
+    });
+
     connection.on("guesses", (data) => {
       setInitialGuesses(data);
     });
@@ -107,7 +114,6 @@ export default function Room() {
       setData(board);
     });
 
-    // Alert should do more than just setLoading...
     connection.on("loading", (boolean) => {
       setLoading(boolean);
 
@@ -134,6 +140,9 @@ export default function Room() {
     // Good for now...
     connection.on("scores", (data) => {
       setScores(data);
+      if (data && data.incorrects && data.incorrects.length == 0) {
+        setShowFinishScreen(true);
+      }
     });
 
     // Good
@@ -218,7 +227,7 @@ export default function Room() {
             <h1>Crossword solved!</h1>
             {scores && (
               <ul css={styles.scores}>
-                {calculateScores(timestamp, completedAtTimestamp, scores)}
+                {formatScores(timestamp, completedAtTimestamp, scores)}
               </ul>
             )}
             <br />
@@ -272,6 +281,7 @@ export default function Room() {
             <Metadata props={{ data }} />
             <Game
               props={{
+                filledAtTimestamp,
                 completedAtTimestamp,
                 socketConnection,
                 data,
@@ -280,7 +290,6 @@ export default function Room() {
                 setScores,
                 clientId,
                 timestamp,
-                completedAtTimestamp,
                 timer,
                 guestHighlights,
                 players,
