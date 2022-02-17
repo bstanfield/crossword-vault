@@ -95,14 +95,12 @@ export default function Room() {
 
     // Perhaps this should just be passed as a property of "scores"?
     connection.on("completed", (time) => {
-      console.log("completed at: ", time);
       if (time) {
         setCompletedAtTimestamp(time);
       }
     });
 
     connection.on("filled", (time) => {
-      console.log("filled at: ", time);
       if (time) {
         setFilledAtTimestamp(time);
       }
@@ -141,7 +139,6 @@ export default function Room() {
     // Sends at end of game to show guest scores
     // Good for now...
     connection.on("scores", (data) => {
-      console.log("scores: ", data);
       setScores(data);
       if (data && data.incorrects && data.incorrects.length == 0) {
         setShowFinishScreen(true);
