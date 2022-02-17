@@ -25,6 +25,7 @@ export default function Room() {
   const [selectedSquare, setSelectedSquare] = useState(false);
   const [highlightedSquares, setHighlightedSquares] = useState([]);
   const [completedAtTimestamp, setCompletedAtTimestamp] = useState(false);
+  const [filledAtTimestamp, setFilledAtTimestamp] = useState(false);
   const [timer, setTimer] = useState(false);
   const [guestHighlights, setGuestHighlights] = useState(false);
   const [players, setPlayers] = useState(false);
@@ -94,8 +95,16 @@ export default function Room() {
 
     // Perhaps this should just be passed as a property of "scores"?
     connection.on("completed", (time) => {
+      console.log("completed at: ", time);
       if (time) {
         setCompletedAtTimestamp(time);
+      }
+    });
+
+    connection.on("filled", (time) => {
+      console.log("filled at: ", time);
+      if (time) {
+        setFilledAtTimestamp(time);
       }
     });
 
@@ -132,6 +141,7 @@ export default function Room() {
     // Sends at end of game to show guest scores
     // Good for now...
     connection.on("scores", (data) => {
+      console.log("scores: ", data);
       setScores(data);
       if (data && data.incorrects && data.incorrects.length == 0) {
         setShowFinishScreen(true);
@@ -274,6 +284,7 @@ export default function Room() {
             <Metadata props={{ data }} />
             <Game
               props={{
+                filledAtTimestamp,
                 completedAtTimestamp,
                 socketConnection,
                 data,
@@ -282,7 +293,6 @@ export default function Room() {
                 setScores,
                 clientId,
                 timestamp,
-                completedAtTimestamp,
                 timer,
                 guestHighlights,
                 players,

@@ -52,7 +52,7 @@ const blockNumber = scale({
 
 const blockLetter = scale({
   fontWeight: 400,
-  fontSize: 8,
+  fontSize: 10,
   top: "1px !important",
   paddingLeft: 25,
 });
@@ -366,9 +366,9 @@ function Square({ props }) {
     <div id={content.position} css={squareBox}>
       <form css={form} autoComplete="off" onSubmit={(e) => e.preventDefault()}>
         {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
-        {content.leter !== "." && (
+        {/* {content.leter !== "." && (
           <span css={blockLetter}>{content.letter}</span>
-        )}
+        )} */}
 
         {/* Shows client username above square */}
         <Nametag
@@ -431,7 +431,6 @@ function Square({ props }) {
                   iterator: selectionIterator,
                 };
                 setFilledInput({ ...inputToFill });
-                console.log("sending input change to API!", { ...inputToFill });
                 setInputChangeToApi({ ...inputToFill });
 
                 let newGuesses = guesses;
@@ -502,5 +501,5 @@ function areEqual(prevProps, nextProps) {
 
 // export default Square;
 
-// Turn back on if you want memoization
+// // Turn back on if you want memoization
 export default React.memo(Square, areEqual);

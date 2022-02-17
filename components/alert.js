@@ -19,10 +19,16 @@ const alertStyles = (complete) =>
   });
 
 export default function Alert({ props }) {
-  const { scores, showIncorrect, setShowIncorrect, setShowFinishScreen } =
-    props;
+  const {
+    scores,
+    showIncorrect,
+    setShowIncorrect,
+    setShowFinishScreen,
+    completedAtTimestamp,
+    filledAtTimestamp,
+  } = props;
 
-  if (scores && scores.incorrects && scores.incorrects.length >= 0) {
+  if (completedAtTimestamp || filledAtTimestamp) {
     return (
       <p
         onClick={() =>

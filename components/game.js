@@ -11,6 +11,7 @@ import Alert from "../components/alert";
 export default function Game({ props }) {
   const {
     scores,
+    filledAtTimestamp,
     completedAtTimestamp,
     socketConnection,
     data,
@@ -173,6 +174,7 @@ export default function Game({ props }) {
       <Alert
         props={{
           scores,
+          filledAtTimestamp,
           completedAtTimestamp,
           showFinishScreen,
           data,
