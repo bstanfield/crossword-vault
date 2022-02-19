@@ -124,6 +124,8 @@ export default function Room() {
       setSelectedSquare(false);
       setGuestHighlights(false);
       setShowIncorrect(false);
+      setFilledAtTimestamp(false);
+      setCompletedAtTimestamp(false);
     });
 
     // Good
