@@ -499,7 +499,7 @@ function areEqual(prevProps, nextProps) {
   return false;
 }
 
-// export default Square;
+export default Square;
 
 // // Turn back on if you want memoization
-export default React.memo(Square, areEqual);
+// export default React.memo(Square, areEqual);
