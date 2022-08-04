@@ -124,7 +124,7 @@ export default function Game({ props }) {
   return (
     <Fragment>
       <p
-        css={styles.mobileClueCard(darkmode)}
+        css={styles.mobileClueCard(darkmode, clueIndex)}
         dangerouslySetInnerHTML={{ __html: currentClueText }}
       />
       <div css={styles.boardAndCluesContainer(data.size.rows, data.size.cols)}>
