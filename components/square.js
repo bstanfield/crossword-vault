@@ -465,39 +465,40 @@ function shallowEqual(object1, object2) {
   return true;
 }
 
-function areEqual(prevProps, nextProps) {
-  const previous = prevProps.props;
-  const next = nextProps.props;
+// Used for memoization, which is off
+// function areEqual(prevProps, nextProps) {
+//   const previous = prevProps.props;
+//   const next = nextProps.props;
 
-  if (next.relevantGuestNametag) {
-    return false;
-  }
+//   if (next.relevantGuestNametag) {
+//     return false;
+//   }
 
-  if (previous.showIncorrect !== next.showIncorrect) {
-    return false;
-  }
+//   if (previous.showIncorrect !== next.showIncorrect) {
+//     return false;
+//   }
 
-  if (previous.relevantGuestHighlight !== next.relevantGuestHighlight) {
-    return false;
-  }
+//   if (previous.relevantGuestHighlight !== next.relevantGuestHighlight) {
+//     return false;
+//   }
 
-  if (previous.darkmode !== next.darkmode) {
-    return false;
-  }
+//   if (previous.darkmode !== next.darkmode) {
+//     return false;
+//   }
 
-  if (previous.isFocused !== next.isFocused) {
-    return false;
-  }
+//   if (previous.isFocused !== next.isFocused) {
+//     return false;
+//   }
 
-  if (previous.relevantGuess !== next.relevantGuess) {
-    return false;
-  }
+//   if (previous.relevantGuess !== next.relevantGuess) {
+//     return false;
+//   }
 
-  if (previous.relevantHighlightedSquare === next.relevantHighlightedSquare) {
-    return true;
-  }
-  return false;
-}
+//   if (previous.relevantHighlightedSquare === next.relevantHighlightedSquare) {
+//     return true;
+//   }
+//   return false;
+// }
 
 export default Square;
 
