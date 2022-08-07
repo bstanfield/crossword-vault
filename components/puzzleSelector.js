@@ -30,7 +30,14 @@ export default function PuzzleSelector({ props }) {
 
   return (
     <select
-      onChange={(event) => socketConnection.send({ type: 'newPuzzle', value: { dow: event.target.value, daily: false, dateRange } })}
+      onChange={(event) => {
+        if (event.target.value === 'Search') { 
+          // Send to /search
+        } else {
+          socketConnection.send({ type: 'newPuzzle', value: { dow: event.target.value, daily: false, dateRange } })
+        }
+      }
+      }
       css={selectStyles(darkmode)}
       name="newPuzzle"
       id="newPuzzle"
@@ -44,6 +51,7 @@ export default function PuzzleSelector({ props }) {
       <option value="Friday">Friday</option>
       <option value="Saturday">Saturday</option>
       <option value="Sunday">Sunday</option>
+      <option value="Search">Search</option>
     </select>
   )
 }
