@@ -5,6 +5,7 @@ import { scale, colors, fonts } from '../lib/helpers'
 
 export default function PuzzleSelector({ props }) {
   const {
+    room,
     darkmode,
     socketConnection,
     dateRange
@@ -31,7 +32,8 @@ export default function PuzzleSelector({ props }) {
   return (
     <select
       onChange={(event) => {
-        if (event.target.value === 'Search') { 
+        if (event.target.value === 'Search') {
+          window.location.href = `/search?room=${room}`;
           // Send to /search
         } else {
           socketConnection.send({ type: 'newPuzzle', value: { dow: event.target.value, daily: false, dateRange } })

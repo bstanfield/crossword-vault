@@ -4,7 +4,7 @@ import { useEffect, useState, Fragment } from "react";
 import { jsx } from "@emotion/react";
 import { scale, fonts, colors, ENDPOINT } from "../lib/helpers";
 import Button from "../components/button";
-import Header from "../components/header";
+import { useRouter } from 'next/router'
 
 const textInput = scale({
   padding: "8px 9px 8px 9px",
@@ -51,6 +51,16 @@ const resultBox = scale({
 export default function Search() {
   const [string, setString] = useState("");
   const [results, setResults] = useState([]);
+  const [roomOrigin, setRoomOrigin] = useState(false);
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.room) {
+      setRoomOrigin(router.query.room);
+    }
+  }, [router])
+
 
   const handleChange = (e) => {
     setString(e.target.value);
@@ -73,8 +83,8 @@ export default function Search() {
       alert("Invalid string");
       setString("");
     }
-    if (data.puzzles.matches) {
-      setResults(data.puzzles.matches);
+    if (data.puzzles) {
+      setResults(data.puzzles);
     }
   };
 
@@ -109,30 +119,37 @@ export default function Search() {
           }}
         />
 
-  
-        <p>{results.length} results found.</p>
-        {results.map(result => (
+        <p>{results.length} results found (showing newest to oldest).</p>
+        {results.reverse().map(result => (
           <div css={resultBox}>
-            <h2
-              dangerouslySetInnerHTML={{
-                __html: result.title
-              }}
+            <a href={`/${roomOrigin}?puzzle=${result.date}`}>
+              <h2
+                dangerouslySetInnerHTML={{
+                  __html: result.title
+                }}
+              />
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: `Published ${result.date}`
+                }}
+              />
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: `by ${result.author}`
+                }}
+              />
+              <br />
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: `Difficulty: ${result.dow}`
+                }}
+              />
+              <p
+                dangerouslySetInnerHTML={{
+                  __html: `“${result.match.replace(string.toLowerCase(), `<span style="background-color: #ffa500a8; border-radius: 2px;">${string.toLowerCase()}</span>`)}”`
+                }}
             />
-            <p
-              dangerouslySetInnerHTML={{
-                __html: result.author
-              }}
-            />
-            <p
-              dangerouslySetInnerHTML={{
-                __html: result.dow
-              }}
-            />
-            <p
-              dangerouslySetInnerHTML={{
-                __html: `“${result.match.replace(string, `<span style="background-color: #ffa500a8; border-radius: 2px;">${string}</span>`)}”`
-              }}
-            />
+            </a>
           </div>
         ))}
       </div>

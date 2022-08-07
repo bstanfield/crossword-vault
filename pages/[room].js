@@ -14,6 +14,7 @@ import Button from "../components/button";
 import PuzzleSelector from "../components/puzzleSelector";
 import DateSelector from "../components/DateSelector";
 import Nav from "../components/nav";
+import { useRouter } from 'next/router'
 
 export default function Room() {
   const [room, setRoom] = useState(null);
@@ -39,6 +40,7 @@ export default function Room() {
   const [showIncorrect, setShowIncorrect] = useState(false);
   const [initialGuesses, setInitialGuesses] = useState([]);
   const [guestInputChange, setGuestInputChange] = useState([]);
+  const [puzzleQuery, setPuzzleQuery] = useState(false);
 
   // Username
   const [name, setName] = useState(false);
@@ -50,6 +52,21 @@ export default function Room() {
 
   // Finish screen
   const [showFinishScreen, setShowFinishScreen] = useState(false);
+
+  // Search query hook
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.puzzle) {
+      setPuzzleQuery(router.query.puzzle);
+    }
+  }, [router])
+
+  useEffect(() => {
+    if (socketConnection && puzzleQuery) {
+      socketConnection.send({ type: 'newPuzzle', value: { query: puzzleQuery } })
+    }
+  }, [puzzleQuery])
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -344,6 +361,7 @@ export default function Room() {
 
               <PuzzleSelector
                 props={{
+                  room,
                   darkmode,
                   dateRange,
                   socketConnection,
