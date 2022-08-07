@@ -59,6 +59,9 @@ export default function Room() {
   useEffect(() => {
     if (router.query.puzzle) {
       setPuzzleQuery(router.query.puzzle);
+
+      // Now, remove URL param
+      router.replace(`/${room}?puzzle`, `/${room}`, { shallow: true });
     }
   }, [router])
 
