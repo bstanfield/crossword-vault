@@ -50,8 +50,9 @@ const resultBox = scale({
 
 export default function Search() {
   const [string, setString] = useState("");
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState(false);
   const [roomOrigin, setRoomOrigin] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   const router = useRouter();
 
@@ -60,6 +61,12 @@ export default function Search() {
       setRoomOrigin(router.query.room);
     }
   }, [router])
+
+  useEffect(() => {
+    if (string === "") {
+      setResults(false);
+    }
+  }, [string])
 
 
   const handleChange = (e) => {
@@ -77,6 +84,7 @@ export default function Search() {
       alert('Search query must be more than 3 characters long.');
       return;
     }
+    setSearching(true);
     const res = await fetch(`${ENDPOINT}/search?string=${string}`);
     const data = await res.json();
     if (data.error) {
@@ -84,8 +92,9 @@ export default function Search() {
       setString("");
     }
     if (data.puzzles) {
-      setResults(data.puzzles);
+      setResults(data.puzzles.reverse());
     }
+    setSearching(false);
   };
 
   return (
@@ -119,8 +128,11 @@ export default function Search() {
           }}
         />
 
-        <p>{results.length} results found (showing newest to oldest).</p>
-        {results.reverse().map(result => (
+        {searching && <p>Searching...</p>}
+        {!results && !searching && <p>No results yet.</p>}
+        {results && !searching && string !== "" && <p>{results.length} results found (showing newest to oldest).</p>}
+        {results && string !== "" && (
+        results.map(result => (
           <div css={resultBox}>
             <a href={`/${roomOrigin}?puzzle=${result.date}`}>
               <h2
@@ -148,10 +160,10 @@ export default function Search() {
                 dangerouslySetInnerHTML={{
                   __html: `“${result.match.replace(string.toLowerCase(), `<span style="background-color: #ffa500a8; border-radius: 2px;">${string.toLowerCase()}</span>`)}”`
                 }}
-            />
+              />
             </a>
           </div>
-        ))}
+        )))}
       </div>
     </Fragment>
   );
