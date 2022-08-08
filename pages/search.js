@@ -57,6 +57,12 @@ export default function Search() {
   const router = useRouter();
 
   useEffect(() => {
+    if (!results) {
+      searchPuzzles('*');
+    }
+  }, [])
+
+  useEffect(() => {
     if (router.query.room) {
       setRoomOrigin(router.query.room);
     }
@@ -80,7 +86,7 @@ export default function Search() {
   };
     
   const searchPuzzles = async (string) => {
-    if (string.length < 3) {
+    if (string !== '*' && string.length < 3) {
       alert('Search query must be more than 3 characters long.');
       return;
     }
@@ -130,9 +136,9 @@ export default function Search() {
 
         {searching && <p>Searching...</p>}
         {!results && !searching && <p>No results yet.</p>}
-        {results && !searching && string !== "" && <p>{results.length} results found (showing newest to oldest).</p>}
-        {results && string !== "" && (
-        results.map(result => (
+        {results && !searching && <p>{results.length} results found (showing newest to oldest).</p>}
+        {results && (
+        results.slice(0, 100).map(result => (
           <div css={resultBox}>
             <a href={`/${roomOrigin}?puzzle=${result.date}`}>
               <h2
@@ -156,14 +162,20 @@ export default function Search() {
                   __html: `Difficulty: ${result.dow}`
                 }}
               />
-              <p
+              {result.jnotes && <p
                 dangerouslySetInnerHTML={{
-                  __html: `“${result.match.replace(string.toLowerCase(), `<span style="background-color: #ffa500a8; border-radius: 2px;">${string.toLowerCase()}</span>`)}”`
+                  __html: `Notes: <span style="font-family: Georgia; font-style: italic; line-height: 1.2;">${result.jnotes}</span>`
                 }}
-              />
+              />}
+              {result.match && <p
+                dangerouslySetInnerHTML={{
+                  __html: `“${result.match.toLowerCase().replace(string.toLowerCase(), `<span style="background-color: #ffa500a8; border-radius: 2px;">${string.toLowerCase()}</span>`)}”`
+                }}
+              />}
             </a>
           </div>
         )))}
+        {results && <p>And {results.length - 100} more results...</p>}
       </div>
     </Fragment>
   );
