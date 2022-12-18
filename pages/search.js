@@ -98,7 +98,7 @@ export default function Search() {
       setString("");
     }
     if (data.puzzles) {
-      setResults(data.puzzles.reverse());
+      setResults(data.puzzles.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
     }
     setSearching(false);
   };
@@ -175,7 +175,7 @@ export default function Search() {
             </a>
           </div>
         )))}
-        {results && <p>And {results.length - 100} more results...</p>}
+        {results.length > 100 && <p>And {results.length - 100} more results...</p>}
       </div>
     </Fragment>
   );
