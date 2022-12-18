@@ -49,7 +49,7 @@ const resultBox = scale({
 })
 
 export default function Search() {
-  const [string, setString] = useState("");
+  const [string, setString] = useState('*');
   const [results, setResults] = useState(false);
   const [roomOrigin, setRoomOrigin] = useState(false);
   const [searching, setSearching] = useState(false);
@@ -100,6 +100,9 @@ export default function Search() {
     if (data.puzzles) {
       setResults(data.puzzles.sort((a, b) => Date.parse(b.date) - Date.parse(a.date)));
     }
+    if (!data.puzzles) {
+      setResults([]);
+    }
     setSearching(false);
   };
 
@@ -134,9 +137,10 @@ export default function Search() {
           }}
         />
 
-        {searching && <p>Searching...</p>}
+        {searching && string === '*' && <p>Retrieving newest puzzles from the Vault...</p>}
+        {searching && string !== '*' && <p>Searching...</p>}
         {!results && !searching && <p>No results yet.</p>}
-        {results && !searching && <p>{results.length} results found (showing newest to oldest).</p>}
+        {results && !searching && <p><b>{results.length}</b> puzzles found (showing newest to oldest).</p>}
         {results && (
         results.slice(0, 100).map(result => (
           <div css={resultBox}>
@@ -162,11 +166,6 @@ export default function Search() {
                   __html: `Difficulty: ${result.dow}`
                 }}
               />
-              {result.jnotes && <p
-                dangerouslySetInnerHTML={{
-                  __html: `Notes: <span style="font-family: Georgia; font-style: italic; line-height: 1.2;">${result.jnotes}</span>`
-                }}
-              />}
               {result.match && <p
                 dangerouslySetInnerHTML={{
                   __html: `“${result.match.toLowerCase().replace(string.toLowerCase(), `<span style="background-color: #ffa500a8; border-radius: 2px;">${string.toLowerCase()}</span>`)}”`
