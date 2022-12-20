@@ -427,7 +427,7 @@ function Square({ props }) {
                 // TODO: Rename
                 const inputToFill = {
                   position: content.position,
-                  letter: input.nativeEvent.data,
+                  letter: input.nativeEvent.data.toLowerCase(),
                   iterator: selectionIterator,
                 };
                 setFilledInput({ ...inputToFill });

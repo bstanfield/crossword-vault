@@ -34,7 +34,7 @@ export default function Index() {
   };
 
   const checkKey = async (key) => {
-    const res = await fetch(`${ENDPOINT}/secret?key=${key}`);
+    const res = await fetch(`${ENDPOINT}/secret?key=${key.toLowerCase()}`);
     const data = await res.json();
     if (data.error) {
       alert("Invalid key");

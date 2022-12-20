@@ -91,7 +91,14 @@ export default function Search() {
       return;
     }
     setSearching(true);
-    const res = await fetch(`${ENDPOINT}/search?string=${string}`);
+    const res = await fetch(`${ENDPOINT}/search?string=${string}`,
+      {
+        method: "get",
+        headers: new Headers({
+          "ngrok-skip-browser-warning": "69420",
+        }),
+      }
+    );
     const data = await res.json();
     if (data.error) {
       alert("Invalid string");
