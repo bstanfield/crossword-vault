@@ -96,28 +96,33 @@ const setBorderColor = (
   isFocused,
   guestHighlight,
   showIncorrect,
-  inputData
+  inputData,
+  isMobile
 ) => {
   // z index is bad
+
+  const thickness = isMobile ? 1 : 2;
   if (
     showIncorrect &&
     inputData &&
     content.letter !== inputData.toUpperCase()
   ) {
-    return `2px solid ${colors.error}`;
+    return `${thickness}px solid ${colors.error}`;
   }
   if (isFocused) {
-    return "2px solid black";
+    return `${thickness}px solid black`;
   }
   if (filled || relevantHighlightedSquare) {
-    return "2px solid black";
+    return `${thickness}px solid black`;
   }
   if (guestHighlight) {
-    return `2px solid ${
+    return `${thickness}px solid ${
       darkmode ? guestHighlight.color.dark_high : guestHighlight.color.high
     }`;
   }
-  return darkmode ? `2px solid ${colors.slate}` : "2px solid black";
+  return darkmode
+    ? `${thickness}px solid ${colors.slate}`
+    : `${thickness}px solid black`;
 };
 
 const setZIndex = (
@@ -329,16 +334,30 @@ function Square({ props }) {
     marginLeft: -2,
     marginBottom: -2,
     borderRadius: 2,
-    border: setBorderColor(
-      darkmode,
-      filledInput === content.position,
-      relevantHighlightedSquare,
-      content,
-      isFocused,
-      guestHighlight,
-      showIncorrect,
-      inputData
-    ),
+    border: [
+      setBorderColor(
+        darkmode,
+        filledInput === content.position,
+        relevantHighlightedSquare,
+        content,
+        isFocused,
+        guestHighlight,
+        showIncorrect,
+        inputData,
+        true
+      ),
+      setBorderColor(
+        darkmode,
+        filledInput === content.position,
+        relevantHighlightedSquare,
+        content,
+        isFocused,
+        guestHighlight,
+        showIncorrect,
+        inputData,
+        false
+      ),
+    ],
     zIndex: setZIndex(
       showIncorrect,
       inputData,

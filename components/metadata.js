@@ -64,16 +64,16 @@ export default function Metadata({ props }) {
           : `${data.dow}, ${formatDate(data.date)}`}
       </h1>
       <p
-        css={{
+        css={scale({
           padding: 0,
-          marginLeft: 8,
+          marginLeft: [0, 0, 8, 8],
           marginTop: 6,
           marginBottom: -8,
           display: "inline-block",
-        }}
+        })}
       >
         {data ? "by " + data.author : "Retrieving puzzle details..."}{" "}
-        {/* <a
+        <a
           style={{
             fontSize: 14,
             color: darkmode ? "#8e8e8e" : "blue",
@@ -84,7 +84,7 @@ export default function Metadata({ props }) {
           target="_blank"
         >
           (Details)
-        </a> */}
+        </a>
       </p>
       {data && data.dow === "Sunday" && (
         <p css={{ padding: 0, marginTop: 6, marginBottom: -8 }}>

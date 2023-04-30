@@ -19,11 +19,6 @@ export default function DateSelector({ props }) {
       fontFamily: fonts.monospace,
       cursor: "pointer",
       border: "1px solid transparent",
-      "&:hover": {
-        border: darkmode
-          ? `1px solid ${colors.lightgrey}`
-          : `1px solid ${colors.slate}`,
-      },
       WebkitAppearance: "none",
       MozAppearance: "none",
     });
@@ -45,6 +40,7 @@ export default function DateSelector({ props }) {
       <option value="2015+">2015+</option>
       <option value="2021">2021</option>
       <option value="2022">2022</option>
+      <option value="2023">2023</option>
     </select>
   );
 }

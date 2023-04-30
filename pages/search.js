@@ -135,7 +135,6 @@ export default function Search() {
             onClickFn: () => searchPuzzles(string),
             darkmode: false,
             text: "Search",
-            icon: { name: "search-outline", size: 16 },
           }}
         />
 

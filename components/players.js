@@ -22,7 +22,7 @@ const collapseBox = (isCollapsed) =>
   scale({
     float: "left",
     marginTop: isCollapsed ? -18 : 2,
-    marginLeft: -34,
+    marginLeft: [-16, -16, -34, -34],
     fontSize: 20,
     p: {
       marginLeft: 12,
@@ -57,22 +57,6 @@ export default function Players({ props }) {
       <div css={playersBox(isCollapsed)}>
         <Button
           props={{
-            onClickFn: () =>
-              socketConnection.send({
-                type: "newPuzzle",
-                value: { dow: null, daily: true },
-              }),
-            darkmode,
-            text: "Today's Puzzle!",
-            icon: {
-              name: "star",
-              size: 14,
-            },
-            backgroundColor: "#ffa500",
-          }}
-        />
-        <Button
-          props={{
             onClickFn: () => {
               localStorage.setItem("darkmode", !darkmode);
               setDarkmode(!darkmode);
@@ -83,6 +67,7 @@ export default function Players({ props }) {
               name: darkmode ? "sunny" : "moon",
               size: 13,
             },
+            backgroundColor: "transparent !important",
           }}
         />
         <Button
