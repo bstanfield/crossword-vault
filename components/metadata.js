@@ -73,7 +73,7 @@ export default function Metadata({ props }) {
         }}
       >
         {data ? "by " + data.author : "Retrieving puzzle details..."}{" "}
-        <a
+        {/* <a
           style={{
             fontSize: 14,
             color: darkmode ? "#8e8e8e" : "blue",
@@ -84,7 +84,7 @@ export default function Metadata({ props }) {
           target="_blank"
         >
           (Details)
-        </a>
+        </a> */}
       </p>
       {data && data.dow === "Sunday" && (
         <p css={{ padding: 0, marginTop: 6, marginBottom: -8 }}>
