@@ -64,7 +64,7 @@ export default function Index() {
         css={{
           textAlign: "center",
           position: "absolute",
-          top: "60vh",
+          top: "30vh",
           bottom: 0,
           right: 0,
           left: 0,

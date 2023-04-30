@@ -4,31 +4,52 @@
 import { jsx } from "@emotion/react";
 import styles from "../lib/boardStyles";
 import Players from "../components/players";
-import React from "react";
+import React, { useState } from "react";
 
 function Nav({ props }) {
   const { darkmode, setDarkmode, players, socketConnection } = props;
-  return (
-    <div
-      css={{
-        borderBottom: `1px solid ${
-          darkmode ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.2)"
-        }`,
-        zIndex: 2,
-        position: "absolute",
-        width: "100%",
-        height: "50px",
-        top: 12,
-        left: 0,
-        right: 0,
-        margin: "auto",
-      }}
-    >
-      <div css={styles.navContainer}>
-        <Players props={{ darkmode, setDarkmode, players, socketConnection }} />
+  const [isCollapsed, setCollapsed] = useState(false);
 
-        <div>
-          <p css={styles.logo}>Word Vault</p>
+  const handleIsCollapsed = () => {
+    setCollapsed(!isCollapsed);
+  };
+
+  return (
+    <div css={{ marginBottom: isCollapsed ? "20px" : "90px" }}>
+      <div
+        css={{
+          borderBottom: isCollapsed
+            ? "none"
+            : `1px solid ${
+                darkmode ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.2)"
+              }`,
+          zIndex: 2,
+          position: "absolute",
+          width: "100%",
+          height: isCollapsed ? "0px" : "50px",
+          top: 12,
+          left: 0,
+          right: 0,
+          margin: "auto",
+        }}
+      >
+        <div css={styles.navContainer}>
+          <Players
+            props={{
+              isCollapsed,
+              handleIsCollapsed,
+              darkmode,
+              setDarkmode,
+              players,
+              socketConnection,
+            }}
+          />
+
+          {!isCollapsed && (
+            <div>
+              <p css={styles.logo}>Word Vault</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
