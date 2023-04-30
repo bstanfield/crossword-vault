@@ -1,8 +1,10 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/react";
 import styles from "../lib/boardStyles";
 import Players from "../components/players";
+import React from "react";
 
 function Nav({ props }) {
   const { darkmode, setDarkmode, players, socketConnection } = props;

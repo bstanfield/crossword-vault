@@ -1,9 +1,11 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/react";
 import { Fragment } from "react";
 import styles from "../lib/boardStyles";
 import Clue from "../components/clue";
+import React from "react";
 
 function Clues({ props }) {
   const {

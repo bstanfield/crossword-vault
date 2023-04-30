@@ -1,51 +1,54 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 
-import { jsx } from '@emotion/react'
-import { scale, colors, fonts } from '../lib/helpers'
+import { jsx } from "@emotion/react";
+import { scale, colors, fonts } from "../lib/helpers";
 
 export default function PuzzleSelector({ props }) {
-  const {
-    room,
-    darkmode,
-    socketConnection,
-    dateRange
-  } = props
+  const { room, darkmode, socketConnection, dateRange } = props;
 
-  const selectStyles = (darkmode) => scale({
-    display: 'inline-block',
-    margin: 0,
-    padding: 8,
-    backgroundColor: darkmode ? colors.slate : colors.lightgrey,
-    fontSize: 13,
-    color: darkmode ? colors.lightgrey : colors.slate,
-    borderRadius: 2,
-    fontFamily: fonts.monospace,
-    cursor: 'pointer',
-    border: '1px solid transparent',
-    '&:hover': {
-      border: darkmode ? `1px solid ${colors.lightgrey}` : `1px solid ${colors.slate}`,
-    },
-    WebkitAppearance: 'none',
-    MozAppearance: 'none',
-  })
+  const selectStyles = (darkmode) =>
+    scale({
+      display: "inline-block",
+      margin: 0,
+      padding: 8,
+      backgroundColor: darkmode ? colors.slate : colors.lightgrey,
+      fontSize: 13,
+      color: darkmode ? colors.lightgrey : colors.slate,
+      borderRadius: 2,
+      fontFamily: fonts.monospace,
+      cursor: "pointer",
+      border: "1px solid transparent",
+      "&:hover": {
+        border: darkmode
+          ? `1px solid ${colors.lightgrey}`
+          : `1px solid ${colors.slate}`,
+      },
+      WebkitAppearance: "none",
+      MozAppearance: "none",
+    });
 
   return (
     <select
       onChange={(event) => {
-        if (event.target.value === 'Search') {
+        if (event.target.value === "Search") {
           window.location.href = `/search?room=${room}`;
           // Send to /search
         } else {
-          socketConnection.send({ type: 'newPuzzle', value: { dow: event.target.value, daily: false, dateRange } })
+          socketConnection.send({
+            type: "newPuzzle",
+            value: { dow: event.target.value, daily: false, dateRange },
+          });
         }
-      }
-      }
+      }}
       css={selectStyles(darkmode)}
       name="newPuzzle"
       id="newPuzzle"
       defaultValue="New puzzle ▼"
     >
-      <option value="New puzzle ▼" disabled>New puzzle ▼</option>
+      <option value="New puzzle ▼" disabled>
+        New puzzle ▼
+      </option>
       <option value="Monday">Monday</option>
       <option value="Tuesday">Tuesday</option>
       <option value="Wednesday">Wednesday</option>
@@ -55,5 +58,5 @@ export default function PuzzleSelector({ props }) {
       <option value="Sunday">Sunday</option>
       <option value="Search">Search</option>
     </select>
-  )
+  );
 }

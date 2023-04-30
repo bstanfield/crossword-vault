@@ -1,8 +1,10 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/react";
 import { scale } from "../lib/helpers";
 import { useEffect, useState } from "react";
+import React from "react";
 
 const clueStyle = (darkmode, highlight) =>
   scale({
