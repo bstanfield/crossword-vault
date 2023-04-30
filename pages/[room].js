@@ -42,6 +42,7 @@ export default function Room() {
   const [initialGuesses, setInitialGuesses] = useState([]);
   const [guestInputChange, setGuestInputChange] = useState([]);
   const [puzzleQuery, setPuzzleQuery] = useState(false);
+  const [isCollapsed, setCollapsed] = useState(false);
 
   // Username
   const [name, setName] = useState(false);
@@ -301,10 +302,19 @@ export default function Room() {
 
         {/* Causing issue on-reload in Safari */}
         {/* <Shortcuts props={{ show: showSidePanel, darkmode }} /> */}
-        <Nav props={{ darkmode, setDarkmode, players, socketConnection }} />
+        <Nav
+          props={{
+            isCollapsed,
+            setCollapsed,
+            darkmode,
+            setDarkmode,
+            players,
+            socketConnection,
+          }}
+        />
         <div css={styles.appContainer}>
           <main>
-            <Metadata props={{ data, darkmode }} />
+            {!isCollapsed && <Metadata props={{ data, darkmode }} />}
             <Game
               props={{
                 filledAtTimestamp,

@@ -4,15 +4,17 @@
 import { jsx } from "@emotion/react";
 import styles from "../lib/boardStyles";
 import Players from "../components/players";
-import React, { useState } from "react";
+import React from "react";
 
 function Nav({ props }) {
-  const { darkmode, setDarkmode, players, socketConnection } = props;
-  const [isCollapsed, setCollapsed] = useState(false);
-
-  const handleIsCollapsed = () => {
-    setCollapsed(!isCollapsed);
-  };
+  const {
+    isCollapsed,
+    setCollapsed,
+    darkmode,
+    setDarkmode,
+    players,
+    socketConnection,
+  } = props;
 
   return (
     <div css={{ marginBottom: isCollapsed ? "20px" : "90px" }}>
@@ -37,7 +39,7 @@ function Nav({ props }) {
           <Players
             props={{
               isCollapsed,
-              handleIsCollapsed,
+              setCollapsed,
               darkmode,
               setDarkmode,
               players,
@@ -61,6 +63,10 @@ function areEqual(prevProps, nextProps) {
   const next = nextProps.props;
 
   // Only re-render Nav if players, darkmode, or socketConnection change
+  if (previous.isCollapsed !== next.isCollapsed) {
+    return false;
+  }
+
   if (previous.players !== next.players) {
     return false;
   }

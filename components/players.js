@@ -18,20 +18,21 @@ const playersBox = (isCollapsed) =>
     },
   });
 
-const collapseBox = scale({
-  float: "left",
-  marginTop: 2,
-  marginLeft: -24,
-  fontSize: 20,
-  p: {
-    marginLeft: 12,
-  },
-});
+const collapseBox = (isCollapsed) =>
+  scale({
+    float: "left",
+    marginTop: isCollapsed ? -18 : 2,
+    marginLeft: -34,
+    fontSize: 20,
+    p: {
+      marginLeft: 12,
+    },
+  });
 
 export default function Players({ props }) {
   const {
     isCollapsed,
-    handleIsCollapsed,
+    setCollapsed,
     darkmode,
     players,
     setDarkmode,
@@ -40,14 +41,14 @@ export default function Players({ props }) {
 
   return (
     <Fragment>
-      <div css={collapseBox}>
+      <div css={collapseBox(isCollapsed)}>
         <Button
           props={{
-            onClickFn: () => handleIsCollapsed(),
+            onClickFn: () => setCollapsed(!isCollapsed),
             darkmode,
-            text: isCollapsed ? "Open" : "Collapse",
+            text: isCollapsed ? "Expand" : "Collapse",
             icon: {
-              name: "chevron-down",
+              name: isCollapsed ? "chevron-down" : "chevron-up",
               size: 14,
             },
           }}
