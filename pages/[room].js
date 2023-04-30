@@ -1,3 +1,4 @@
+/** @jsxRuntime classic */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/react";
@@ -14,7 +15,7 @@ import Button from "../components/button";
 import PuzzleSelector from "../components/puzzleSelector";
 import DateSelector from "../components/DateSelector";
 import Nav from "../components/nav";
-import { useRouter } from 'next/router'
+import { useRouter } from "next/router";
 
 export default function Room() {
   const [room, setRoom] = useState(null);
@@ -63,13 +64,16 @@ export default function Room() {
       // Now, remove URL param
       router.replace(`/${room}?puzzle`, `/${room}`, { shallow: true });
     }
-  }, [router])
+  }, [router]);
 
   useEffect(() => {
     if (socketConnection && puzzleQuery) {
-      socketConnection.send({ type: 'newPuzzle', value: { query: puzzleQuery } })
+      socketConnection.send({
+        type: "newPuzzle",
+        value: { query: puzzleQuery },
+      });
     }
-  }, [puzzleQuery])
+  }, [puzzleQuery]);
 
   useEffect(() => {
     const path = window.location.pathname;
@@ -300,7 +304,7 @@ export default function Room() {
         <Nav props={{ darkmode, setDarkmode, players, socketConnection }} />
         <div css={styles.appContainer}>
           <main>
-            <Metadata props={{ data }} />
+            <Metadata props={{ data, darkmode }} />
             <Game
               props={{
                 filledAtTimestamp,
