@@ -426,6 +426,7 @@ function Square({ props }) {
               e.preventDefault();
               setFocus(content.position);
               setSelectedSquare(content.position);
+              console.log(`Setting selected square as ${content.position}!`);
             }}
             onBlur={() => {
               setClickCount(0);
