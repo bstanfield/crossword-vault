@@ -1,4 +1,3 @@
-/** @jsxRuntime classic */
 /** @jsx jsx */
 
 import { jsx } from "@emotion/react";
@@ -157,7 +156,7 @@ export default function Board({ props }) {
           setClueIndex(nextClue);
           setHighlightedSquares(groupingsToUse[nextClue]);
           const nextLocation = groupingsToUse[nextClue][0];
-          // document.getElementById(`input-${nextLocation}`).focus();
+          document.getElementById(`input-${nextLocation}`).focus();
         }
       }
 
@@ -170,7 +169,7 @@ export default function Board({ props }) {
           setClueIndex(previousClue);
           setHighlightedSquares(groupingsToUse[previousClue]);
           const previousLocation = groupingsToUse[previousClue][0];
-          // document.getElementById(`input-${previousLocation}`).focus();
+          document.getElementById(`input-${previousLocation}`).focus();
         }
       }
 
