@@ -207,6 +207,7 @@ function Square({ props }) {
     setInputChangeToApi,
     guesses,
     relevantGuestNametag,
+    squareToFocus,
   } = props;
 
   const [clickCount, setClickCount] = useState(0);
@@ -230,6 +231,14 @@ function Square({ props }) {
       setMovementDirection(movementDirection === "across" ? "down" : "across");
     }
   }, [clickCount]);
+
+  useEffect(() => {
+    if (squareToFocus === content.position) {
+      document.getElementById(`input-${content.position}`).focus();
+      setFocus(content.position);
+      setSelectedSquare(content.position);
+    }
+  }, [squareToFocus]);
 
   // Runs every time the user moves!
   // Good
@@ -424,14 +433,15 @@ function Square({ props }) {
             }}
             onFocus={(e) => {
               e.preventDefault();
-              setFocus(content.position);
-              setSelectedSquare(content.position);
+              // Handled in useEffect to avoid unnecessary re-renders
             }}
             onBlur={() => {
               setClickCount(0);
             }}
             onClick={() => {
+              setFocus(content.position);
               setSelectedSquare(content.position);
+              document.getElementById(`input-${content.position}`).focus();
               setClickCount(clickCount + 1);
             }}
             css={squareInput}
