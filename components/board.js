@@ -37,8 +37,9 @@ export default function Board({ props }) {
   const [filledInput, setFilledInput] = useState(false);
   // Is a square focused?
   const [focus, setFocus] = useState(false);
-  // HACK
+  // HACKS
   const [uploadGuess, setUploadGuess] = useState(false);
+  const [squareToFocus, setSquareToFocus] = useState(false);
 
   // Keyboard shortcuts
   const [backspace, setBackspace] = useState(false);
@@ -81,7 +82,7 @@ export default function Board({ props }) {
     if (newFocus !== false) {
       const groupingsToUse =
         movementDirection === "across" ? acrossGroupings : downGroupings;
-      document.getElementById(`input-${groupingsToUse[newFocus][0]}`).focus();
+      setSquareToFocus(groupingsToUse[newFocus][0]);
     }
   }, [newFocus]);
 
@@ -95,7 +96,7 @@ export default function Board({ props }) {
       const nextLocation = highlightedSquares[currentLocation + 1];
 
       if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus();
+        setSquareToFocus(nextLocation);
       } else {
         setFilledInput(false);
       }
@@ -114,7 +115,7 @@ export default function Board({ props }) {
       const nextLocation = highlightedSquares[currentLocation - 1];
 
       if (highlightedSquares.indexOf(nextLocation) !== -1) {
-        document.getElementById(`input-${nextLocation}`).focus();
+        setSquareToFocus(nextLocation);
       }
       // Reset
       setBackspace(false);
@@ -141,7 +142,7 @@ export default function Board({ props }) {
             `input-${nextLocation}`
           );
           if (nextLocationInput) {
-            document.getElementById(`input-${nextLocation}`).focus();
+            setSquareToFocus(nextLocation);
           }
         }
       }
@@ -156,7 +157,7 @@ export default function Board({ props }) {
           setClueIndex(nextClue);
           setHighlightedSquares(groupingsToUse[nextClue]);
           const nextLocation = groupingsToUse[nextClue][0];
-          document.getElementById(`input-${nextLocation}`).focus();
+          setSquareToFocus(nextLocation);
         }
       }
 
@@ -169,7 +170,7 @@ export default function Board({ props }) {
           setClueIndex(previousClue);
           setHighlightedSquares(groupingsToUse[previousClue]);
           const previousLocation = groupingsToUse[previousClue][0];
-          document.getElementById(`input-${previousLocation}`).focus();
+          setSquareToFocus(previousLocation);
         }
       }
 
@@ -250,6 +251,7 @@ export default function Board({ props }) {
               nametagLocations,
               content
             ),
+            squareToFocus,
             isFocused: focus === content.position,
             name,
             uploadGuess,
