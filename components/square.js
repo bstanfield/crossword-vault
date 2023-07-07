@@ -332,7 +332,7 @@ function Square({ props }) {
       showIncorrect,
       inputData
     ),
-    // transition: 'background-color 0.1s ease-in-out',
+    transition: "background-color 0.1s ease-in-out",
   });
 
   const squareBox = scale({
