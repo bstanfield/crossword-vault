@@ -432,7 +432,8 @@ function Square({ props }) {
             }}
             onFocus={(e) => {
               e.preventDefault();
-              // Handled in useEffect to avoid unnecessary re-renders
+              // const mobileClueDiv = document.querySelector("#mobile-clue");
+              // mobileClueDiv.classList.add("sticky");
             }}
             onBlur={() => {
               setClickCount(0);
@@ -445,6 +446,7 @@ function Square({ props }) {
             }}
             css={squareInput}
             type="text"
+            inputMode="none"
             id={`input-${content.position}`}
             defaultValue={inputData}
             onBeforeInput={(input) => {

@@ -12,6 +12,7 @@ const textInput = scale({
   borderRadius: 2,
   marginRight: 12,
   fontFamily: fonts.monospace,
+  textTransform: "lowercase",
   "&::placeholder": {
     fontFamily: fonts.monospace,
   },
