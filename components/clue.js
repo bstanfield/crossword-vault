@@ -49,6 +49,7 @@ function Clue({ props }) {
     setCurrentClueText,
   } = props;
   const [highlight, setHighlight] = useState(false);
+  const [parsedHtml, setParsedHtml] = useState("");
 
   useEffect(() => {
     if (relevantClue) {
@@ -67,6 +68,25 @@ function Clue({ props }) {
     // setFocus(false)
   }, [relevantClue, movementDirection]);
 
+  useEffect(() => {
+    // Extract HTML from clue
+    const htmlString = clue.substring(clue.indexOf(".") + 1);
+
+    // Use the DOMParser to parse the string to a DOM
+    const parser = new DOMParser();
+    const html = parser.parseFromString(htmlString, "text/html");
+
+    // Find the img element
+    const imgElement = html.querySelector("img");
+    if (imgElement && imgElement.alt) {
+      // If the img and alt exists, use the alt text
+      setParsedHtml(imgElement.alt);
+    } else {
+      // Otherwise, use the original HTML string
+      setParsedHtml(htmlString);
+    }
+  }, [clue]);
+
   return (
     <li
       css={clueStyle(darkmode, highlight)}
@@ -81,7 +101,7 @@ function Clue({ props }) {
       <strong>{clue.split(".")[0]}.</strong>{" "}
       <span
         dangerouslySetInnerHTML={{
-          __html: clue.substring(clue.indexOf(".") + 1),
+          __html: parsedHtml,
         }}
       />
     </li>
