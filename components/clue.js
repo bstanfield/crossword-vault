@@ -80,7 +80,7 @@ function Clue({ props }) {
     const imgElement = html.querySelector("img");
     if (imgElement && imgElement.alt) {
       // If the img and alt exists, use the alt text
-      setParsedHtml(imgElement.alt);
+      setParsedHtml(`[Image alt text] ${imgElement.alt}`);
     } else {
       // Otherwise, use the original HTML string
       setParsedHtml(htmlString);
