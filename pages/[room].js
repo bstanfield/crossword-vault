@@ -226,7 +226,7 @@ export default function Room() {
 
   if (!data || loading || !socketConnection) {
     return (
-      <div css={[styles.appBackground(darkmode), { height: "100vh" }]}>
+      <div css={[styles.appBackground(darkmode), { height: "100%" }]}>
         <Header props={{ isLoading: true }} />
         <div css={styles.loadingSpinner}>
           <div css={styles.loadingRing}>

@@ -258,31 +258,6 @@ function Square({ props }) {
     }
   }, [relevantGuess]);
 
-  const handleKeyDown = (e) => {
-    if (e.key === " ") {
-      e.preventDefault();
-    }
-
-    if (e.key === "Backspace") {
-      // This is a dumb method. Just see if the box is empty. If it is, move back
-      if (!inputData) {
-        setBackspace(true);
-      }
-      setInputData("");
-      const inputToFill = {
-        position: content.position,
-        letter: "",
-        iterator: 0,
-      };
-
-      setInputChangeToApi({ ...inputToFill });
-      // TODO: setGuesses shouldn't happen at square level...
-      let newGuesses = guesses;
-      newGuesses[content.position - 1] = "";
-      setGuesses([...newGuesses]);
-    }
-  };
-
   const isGuestHighlight = () => {
     if (guestHighlights) {
       // Replace this deletion with a new method outside of Square
@@ -317,7 +292,7 @@ function Square({ props }) {
     textAlign: "center",
     fontSize: ["17px", "20px", "25px", "25px"],
     lineHeight: 0,
-    paddingTop: 4,
+    paddingTop: "50%",
     fontWeight: 500,
     borderRadius: 0,
     webkitBorderRadius: 0,
@@ -390,92 +365,91 @@ function Square({ props }) {
     },
   });
 
+  const handleGlobalKeyDown = (event) => {
+    if (content.letter !== "." && isFocused) {
+      if (/^[a-z]$/i.test(event.key)) {
+        event.preventDefault();
+
+        const letter = event.key.toLowerCase();
+
+        // Handle your input here...
+
+        setInputData(letter);
+        setSelectionIterator(selectionIterator + 1);
+
+        const inputToFill = {
+          position: content.position,
+          letter,
+          iterator: selectionIterator,
+        };
+        setFilledInput({ ...inputToFill });
+        setInputChangeToApi({ ...inputToFill });
+
+        let newGuesses = guesses;
+        newGuesses[content.position - 1] = letter;
+        setGuesses([...newGuesses]);
+        setUploadGuess(uploadGuess ? false : true);
+      } else if (event.key === "Backspace") {
+        if (!inputData) {
+          setBackspace(true);
+        }
+        setInputData("");
+        const inputToFill = {
+          position: content.position,
+          letter: "",
+          iterator: 0,
+        };
+
+        setInputChangeToApi({ ...inputToFill });
+        // TODO: setGuesses shouldn't happen at square level...
+        let newGuesses = guesses;
+        newGuesses[content.position - 1] = "";
+        setGuesses([...newGuesses]);
+      }
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener("keydown", handleGlobalKeyDown);
+
+    // Remember to remove event listener on unmount
+    return () => {
+      window.removeEventListener("keydown", handleGlobalKeyDown);
+    };
+  }, [content, isFocused, inputData, selectionIterator, guesses, uploadGuess]);
+
   return (
     <div id={content.position} css={squareBox}>
-      <form css={form} autoComplete="off" onSubmit={(e) => e.preventDefault()}>
-        {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
-        {/* {content.leter !== "." && (
-          <span css={blockLetter}>{content.letter}</span>
-        )} */}
+      {content.number > 0 && <span css={blockNumber}>{content.number}</span>}
 
-        {/* Shows client username above square */}
-        <Nametag
-          props={{
-            isFocused,
-            clientId,
-            colorLookup,
-            name,
-            guestHighlight,
-            nametagData,
-            nametagLocations,
-            content,
-            darkmode,
+      <Nametag
+        props={{
+          isFocused,
+          clientId,
+          colorLookup,
+          name,
+          guestHighlight,
+          nametagData,
+          nametagLocations,
+          content,
+          darkmode,
+        }}
+      />
+
+      {content.letter !== "." && (
+        <div
+          onClick={() => {
+            setFocus(content.position);
+            setSelectedSquare(content.position);
+            setClickCount(clickCount + 1);
           }}
-        />
+          css={squareInput}
+          id={`input-${content.position}`}
+        >
+          {inputData}
+        </div>
+      )}
 
-        {/* Skips rendering input for black squares */}
-        {content.letter !== "." && (
-          <input
-            onKeyDown={handleKeyDown}
-            autoComplete="off"
-            onPaste={(e) => {
-              e.preventDefault();
-              return false;
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              return false;
-            }}
-            onCopy={(e) => {
-              e.preventDefault();
-              return false;
-            }}
-            onFocus={(e) => {
-              e.preventDefault();
-              // const mobileClueDiv = document.querySelector("#mobile-clue");
-              // mobileClueDiv.classList.add("sticky");
-            }}
-            onBlur={() => {
-              setClickCount(0);
-            }}
-            onClick={() => {
-              setFocus(content.position);
-              setSelectedSquare(content.position);
-              document.getElementById(`input-${content.position}`).focus();
-              setClickCount(clickCount + 1);
-            }}
-            css={squareInput}
-            type="text"
-            inputMode="none"
-            id={`input-${content.position}`}
-            defaultValue={inputData}
-            onBeforeInput={(input) => {
-              input.preventDefault();
-              if (input.nativeEvent.data && input.nativeEvent.data !== "") {
-                setInputData(input.nativeEvent.data);
-                setSelectionIterator(selectionIterator + 1);
-
-                // TODO: Rename
-                const inputToFill = {
-                  position: content.position,
-                  letter: input.nativeEvent.data.toLowerCase(),
-                  iterator: selectionIterator,
-                };
-                setFilledInput({ ...inputToFill });
-                setInputChangeToApi({ ...inputToFill });
-
-                let newGuesses = guesses;
-                newGuesses[content.position - 1] = input.nativeEvent.data;
-                setGuesses([...newGuesses]);
-                // TODO: Remove if array spread operator fixes useEffect
-                // picking up changes to state
-                setUploadGuess(uploadGuess ? false : true);
-              }
-            }}
-            name={content.letter}
-          />
-        )}
-      </form>
       {circle === 1 && <div css={circleClue}></div>}
     </div>
   );
